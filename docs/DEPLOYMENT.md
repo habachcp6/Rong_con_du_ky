@@ -19,6 +19,12 @@ npm run validate:client-build
 docker build -t rong-con-du-ky .
 ```
 
+For a local browser Auth/Firestore smoke, start the Auth and Firestore
+emulators, run Vite with the dummy emulator config from `.env.example`, then
+run `npm run test:firebase:browser`. This must report `Đã đồng bộ`/`Synced`,
+successful `:9099` and `:8080` responses, and no browser errors. It does not
+replace a production Firebase project smoke.
+
 `test:e2e:bridge` is development-only verification; the production client bundle check must still pass with the bridge absent. Run `npm run test:e2e:record` separately when technical video evidence is needed; it is not a release gate for a public URL.
 
 Tạo secrets cho production: `GEMINI_API_KEY` (và chỉ Standard: `GOOGLE_MAPS_API_KEY`). Không bật `ALLOW_LOCAL_AUTH`; không đặt `VITE_USE_FIREBASE_EMULATORS=true`; không đưa service-account JSON vào image.

@@ -19,6 +19,7 @@
     "test:e2e": "playwright test",
     "test:e2e:bridge": "node --import tsx scripts/run-e2e-bridge.ts",
     "test:e2e:record": "node --import tsx scripts/run-e2e-record.ts",
+    "test:firebase:browser": "node --import tsx scripts/run-firebase-browser-smoke.ts",
     "test:rules": "firebase emulators:exec --project demo-rong-con-du-ky --only auth,firestore \"vitest run --config vitest.rules.config.ts\"",
     "validate:content": "node --import tsx scripts/validate-content.ts",
     "validate:assets": "node --import tsx scripts/validate-assets.ts",
