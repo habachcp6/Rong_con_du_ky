@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "cards": [
+    {
+      "id": "banh_xeo_ba_duong",
+      "placeId": null,
+      "placeIdStatus": "unverified",
+      "landmarkKey": "dragon_bridge",
+      "nameVi": "Bánh Xèo Bà Dưỡng",
+      "nameEn": "Banh Xeo Ba Duong",
+      "descriptionVi": "Thẻ gợi ý món bánh xèo đã biên tập cho hành trình gần khu trung tâm. Hãy mở Google Maps và kiểm tra thông tin hiện hành trước khi đi.",
+      "descriptionEn": "An authored banh xeo suggestion for a city-centre itinerary. Open Google Maps and verify current information before visiting.",
+      "address": "K280/23 Hoàng Diệu, Hải Châu, Đà Nẵng",
+      "priceRange": "budget",
+      "dietary": "any",
+      "googleMapsUri": "https://www.google.com/maps/search/?api=1&query=B%C3%A1nh%20X%C3%A8o%20B%C3%A0%20D%C6%B0%E1%BB%A1ng%2C%20%C4%90%C3%A0%20N%E1%BA%B5ng",
+      "sourceIds": [
+        "source_food_banh_xeo_ba_duong_01",
+        "source_starter_curation_01"
+      ]
+    },
+    {
+      "id": "hoangs_kitchen",
+      "placeId": null,
+      "placeIdStatus": "unverified",
+      "landmarkKey": "my_khe_beach",
+      "nameVi": "Hoang's Kitchen Đà Nẵng",
+      "nameEn": "Hoang's Kitchen Da Nang",
+      "descriptionVi": "Lựa chọn đã biên tập có món chay và thuần chay cho hành trình gần bãi biển. Hãy xác nhận thực đơn và khả năng phục vụ phù hợp với nhu cầu của bạn trước khi đi.",
+      "descriptionEn": "An authored option with vegetarian and vegan dishes for a beach-area itinerary. Confirm the current menu and dietary fit before visiting.",
+      "address": "40 Hà Bổng, An Hải, Sơn Trà, Đà Nẵng",
+      "priceRange": "moderate",
+      "dietary": "vegetarian",
+      "googleMapsUri": "https://www.google.com/maps/search/?api=1&query=Hoang%27s%20Kitchen%20Da%20Nang",
+      "sourceIds": [
+        "source_food_hoangs_kitchen_01",
+        "source_starter_curation_01"
+      ]
+    },
+    {
+      "id": "mi_quang_ba_mua_ngu_hanh_son",
+      "placeId": null,
+      "placeIdStatus": "unverified",
+      "landmarkKey": "marble_mountains",
+      "nameVi": "Mì Quảng Bà Mua — Ngũ Hành Sơn",
+      "nameEn": "Mi Quang Ba Mua — Ngu Hanh Son",
+      "descriptionVi": "Thẻ gợi ý mì Quảng đã biên tập cho hành trình quanh Ngũ Hành Sơn. Điểm bán có thể thay đổi, vì vậy hãy dùng liên kết Google Maps để kiểm tra trước khi đi.",
+      "descriptionEn": "An authored mi quang suggestion for a Marble Mountains itinerary. Locations can change, so use the Google Maps link to verify it before travelling.",
+      "address": "40 Ngũ Hành Sơn, Ngũ Hành Sơn, Đà Nẵng",
+      "priceRange": "budget",
+      "dietary": "any",
+      "googleMapsUri": "https://www.google.com/maps/search/?api=1&query=M%C3%AC%20Qu%E1%BA%A3ng%20B%C3%A0%20Mua%2040%20Ng%C5%A9%20H%C3%A0nh%20S%C6%A1n%20%C4%90%C3%A0%20N%E1%BA%B5ng",
+      "sourceIds": [
+        "source_food_mi_quang_ba_mua_01",
+        "source_starter_curation_01"
+      ]
+    },
+    {
+      "id": "maha_vegetariano",
+      "placeId": null,
+      "placeIdStatus": "unverified",
+      "landmarkKey": "son_tra_peninsula",
+      "nameVi": "Maha Vegetariano",
+      "nameEn": "Maha Vegetariano",
+      "descriptionVi": "Lựa chọn chay đã biên tập cho hành trình ở khu vực Sơn Trà. Đây không phải dữ liệu Places trực tiếp; hãy xác nhận thực đơn, tuyến đường và giờ phục vụ trên Google Maps hoặc kênh của cơ sở.",
+      "descriptionEn": "An authored vegetarian option for a Son Tra area itinerary. This is not live Places data; confirm the current menu, route, and opening information through Google Maps or the venue.",
+      "address": "2 Nguyễn Xuân Khoát, An Hải, Sơn Trà, Đà Nẵng",
+      "priceRange": "moderate",
+      "dietary": "vegetarian",
+      "googleMapsUri": "https://www.google.com/maps/search/?api=1&query=Maha%20Vegetariano%20Da%20Nang",
+      "sourceIds": [
+        "source_food_maha_vegetariano_01",
+        "source_starter_curation_01"
+      ]
+    }
+  ]
+}

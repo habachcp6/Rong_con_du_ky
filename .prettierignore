@@ -1,0 +1,10 @@
+build/
+firestore.rules
+.env.example
+.gitignore
+.dockerignore
+Dockerfile
+AGENTS.md
+dist/
+node_modules/
+.git/

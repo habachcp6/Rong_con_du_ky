@@ -1,0 +1,802 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body,
+html,
+#root {
+  width: 100%;
+  height: 100%;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #121212;
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  width: 100vw;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.app-header {
+  min-height: 50px;
+  background: linear-gradient(90deg, #1e1e2f 0%, #2d1b4e 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 2px solid #3d2b6e;
+}
+
+.app-header h1 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffd700;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-header__button {
+  min-height: 32px;
+  padding: 5px 9px;
+  border: 1px solid #8ecbdb;
+  border-radius: 5px;
+  color: #e9fbff;
+  background: #1b3a52;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.app-header__button:hover,
+.app-header__button:focus-visible {
+  border-color: #ffe082;
+  outline: 2px solid #ffe082;
+  outline-offset: 2px;
+}
+
+.app-header__icon-button {
+  display: inline-grid;
+  min-width: 32px;
+  place-items: center;
+  padding-inline: 6px;
+}
+
+.app-header__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.app-header__legal-links {
+  display: inline-flex;
+  gap: 5px;
+  font-size: 0.66rem;
+  white-space: nowrap;
+}
+
+.app-header__legal-links a {
+  color: #b9ecff;
+}
+
+.app-header__legal-links a:focus-visible {
+  outline: 2px solid #ffe082;
+  outline-offset: 2px;
+}
+
+.app-save-status {
+  color: #b9ecff;
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.app-badge {
+  background: #00e5ff;
+  color: #000;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.app-main {
+  flex: 1;
+  position: relative;
+  background-color: #050505;
+  min-height: 0;
+}
+
+.game-loading {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: #b9ecff;
+  background: #050505;
+}
+
+.game-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.game-canvas-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  touch-action: none;
+}
+
+.game-canvas-container canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  outline: none;
+}
+
+.game-canvas-container canvas:focus-visible {
+  outline: 3px solid #6ce5ff;
+  outline-offset: 4px;
+}
+
+.game-ui-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.game-ui-overlay__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 8px 12px;
+  border: 1px solid rgba(185, 236, 255, 0.68);
+  border-radius: 999px;
+  color: #e8f7ff;
+  background: rgba(16, 35, 61, 0.9);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.game-dialogue,
+.game-postcard {
+  position: absolute;
+  left: 50%;
+  width: min(520px, calc(100% - 32px));
+  padding: 20px;
+  border: 2px solid #6ce5ff;
+  border-radius: 14px;
+  color: #f8fbff;
+  background: rgba(11, 27, 52, 0.98);
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.48);
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.game-dialogue {
+  bottom: 24px;
+}
+
+.game-postcard {
+  top: 50%;
+  border-color: #ffd166;
+  background: linear-gradient(
+    145deg,
+    rgba(67, 42, 30, 0.98),
+    rgba(19, 30, 57, 0.99)
+  );
+  transform: translate(-50%, -50%);
+}
+
+.game-dialogue h2,
+.game-postcard h2 {
+  margin-bottom: 10px;
+  color: #ffe082;
+  font-size: 1.2rem;
+}
+
+.game-dialogue p,
+.game-postcard p {
+  line-height: 1.5;
+}
+
+.game-dialogue__source,
+.game-postcard__source {
+  margin-top: 10px;
+  color: #b9ecff;
+  font-size: 0.76rem;
+}
+
+.game-postcard__image {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  margin: 10px 0;
+  border: 1px solid #ffe082;
+  border-radius: 6px;
+  image-rendering: pixelated;
+  object-fit: cover;
+}
+
+.game-dialogue__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.game-dialogue button,
+.game-postcard button {
+  min-height: 42px;
+  padding: 9px 14px;
+  border: 1px solid #fff3bf;
+  border-radius: 8px;
+  color: #17243c;
+  background: #ffd166;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.game-dialogue button:hover,
+.game-postcard button:hover,
+.game-dialogue button:focus-visible,
+.game-postcard button:focus-visible {
+  filter: brightness(1.1);
+  outline: 3px solid #6ce5ff;
+  outline-offset: 2px;
+}
+
+.game-dialogue__secondary {
+  border-color: #7d95ac !important;
+  color: #e8f7ff !important;
+  background: #243956 !important;
+}
+
+.game-postcard__eyebrow {
+  margin-bottom: 6px;
+  color: #ffd166;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.passport-panel,
+.journey-ending {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 50%;
+  width: min(720px, calc(100% - 32px));
+  max-height: min(720px, calc(100% - 32px));
+  overflow: auto;
+  padding: 20px;
+  border: 2px solid #ffd166;
+  border-radius: 14px;
+  color: #f8fbff;
+  background: #172a42;
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.56);
+  transform: translate(-50%, -50%);
+}
+
+.passport-panel__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.passport-panel__eyebrow,
+.journey-ending__eyebrow {
+  margin-bottom: 4px;
+  color: #ffd166;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.passport-panel h2,
+.journey-ending h2 {
+  color: #fff2bd;
+  font-size: 1.35rem;
+}
+
+.passport-panel__close {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #8ecbdb;
+  border-radius: 5px;
+  color: #e9fbff;
+  background: #203e59;
+  font: inherit;
+  font-size: 1.35rem;
+  cursor: pointer;
+}
+
+.passport-panel__progress,
+.passport-panel__next,
+.journey-ending p {
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.passport-panel__stamps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.passport-stamp {
+  position: relative;
+  display: flex;
+  min-height: 104px;
+  gap: 10px;
+  align-items: center;
+  padding: 9px;
+  border: 1px solid #6b8398;
+  border-radius: 7px;
+  background: #213b52;
+}
+
+.passport-stamp--locked {
+  filter: grayscale(0.9);
+  opacity: 0.7;
+}
+
+.passport-stamp--earned {
+  border-color: #ffd166;
+}
+
+.passport-stamp img,
+.passport-stamp__placeholder {
+  width: 66px;
+  height: 66px;
+  flex: 0 0 66px;
+  border: 1px solid #a0dce8;
+  border-radius: 4px;
+  background: #10233d;
+  object-fit: cover;
+}
+
+.passport-stamp__placeholder {
+  display: grid;
+  place-items: center;
+  color: #c1d5dd;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.passport-stamp__number {
+  position: absolute;
+  top: 4px;
+  right: 7px;
+  color: #b9ecff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.passport-stamp h3 {
+  padding-right: 12px;
+  color: #fff2bd;
+  font-size: 0.92rem;
+}
+
+.passport-stamp p,
+.passport-stamp small {
+  display: block;
+  margin-top: 5px;
+  color: #d6eef8;
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.passport-stamp small {
+  color: #a7d6e7;
+  font-size: 0.64rem;
+}
+
+.passport-panel__ending,
+.journey-ending button {
+  min-height: 42px;
+  margin-top: 18px;
+  padding: 9px 14px;
+  border: 1px solid #fff3bf;
+  border-radius: 8px;
+  color: #17243c;
+  background: #ffd166;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.passport-panel__ending:hover,
+.passport-panel__ending:focus-visible,
+.journey-ending button:hover,
+.journey-ending button:focus-visible,
+.passport-panel__close:hover,
+.passport-panel__close:focus-visible {
+  outline: 3px solid #6ce5ff;
+  outline-offset: 2px;
+}
+
+.journey-ending {
+  width: min(560px, calc(100% - 32px));
+  border-color: #8ddd82;
+  background: #183b3a;
+}
+
+.travel-tools-panel {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: 50%;
+  width: min(760px, calc(100% - 32px));
+  max-height: min(740px, calc(100% - 32px));
+  overflow: auto;
+  padding: 20px;
+  border: 2px solid #6ce5ff;
+  border-radius: 14px;
+  color: #f8fbff;
+  background: #10233d;
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.56);
+  transform: translate(-50%, -50%);
+}
+
+.travel-tools-panel__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.travel-tools-panel__eyebrow {
+  margin-bottom: 4px;
+  color: #6ce5ff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.travel-tools-panel h2,
+.travel-tools-panel h3,
+.travel-tools-panel h4 {
+  color: #fff2bd;
+}
+
+.travel-tools-panel h2 {
+  font-size: 1.3rem;
+}
+
+.travel-tools-panel h3 {
+  font-size: 1rem;
+}
+
+.travel-tools-panel__close {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #8ecbdb;
+  border-radius: 5px;
+  color: #e9fbff;
+  background: #203e59;
+  font: inherit;
+  font-size: 1.35rem;
+  cursor: pointer;
+}
+
+.travel-tools-panel__section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(142, 203, 219, 0.45);
+}
+
+.travel-tools-panel__section > p {
+  margin-top: 8px;
+  line-height: 1.45;
+}
+
+.travel-tools-panel label {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+  color: #d8eff8;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.travel-tools-panel textarea,
+.travel-tools-panel input,
+.travel-tools-panel select {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid #6d9eb0;
+  border-radius: 6px;
+  color: #f8fbff;
+  background: #19344c;
+  font: inherit;
+  padding: 8px;
+}
+
+.travel-tools-panel textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
+.travel-tools-panel__fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.travel-tools-panel button:not(.travel-tools-panel__close) {
+  min-height: 40px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  border: 1px solid #fff3bf;
+  border-radius: 7px;
+  color: #17243c;
+  background: #ffd166;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.travel-tools-panel button:disabled {
+  cursor: wait;
+  filter: grayscale(0.45);
+  opacity: 0.65;
+}
+
+.travel-tools-panel button:focus-visible,
+.travel-tools-panel__close:focus-visible,
+.travel-tools-panel a:focus-visible {
+  outline: 3px solid #6ce5ff;
+  outline-offset: 2px;
+}
+
+.travel-tools-panel__result,
+.travel-tools-panel__notice {
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid #4a8198;
+  border-radius: 6px;
+  background: #17334a;
+  line-height: 1.45;
+}
+
+.travel-tools-panel__result p + p,
+.travel-tools-panel__result small,
+.travel-tools-panel__result ol {
+  display: block;
+  margin-top: 8px;
+}
+
+.travel-tools-panel__result ol {
+  padding-left: 20px;
+}
+
+.travel-tools-panel__result li + li {
+  margin-top: 8px;
+}
+
+.travel-tools-panel__result small,
+.place-card__source,
+.place-card__meta {
+  color: #b9ecff;
+  font-size: 0.73rem;
+}
+
+.place-card-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.place-card {
+  display: flex;
+  min-height: 160px;
+  flex-direction: column;
+  padding: 11px;
+  border: 1px solid #4a8198;
+  border-radius: 7px;
+  background: #17334a;
+}
+
+.place-card p {
+  margin-top: 7px;
+  line-height: 1.4;
+}
+
+.place-card a,
+.travel-tools-panel__result a {
+  display: inline-block;
+  margin-top: auto;
+  padding-top: 10px;
+  color: #ffe082;
+  font-weight: 700;
+}
+
+.legal-page {
+  height: 100vh;
+  min-height: 100vh;
+  padding: 24px;
+  overflow: auto;
+  color: #eaf7ff;
+  background: radial-gradient(circle at top, #1c4262, #0d1725 58%);
+}
+
+.legal-page__nav,
+.legal-page__nav div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.legal-page__nav {
+  width: min(880px, 100%);
+  margin: 0 auto 24px;
+  justify-content: space-between;
+}
+
+.legal-page a {
+  color: #8ee5ff;
+}
+
+.legal-page button {
+  min-height: 32px;
+  padding: 5px 9px;
+  border: 1px solid #8ecbdb;
+  border-radius: 5px;
+  color: #e9fbff;
+  background: #1b3a52;
+  font: inherit;
+  cursor: pointer;
+}
+
+.legal-page__article {
+  width: min(880px, 100%);
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 42px);
+  border: 1px solid rgba(142, 203, 219, 0.65);
+  border-radius: 14px;
+  background: rgba(12, 30, 49, 0.94);
+  box-shadow: 0 16px 46px rgba(0, 0, 0, 0.35);
+}
+
+.legal-page__eyebrow {
+  color: #ffd166;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.legal-page h1 {
+  margin-top: 8px;
+  color: #fff2bd;
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+}
+
+.legal-page h2 {
+  margin-top: 28px;
+  color: #ffe082;
+  font-size: 1.15rem;
+}
+
+.legal-page p {
+  margin-top: 10px;
+  line-height: 1.65;
+}
+
+.legal-page__intro {
+  color: #c9edff;
+  font-size: 1.05rem;
+}
+
+.legal-page__updated {
+  margin-top: 32px !important;
+  color: #b9ecff;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 560px) {
+  .app-header {
+    padding: 0 12px;
+  }
+
+  .app-header h1 {
+    font-size: 0.9rem;
+  }
+
+  .app-header__actions {
+    gap: 5px;
+  }
+
+  .app-header__button {
+    min-height: 28px;
+    padding: 4px 6px;
+    font-size: 0.68rem;
+  }
+
+  .app-header__legal-links,
+  .app-save-status,
+  .app-badge {
+    display: none;
+  }
+
+  .legal-page {
+    padding: 14px;
+  }
+
+  .legal-page__nav {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .legal-page__nav div {
+    flex-wrap: wrap;
+  }
+
+  .game-dialogue,
+  .game-postcard {
+    width: calc(100% - 20px);
+    padding: 16px;
+  }
+
+  .game-dialogue {
+    bottom: 12px;
+  }
+
+  .passport-panel,
+  .journey-ending {
+    width: calc(100% - 20px);
+    max-height: calc(100% - 20px);
+    padding: 15px;
+  }
+
+  .passport-panel__stamps {
+    grid-template-columns: 1fr;
+  }
+
+  .travel-tools-panel {
+    width: calc(100% - 20px);
+    max-height: calc(100% - 20px);
+    padding: 15px;
+  }
+
+  .travel-tools-panel__fields,
+  .place-card-list {
+    grid-template-columns: 1fr;
+  }
+}

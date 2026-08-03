@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" shape-rendering="crispEdges" data-pixel-art="true" data-alpha="true">
+  <defs>
+    <g id="dragon-down-idle">
+      <path fill="#182433" d="M10 4h12v4h4v8h2v10h-4v2H8v-2H4V16h2V8h4z"/>
+      <path fill="#E8891D" d="M10 6h12v4h2v12h-4v4H12v-4H8V10h2z"/>
+      <path fill="#FFC94A" d="M12 8h8v4h2v6h-4v2h-4v-2h-4V10h2z"/>
+      <path fill="#F5F0D8" d="M12 14h4v4h-4zm8 0h2v4h-2z"/>
+      <path fill="#182433" d="M14 16h2v2h-2zm6 0h2v2h-2z"/>
+      <path fill="#D44F65" d="M15 22h4v2h-4z"/>
+      <path fill="#B95719" d="M6 18h2v6H4v-2h2zm18 0h2v4h2v2h-4z"/>
+    </g>
+    <g id="dragon-left">
+      <path fill="#182433" d="M8 4h12v4h4v8h2v10h-4v2H6v-2H2V18h4V8h2z"/>
+      <path fill="#E8891D" d="M8 6h12v4h2v12h-4v4H8v-4H6V10h2z"/>
+      <path fill="#FFC94A" d="M10 8h8v4h2v8h-4v2H8v-8h2z"/>
+      <path fill="#F5F0D8" d="M8 14h4v4H8z"/>
+      <path fill="#182433" d="M10 16h2v2h-2z"/>
+      <path fill="#B95719" d="M20 18h4v4h2v2h-6zM4 22h4v4H4z"/>
+    </g>
+    <g id="dragon-right">
+      <path fill="#182433" d="M12 4h12v4h2v10h4v8h-4v2H10v-2H6V16h2V8h4z"/>
+      <path fill="#E8891D" d="M12 6h12v4h2v12h-2v4h-10v-4H10V10h2z"/>
+      <path fill="#FFC94A" d="M14 8h8v4h2v8h-2v2h-8v-2h-2v-8h2z"/>
+      <path fill="#F5F0D8" d="M22 14h4v4h-4z"/>
+      <path fill="#182433" d="M22 16h2v2h-2z"/>
+      <path fill="#B95719" d="M8 18h4v6H6v-2h2zm16 4h4v4h-4z"/>
+    </g>
+    <g id="dragon-up">
+      <path fill="#182433" d="M10 4h12v4h4v8h2v10h-4v2H8v-2H4V16h2V8h4z"/>
+      <path fill="#B95719" d="M10 6h12v4h2v12h-4v4H12v-4H8V10h2z"/>
+      <path fill="#E8891D" d="M12 8h8v4h2v8h-4v2h-4v-2h-4v-8h2z"/>
+      <path fill="#FFC94A" d="M14 10h4v8h-4z"/>
+      <path fill="#182433" d="M6 18h4v6H4v-2h2zm16 0h4v4h2v2h-6z"/>
+    </g>
+  </defs>
+  <use href="#dragon-down-idle" x="0" y="0"/>
+  <use href="#dragon-down-idle" x="32" y="0" transform="translate(32 0) translate(0 -1)"/>
+  <use href="#dragon-down-idle" x="64" y="0"/>
+  <use href="#dragon-down-idle" x="96" y="0" transform="translate(96 0) translate(0 1)"/>
+  <use href="#dragon-left" x="0" y="32"/>
+  <use href="#dragon-left" x="32" y="32" transform="translate(32 32) translate(-1 0)"/>
+  <use href="#dragon-left" x="64" y="32"/>
+  <use href="#dragon-left" x="96" y="32" transform="translate(96 32) translate(1 0)"/>
+  <use href="#dragon-right" x="0" y="64"/>
+  <use href="#dragon-right" x="32" y="64" transform="translate(32 64) translate(1 0)"/>
+  <use href="#dragon-right" x="64" y="64"/>
+  <use href="#dragon-right" x="96" y="64" transform="translate(96 64) translate(-1 0)"/>
+  <use href="#dragon-up" x="0" y="96"/>
+  <use href="#dragon-up" x="32" y="96" transform="translate(32 96) translate(0 -1)"/>
+  <use href="#dragon-up" x="64" y="96"/>
+  <use href="#dragon-up" x="96" y="96" transform="translate(96 96) translate(0 1)"/>
+</svg>

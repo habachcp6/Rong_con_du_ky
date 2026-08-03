@@ -1,0 +1,127 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function exactKeys(data, required, allowed) {
+      return data.keys().hasAll(required) && data.keys().hasOnly(allowed);
+    }
+
+    function isQuestStatus(status) {
+      return status == 'LOCKED' ||
+        status == 'AVAILABLE' ||
+        status == 'ACTIVE' ||
+        status == 'COMPLETED' ||
+        status == 'REWARDED';
+    }
+
+    function validQuests(quests) {
+      return quests is map &&
+        exactKeys(
+          quests,
+          ['dragon_bridge_lights', 'my_khe_clean_wave', 'marble_five_elements', 'son_tra_traces'],
+          ['dragon_bridge_lights', 'my_khe_clean_wave', 'marble_five_elements', 'son_tra_traces']
+        ) &&
+        isQuestStatus(quests.dragon_bridge_lights) &&
+        isQuestStatus(quests.my_khe_clean_wave) &&
+        isQuestStatus(quests.marble_five_elements) &&
+        isQuestStatus(quests.son_tra_traces);
+    }
+
+    function validPlayer(player) {
+      return player is map &&
+        exactKeys(player, ['scene', 'x', 'y'], ['scene', 'x', 'y']) &&
+        player.scene is string &&
+        player.scene.size() > 0 &&
+        player.scene.size() <= 80 &&
+        player.x is number && player.x >= -100000 && player.x <= 100000 &&
+        player.y is number && player.y >= -100000 && player.y <= 100000;
+    }
+
+    function validPreferences(preferences) {
+      return preferences is map &&
+        exactKeys(preferences, ['interests'], ['budgetVnd', 'dietary', 'interests']) &&
+        preferences.interests is list && preferences.interests.size() <= 12 &&
+        (preferences.get('budgetVnd', 1) is number &&
+          preferences.get('budgetVnd', 1) > 0 && preferences.get('budgetVnd', 1) <= 100000000) &&
+        (preferences.get('dietary', 'any') == 'any' || preferences.get('dietary', 'any') == 'vegetarian');
+    }
+
+    function rewardedCount(quests) {
+      return (quests.dragon_bridge_lights == 'REWARDED' ? 1 : 0) +
+        (quests.my_khe_clean_wave == 'REWARDED' ? 1 : 0) +
+        (quests.marble_five_elements == 'REWARDED' ? 1 : 0) +
+        (quests.son_tra_traces == 'REWARDED' ? 1 : 0);
+    }
+
+    function validQuestOrder(quests) {
+      return quests.dragon_bridge_lights != 'LOCKED' &&
+        (quests.my_khe_clean_wave == 'LOCKED' || quests.dragon_bridge_lights == 'REWARDED') &&
+        (quests.marble_five_elements == 'LOCKED' || quests.my_khe_clean_wave == 'REWARDED') &&
+        (quests.son_tra_traces == 'LOCKED' || quests.marble_five_elements == 'REWARDED');
+    }
+
+    function postcardsMatchRewards(state) {
+      return
+        (state.unlockedPostcards.hasAll(['dragon_bridge']) == (state.quests.dragon_bridge_lights == 'REWARDED')) &&
+        (state.unlockedPostcards.hasAll(['my_khe_beach']) == (state.quests.my_khe_clean_wave == 'REWARDED')) &&
+        (state.unlockedPostcards.hasAll(['marble_mountains']) == (state.quests.marble_five_elements == 'REWARDED')) &&
+        (state.unlockedPostcards.hasAll(['son_tra_peninsula']) == (state.quests.son_tra_traces == 'REWARDED'));
+    }
+
+    function validQuestTransition(current, next) {
+      return current == next ||
+        (current == 'LOCKED' && next == 'AVAILABLE') ||
+        (current == 'AVAILABLE' && next == 'ACTIVE') ||
+        (current == 'ACTIVE' && (next == 'AVAILABLE' || next == 'COMPLETED')) ||
+        (current == 'COMPLETED' && next == 'REWARDED');
+    }
+
+    function validQuestUpdate(current, next) {
+      return validQuestTransition(current.dragon_bridge_lights, next.dragon_bridge_lights) &&
+        validQuestTransition(current.my_khe_clean_wave, next.my_khe_clean_wave) &&
+        validQuestTransition(current.marble_five_elements, next.marble_five_elements) &&
+        validQuestTransition(current.son_tra_traces, next.son_tra_traces);
+    }
+
+    function validGameState(state) {
+      return state is map &&
+        exactKeys(
+          state,
+          ['version', 'language', 'player', 'quests', 'unlockedPostcards', 'memoryFragments', 'preferences', 'updatedAt'],
+          ['version', 'language', 'player', 'quests', 'unlockedPostcards', 'memoryFragments', 'preferences', 'updatedAt']
+        ) &&
+        state.version == 1 &&
+        (state.language == 'vi' || state.language == 'en') &&
+        validPlayer(state.player) &&
+        validQuests(state.quests) &&
+        state.unlockedPostcards is list &&
+        state.unlockedPostcards.size() <= 4 &&
+        state.unlockedPostcards.hasOnly(['dragon_bridge', 'my_khe_beach', 'marble_mountains', 'son_tra_peninsula']) &&
+        state.memoryFragments is int &&
+        state.memoryFragments >= 0 && state.memoryFragments <= 4 &&
+        state.memoryFragments == rewardedCount(state.quests) &&
+        state.memoryFragments == state.unlockedPostcards.size() &&
+        validQuestOrder(state.quests) &&
+        postcardsMatchRewards(state) &&
+        validPreferences(state.preferences) &&
+        state.updatedAt is string && state.updatedAt.size() > 0 && state.updatedAt.size() <= 40;
+    }
+
+    // Point reads/writes only. No parent user document, collection listing, or
+    // arbitrary itinerary/provider payload is stored from the browser.
+    match /users/{userId}/game/state {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      // Creation can import valid local-first progress after an offline session.
+      // Later writes may only use the deterministic transition graph.
+      allow create: if isOwner(userId) && validGameState(request.resource.data);
+      allow update: if isOwner(userId) && validGameState(request.resource.data) &&
+        validQuestUpdate(resource.data.quests, request.resource.data.quests);
+      allow delete: if isOwner(userId);
+    }
+  }
+}

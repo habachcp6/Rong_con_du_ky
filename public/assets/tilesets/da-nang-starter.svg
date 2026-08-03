@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" shape-rendering="crispEdges" data-pixel-art="true" data-alpha="true">
+  <defs>
+    <pattern id="water" width="64" height="64" patternUnits="userSpaceOnUse"><rect width="64" height="64" fill="#0B6E99"/><path fill="#1595C5" d="M0 8h24v4H0zm32 20h32v4H32zM8 48h32v4H8z"/><path fill="#61C8E8" d="M16 20h16v4H16zm24 20h16v4H40z"/></pattern>
+    <pattern id="grass" width="64" height="64" patternUnits="userSpaceOnUse"><rect width="64" height="64" fill="#3E8A4F"/><path fill="#83B85A" d="M8 12h4v8H8zm20 20h4v8h-4zm24-18h4v8h-4zM12 50h4v8h-4z"/><path fill="#24613A" d="M24 6h4v8h-4zm20 34h4v8h-4z"/></pattern>
+    <pattern id="sand" width="64" height="64" patternUnits="userSpaceOnUse"><rect width="64" height="64" fill="#E8D3A3"/><path fill="#C9A77B" d="M6 12h4v4H6zm24 18h4v4h-4zm20-14h4v4h-4zM12 48h4v4h-4z"/></pattern>
+    <pattern id="stone" width="64" height="64" patternUnits="userSpaceOnUse"><rect width="64" height="64" fill="#9A7455"/><path fill="#6E5140" d="M0 0h32v3H0zm32 16h32v3H32zM0 32h32v3H0zm32 48h32v3H32z"/><path fill="#C9A77B" d="M12 12h12v4H12zm30 22h12v4H42zM8 46h12v4H8z"/></pattern>
+  </defs>
+  <rect width="256" height="256" fill="url(#water)"/>
+  <rect x="256" width="256" height="256" fill="url(#grass)"/>
+  <rect y="256" width="256" height="256" fill="url(#sand)"/>
+  <rect x="256" y="256" width="256" height="256" fill="url(#stone)"/>
+  <path fill="#182433" fill-opacity=".35" d="M0 0h512v1H0zM0 32h512v1H0zM0 64h512v1H0zM0 96h512v1H0zM0 128h512v1H0zM0 160h512v1H0zM0 192h512v1H0zM0 224h512v1H0zM0 256h512v1H0zM0 288h512v1H0zM0 320h512v1H0zM0 352h512v1H0zM0 384h512v1H0zM0 416h512v1H0zM0 448h512v1H0zM0 480h512v1H0zM0 0h1v512H0zM32 0h1v512h-1zM64 0h1v512h-1zM96 0h1v512h-1zM128 0h1v512h-1zM160 0h1v512h-1zM192 0h1v512h-1zM224 0h1v512h-1zM256 0h1v512h-1zM288 0h1v512h-1zM320 0h1v512h-1zM352 0h1v512h-1zM384 0h1v512h-1zM416 0h1v512h-1zM448 0h1v512h-1zM480 0h1v512h-1z"/>
+</svg>

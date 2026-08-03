@@ -1,0 +1,46 @@
+{
+  "dragon_bridge": {
+    "key": "dragon_bridge",
+    "name": "Cầu Rồng",
+    "shortDescription": "Cầu Rồng bắc qua sông Hàn, kết nối khu vực trung tâm với phía đông thành phố. Công trình mang hình tượng rồng và là một dấu mốc quen thuộc trên tuyến tham quan ven sông. Trong game, đây là điểm khởi đầu để Rồng Con khám phá ký ức của Đà Nẵng; hãy kiểm tra cổng du lịch chính thức trước khi lập kế hoạch tham quan thực tế.",
+    "funFact": "Theo cổng thông tin du lịch Đà Nẵng, Cầu Rồng dài 666 m, rộng 37,5 m và có sáu làn xe.",
+    "visitTip": "Lịch trình phun lửa, phun nước và phương án giao thông có thể thay đổi; hãy kiểm tra thông báo hiện hành của địa phương trước chuyến đi.",
+    "authoredImage": "/assets/landmarks/dragon-bridge.svg",
+    "assetId": "landmark_dragon_bridge",
+    "imageAttributionId": "asset_placeholder_original_01",
+    "sourceIds": ["source_dragon_bridge_01"]
+  },
+  "my_khe_beach": {
+    "key": "my_khe_beach",
+    "name": "Biển Mỹ Khê",
+    "shortDescription": "Biển Mỹ Khê nằm dọc khu vực ven biển phía đông Đà Nẵng, cách trung tâm thành phố vài ki-lô-mét theo thông tin của cổng du lịch thành phố. Bờ cát, không gian rộng và hoạt động ven biển khiến nơi đây phù hợp cho một điểm dừng ngoài trời. Trong game, nhiệm vụ dọn rác nhắc người chơi giữ sạch bãi biển; đây là thông điệp bảo tồn, không phải dữ liệu vận hành của bãi tắm.",
+    "funFact": "Cổng du lịch Đà Nẵng ghi nhận Mỹ Khê được Forbes gọi là một trong những bãi biển quyến rũ nhất hành tinh.",
+    "visitTip": "Theo dõi thời tiết, biển báo và hướng dẫn của lực lượng cứu hộ tại chỗ; chỉ xuống nước khi điều kiện an toàn.",
+    "authoredImage": "/assets/landmarks/my-khe.svg",
+    "assetId": "landmark_my_khe_beach",
+    "imageAttributionId": "asset_placeholder_original_01",
+    "sourceIds": ["source_my_khe_01"]
+  },
+  "marble_mountains": {
+    "key": "marble_mountains",
+    "name": "Ngũ Hành Sơn",
+    "shortDescription": "Ngũ Hành Sơn là quần thể danh thắng ở phía đông nam Đà Nẵng, có hang động, chùa và các lối đi bậc đá. Cổng du lịch thành phố mô tả quần thể gồm Thủy Sơn, Kim Sơn, hai ngọn Hỏa Sơn, Thổ Sơn và Mộc Sơn. Câu đố Ngũ Hành trong game lấy cảm hứng từ tên gọi địa danh, không thay thế hướng dẫn tham quan tại điểm đến.",
+    "funFact": "Làng nghề điêu khắc đá mỹ nghệ Non Nước dưới chân núi được công nhận là Di sản văn hóa phi vật thể quốc gia vào năm 2014.",
+    "visitTip": "Đi giày có độ bám tốt, đi theo biển chỉ dẫn và kiểm tra thông tin vé, lối lên núi hoặc thang máy trên kênh chính thức trước khi đi.",
+    "authoredImage": "/assets/landmarks/marble-mountains.svg",
+    "assetId": "landmark_marble_mountains",
+    "imageAttributionId": "asset_placeholder_original_01",
+    "sourceIds": ["source_marble_mountains_01"]
+  },
+  "son_tra_peninsula": {
+    "key": "son_tra_peninsula",
+    "name": "Bán Đảo Sơn Trà",
+    "shortDescription": "Bán đảo Sơn Trà là khu vực thiên nhiên phía đông bắc Đà Nẵng, nơi rừng gặp biển và hệ sinh thái đa dạng được bảo tồn. Cổng du lịch thành phố ghi nhận voọc chà vá chân nâu là loài quý hiếm tại đây; GreenViet cũng có chương trình bảo tồn loài này ở Sơn Trà. Nhiệm vụ trong game yêu cầu quan sát dấu vết, không đuổi theo hay chạm vào động vật hoang dã.",
+    "funFact": "Cổng du lịch Đà Nẵng mô tả Sơn Trà là “lá phổi xanh” của thành phố và gọi voọc chà vá chân nâu là “Nữ hoàng linh trưởng”.",
+    "visitTip": "Chỉ đi theo tuyến được phép và thông báo hiện hành; giữ khoảng cách yên lặng, không cho động vật ăn, không xả rác hay gây xáo trộn sinh cảnh.",
+    "authoredImage": "/assets/landmarks/son-tra.svg",
+    "assetId": "landmark_son_tra_peninsula",
+    "imageAttributionId": "asset_placeholder_original_01",
+    "sourceIds": ["source_son_tra_01", "source_son_tra_conservation_01"]
+  }
+}

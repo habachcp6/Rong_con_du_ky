@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+.git
+.env
+.env.*
+!.env.example
+service-account*.json
+firebase-adminsdk-*.json
+*.pem
+*.key
+*.log
+tests
+docs

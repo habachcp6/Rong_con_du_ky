@@ -1,0 +1,30 @@
+{
+  "dragon_bridge_npc": {
+    "greeting": "Welcome, Little Dragon, to Dragon Bridge on the Han River. The bridge is waiting for five memory lights to shine.",
+    "questPrompt": "Are you ready for the rhythm challenge that lights five bridge sections in the game?",
+    "successMessage": "Wonderful! Dragon Bridge is glowing in our journey. This Dragon Bridge Memory Fragment is yours.",
+    "failureMessage": "The rhythm was not quite there yet. Try again and watch each signal closely.",
+    "sourceIds": ["source_dragon_bridge_01"]
+  },
+  "my_khe_npc": {
+    "greeting": "Hello, Little Dragon! My Khe Beach in our game needs to stay clean for everyone to enjoy.",
+    "questPrompt": "Please collect eight litter items in this challenge and share a responsible-travel habit.",
+    "successMessage": "Thank you, Little Dragon! Our journey's beach is cleaner and greener now.",
+    "failureMessage": "Time ran out. Try again and collect the nearest item first.",
+    "sourceIds": ["source_my_khe_01"]
+  },
+  "marble_npc": {
+    "greeting": "Welcome, Little Dragon, to Marble Mountains, a place of caves, pagodas, and stone steps.",
+    "questPrompt": "Connect the five Metal, Wood, Water, Fire, and Earth symbols in this journey's puzzle.",
+    "successMessage": "You opened the puzzle's mystery. The Marble Mountains Memory Fragment is yours.",
+    "failureMessage": "The symbols are not in the right order. Reflect, use a hint if needed, and try again.",
+    "sourceIds": ["source_marble_mountains_01"]
+  },
+  "son_tra_npc": {
+    "greeting": "Hello, Little Dragon! Son Tra is a place to observe with respect for nature.",
+    "questPrompt": "Find three traces in the game, stay quiet, and remember that we never chase wildlife.",
+    "successMessage": "Excellent! You completed Son Tra's responsible-observation challenge.",
+    "failureMessage": "Do not give up. Check the canopy, the trail, and the subtle signs around you.",
+    "sourceIds": ["source_son_tra_01", "source_son_tra_conservation_01"]
+  }
+}

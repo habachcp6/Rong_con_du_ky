@@ -1,0 +1,46 @@
+{
+  "dragon_bridge": {
+    "key": "dragon_bridge",
+    "name": "Dragon Bridge",
+    "shortDescription": "Dragon Bridge spans the Han River and links the city-centre area with the eastern side of Da Nang. Its dragon form makes it a familiar landmark along the riverfront route. In the game, it is Little Dragon's first memory stop; check the official tourism portal before making a real-world visit plan.",
+    "funFact": "Da Nang's tourism portal lists Dragon Bridge as 666 metres long, 37.5 metres wide, with six traffic lanes.",
+    "visitTip": "Fire-and-water-show schedules and traffic arrangements can change, so check the current local notice before travelling.",
+    "authoredImage": "/assets/landmarks/dragon-bridge.svg",
+    "assetId": "landmark_dragon_bridge",
+    "imageAttributionId": "asset_placeholder_original_01",
+    "sourceIds": ["source_dragon_bridge_01"]
+  },
+  "my_khe_beach": {
+    "key": "my_khe_beach",
+    "name": "My Khe Beach",
+    "shortDescription": "My Khe Beach runs along Da Nang's eastern coast, a few kilometres from the city centre according to the city's tourism portal. Its sandy shore, open setting, and seaside activity make it a useful outdoor stop. In the game, the cleanup quest is a conservation message about keeping the beach clean; it is not operational information for the beach.",
+    "funFact": "Da Nang's tourism portal notes that Forbes called My Khe one of the planet's most attractive beaches.",
+    "visitTip": "Follow weather reports, posted beach warnings, and local lifeguard guidance; enter the water only when conditions are safe.",
+    "authoredImage": "/assets/landmarks/my-khe.svg",
+    "assetId": "landmark_my_khe_beach",
+    "imageAttributionId": "asset_placeholder_original_01",
+    "sourceIds": ["source_my_khe_01"]
+  },
+  "marble_mountains": {
+    "key": "marble_mountains",
+    "name": "Marble Mountains",
+    "shortDescription": "Marble Mountains is a scenic complex in southeast Da Nang with caves, pagodas, and stone stairways. The city tourism portal describes Thuy Son, Kim Son, two Hoa Son peaks, Tho Son, and Moc Son. The game's Five Elements puzzle draws on the place name as storytelling; it does not replace visitor guidance at the site.",
+    "funFact": "The Non Nuoc stone-carving village at the foot of the mountains was recognised as National Intangible Cultural Heritage in 2014.",
+    "visitTip": "Wear footwear with good grip, follow site signage, and check official ticket, route, and lift information before setting out.",
+    "authoredImage": "/assets/landmarks/marble-mountains.svg",
+    "assetId": "landmark_marble_mountains",
+    "imageAttributionId": "asset_placeholder_original_01",
+    "sourceIds": ["source_marble_mountains_01"]
+  },
+  "son_tra_peninsula": {
+    "key": "son_tra_peninsula",
+    "name": "Son Tra Peninsula",
+    "shortDescription": "Son Tra Peninsula is a natural area northeast of Da Nang where forest meets the sea and a diverse ecosystem is protected. The city tourism portal identifies the rare red-shanked douc there, while GreenViet runs a conservation programme for the species in Son Tra. The game's quest asks players to observe traces, never to chase or touch wildlife.",
+    "funFact": "Da Nang's tourism portal describes Son Tra as the city's green lung and calls the red-shanked douc the “Queen of Primates”.",
+    "visitTip": "Use only currently permitted routes; observe quietly from a distance, never feed animals, and do not litter or disturb their habitat.",
+    "authoredImage": "/assets/landmarks/son-tra.svg",
+    "assetId": "landmark_son_tra_peninsula",
+    "imageAttributionId": "asset_placeholder_original_01",
+    "sourceIds": ["source_son_tra_01", "source_son_tra_conservation_01"]
+  }
+}

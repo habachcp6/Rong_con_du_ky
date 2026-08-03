@@ -1,0 +1,30 @@
+{
+  "dragon_bridge_npc": {
+    "greeting": "Chào mừng Rồng Con đến với Cầu Rồng trên sông Hàn. Cây cầu đang chờ năm ngọn đèn ký ức được thắp sáng.",
+    "questPrompt": "Con có sẵn sàng tham gia thử thách nhịp điệu để thắp sáng năm đoạn cầu trong game không?",
+    "successMessage": "Tuyệt vời! Cầu Rồng trong hành trình của chúng ta đã bừng sáng. Đây là Mảnh Ký Ức Cầu Rồng của con.",
+    "failureMessage": "Chưa đủ nhịp điệu rồi. Hãy thử lại và quan sát tín hiệu thật kỹ nhé.",
+    "sourceIds": ["source_dragon_bridge_01"]
+  },
+  "my_khe_npc": {
+    "greeting": "Chào Rồng Con! Bãi biển Mỹ Khê trong game cần được giữ sạch để mọi người cùng tận hưởng.",
+    "questPrompt": "Hãy giúp thu gom tám vật thể rác trong thử thách để lan tỏa thói quen du lịch có trách nhiệm nhé.",
+    "successMessage": "Cảm ơn Rồng Con! Bãi biển trong hành trình của chúng ta đã xanh sạch hơn rồi.",
+    "failureMessage": "Thời gian đã hết. Hãy thử lại và ưu tiên vật thể gần nhất trước nhé.",
+    "sourceIds": ["source_my_khe_01"]
+  },
+  "marble_npc": {
+    "greeting": "Chào mừng Rồng Con đến với Ngũ Hành Sơn, nơi có hang động, chùa và những bậc đá.",
+    "questPrompt": "Hãy kết nối năm biểu tượng Kim, Mộc, Thủy, Hỏa và Thổ trong câu đố của hành trình nhé.",
+    "successMessage": "Con đã mở được bí ẩn của câu đố. Mảnh Ký Ức Ngũ Hành Sơn thuộc về con.",
+    "failureMessage": "Các biểu tượng chưa đúng thứ tự. Hãy suy ngẫm, dùng gợi ý khi cần và thử lại nhé.",
+    "sourceIds": ["source_marble_mountains_01"]
+  },
+  "son_tra_npc": {
+    "greeting": "Xin chào Rồng Con! Sơn Trà là nơi cần được quan sát với sự tôn trọng dành cho thiên nhiên.",
+    "questPrompt": "Hãy tìm ba dấu vết trong game, giữ yên lặng và nhớ rằng chúng ta không đuổi theo động vật hoang dã.",
+    "successMessage": "Xuất sắc! Con đã hoàn thành thử thách quan sát có trách nhiệm ở Sơn Trà.",
+    "failureMessage": "Đừng nản lòng. Hãy quan sát kỹ tán cây, lối mòn và các dấu hiệu quanh mình nhé.",
+    "sourceIds": ["source_son_tra_01", "source_son_tra_conservation_01"]
+  }
+}
