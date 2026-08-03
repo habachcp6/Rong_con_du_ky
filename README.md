@@ -88,6 +88,8 @@ npm run test:e2e:bridge
 npm run test:e2e:record
 ```
 
+With Auth and Firestore emulators running and Vite started using the emulator-only values in `.env.example`, run `npm run test:firebase:browser`. It verifies the browser reaches `Đã đồng bộ`/`Synced`, observes successful Auth and Firestore emulator responses, and reports browser errors. It does not replace production Firebase smoke.
+
 `verify` chạy TypeScript, Oxlint, Vitest unit suite, content/assets validators, Vite build, server TypeScript và quét browser bundle để cấm test bridge/marker credential. `test:rules` tự khởi động Auth + Firestore Emulator với demo project cục bộ và kiểm tra owner-only access, cấm listing/cross-UID, schema và lifecycle reward; không cần Firebase project thật. `test:e2e` kiểm tra desktop/mobile title, keyboard, bridge guard, retry/reward/refresh của Cầu Rồng, ba quest còn lại, passport/ending và fallback Journey Companion. `test:e2e:bridge` chỉ bật automation reducer trong Vite development; `test:e2e:record` tạo technical video evidence local, không thay thế video pitch.
 
 Trong WSL hiện tại, Chromium cần thư viện đã provision và thư mục temp Linux:

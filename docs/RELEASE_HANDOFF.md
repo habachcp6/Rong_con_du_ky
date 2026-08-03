@@ -16,9 +16,12 @@ npm run test:rules
 npm run test:e2e
 npm run test:e2e:bridge
 npm run test:e2e:record
+npm run test:firebase:browser
 ```
 
 `test:e2e:bridge` chỉ bật dev flag cho reducer graph; `test:e2e` và technical capture giữ black-box input thật. `verify` cũng build client và quét artifact để cấm `__GAME_TEST__` cùng marker credential.
+
+`test:firebase:browser` cần Auth/Firestore Emulator và Vite chạy với dummy emulator-only config; nó là bằng chứng local browser integration, không phải production Firebase evidence.
 
 ## Smoke production artifact local
 
