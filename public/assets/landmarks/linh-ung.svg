@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" shape-rendering="crispEdges" data-pixel-art="true" data-alpha="false">
+  <!-- Sky -->
+  <rect width="320" height="180" fill="#87ceeb"/>
+  <!-- Cloud -->
+  <rect x="20" y="20" width="60" height="12" fill="#ffffff"/>
+  <rect x="240" y="15" width="50" height="10" fill="#ffffff"/>
+
+  <!-- Ocean -->
+  <rect y="140" width="320" height="40" fill="#1a7fa0"/>
+
+  <!-- Mountain slope backdrop -->
+  <rect x="0" y="70" width="250" height="75" fill="#2d7a4f"/>
+  <rect x="0" y="50" width="150" height="40" fill="#2d7a4f"/>
+  <rect x="0" y="35" width="80" height="25" fill="#1a5c38"/>
+
+  <!-- Pagoda terrace -->
+  <rect x="100" y="120" width="220" height="25" fill="#1a5c38"/>
+
+  <!-- Pagoda roofs (left of statue) -->
+  <rect x="100" y="110" width="50" height="10" fill="#c75a3d"/>
+  <rect x="110" y="102" width="30" height="10" fill="#c75a3d"/>
+  <rect x="120" y="96" width="10" height="8" fill="#ffd166"/>
+
+  <!-- Lady Buddha statue (dominant center-right) -->
+  <!-- Lotus pedestal -->
+  <rect x="185" y="108" width="50" height="12" fill="#ffd166"/>
+  <!-- Robe body -->
+  <rect x="195" y="50" width="30" height="58" fill="#ffffff"/>
+  <rect x="190" y="65" width="40" height="43" fill="#ffffff"/>
+  <!-- Head -->
+  <rect x="200" y="32" width="20" height="20" fill="#ffffff"/>
+  <!-- Halo -->
+  <rect x="195" y="26" width="30" height="6" fill="#ffd166"/>
+</svg>

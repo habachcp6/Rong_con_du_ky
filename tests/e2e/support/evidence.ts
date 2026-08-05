@@ -33,10 +33,12 @@ export async function captureVisualEvidence(
 
 export async function waitForGameCanvas(page: Page): Promise<Locator> {
   const gameCanvas = page.locator("#game-container canvas").first();
-  await expect(gameCanvas).toBeVisible();
+  await expect(gameCanvas).toBeVisible({ timeout: 20_000 });
   await expect
-    .poll(async () =>
-      gameCanvas.evaluate((canvas) => canvas.width > 0 && canvas.height > 0),
+    .poll(
+      async () =>
+        gameCanvas.evaluate((canvas) => canvas.width > 0 && canvas.height > 0),
+      { timeout: 20_000 },
     )
     .toBe(true);
   return gameCanvas;

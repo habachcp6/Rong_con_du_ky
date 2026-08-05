@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { isJourneyComplete } from "../../shared/game-state";
+import { isJourneyComplete, QUEST_ORDER } from "../../shared/game-state";
+import { getLandmarkGameDefinitionByLocationKey } from "../../shared/landmark-game-definitions";
 import { gameSession } from "../game/state/GameStateStore";
 import { trackAnalytics } from "../services/analytics";
 import type {
@@ -10,10 +11,18 @@ import { LegalPage, type LegalDocument } from "./LegalPage";
 import { JourneyEnding, PassportPanel } from "./PassportPanel";
 import { bridge } from "./PhaserBridge";
 import { TravelToolsPanel } from "./TravelToolsPanel";
+import { LandmarkGalleryPanel } from "./LandmarkGalleryPanel";
+import { LandmarkDetailPanel } from "./LandmarkDetailPanel";
+import { LandmarkChallengePanel } from "./LandmarkChallengePanel";
 import "./App.css";
 
 const uiText = (language: "vi" | "en", vi: string, en: string): string =>
   language === "vi" ? vi : en;
+
+type LandmarkChallengeSelection = {
+  questId: string;
+  placeKey: string;
+};
 
 const e2eBridgeRequested =
   import.meta.env.DEV && import.meta.env.VITE_ENABLE_E2E_BRIDGE === "true";
@@ -43,6 +52,13 @@ const GameApp: React.FC = () => {
   const [passportOpen, setPassportOpen] = useState(false);
   const [endingOpen, setEndingOpen] = useState(false);
   const [travelToolsOpen, setTravelToolsOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [selectedLandmarkKey, setSelectedLandmarkKey] = useState<string | null>(
+    null,
+  );
+  const [challenge, setChallenge] = useState<LandmarkChallengeSelection | null>(
+    null,
+  );
   const [muted, setMuted] = useState(true);
   const [fullscreen, setFullscreen] = useState(false);
   const [persistenceStatus, setPersistenceStatus] =
@@ -67,6 +83,34 @@ const GameApp: React.FC = () => {
         }
         if (event.type === "POSTCARD_UNLOCKED") {
           trackAnalytics("postcard_open", { place_key: event.placeKey });
+        }
+        if (event.type === "LANDMARK_CHALLENGE_OPEN") {
+          bridge.emitUiToGame({ type: "POSTCARD_CLOSE" });
+          setPassportOpen(false);
+          setTravelToolsOpen(false);
+          setEndingOpen(false);
+          setGalleryOpen(false);
+          setSelectedLandmarkKey(null);
+          setChallenge({ questId: event.questId, placeKey: event.placeKey });
+          bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: false });
+          trackAnalytics("landmark_challenge_open", {
+            quest_id: event.questId,
+            place_key: event.placeKey,
+          });
+        }
+        if (event.type === "OPEN_LANDMARK_DETAIL") {
+          bridge.emitUiToGame({ type: "POSTCARD_CLOSE" });
+          bridge.emitUiToGame({ type: "DIALOGUE_CLOSE" });
+          bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: false });
+          setPassportOpen(false);
+          setTravelToolsOpen(false);
+          setEndingOpen(false);
+          setGalleryOpen(false);
+          setChallenge(null);
+          setSelectedLandmarkKey(event.locationKey);
+          trackAnalytics("landmark_detail_open", {
+            place_key: event.locationKey,
+          });
         }
       }),
     [],
@@ -104,6 +148,12 @@ const GameApp: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    return gameSession.subscribe(() => {
+      setVersion((current) => current + 1);
+    });
+  }, []);
+
+  useEffect(() => {
     let mounted = true;
     let mirror: GameStateMirror | null = null;
     let unsubscribe: (() => void) | null = null;
@@ -126,7 +176,10 @@ const GameApp: React.FC = () => {
         });
         const result = await mirror.bootstrap(gameSession.getState());
         if (!mounted) return;
-        gameSession.replaceState(result.state);
+        gameSession.replaceState({
+          ...result.state,
+          language: gameSession.getState().language,
+        });
         setPersistenceStatus(result.status);
       } catch {
         if (mounted)
@@ -166,6 +219,7 @@ const GameApp: React.FC = () => {
     gameSession.setLanguage(selected);
     bridge.emitUiToGame({ type: "DIALOGUE_CLOSE" });
     bridge.emitUiToGame({ type: "POSTCARD_CLOSE" });
+    setChallenge(null);
     bridge.emitUiToGame({ type: "SET_LANGUAGE", language: selected });
     trackAnalytics("language_selected", { language: selected });
     setVersion((current) => current + 1);
@@ -178,6 +232,23 @@ const GameApp: React.FC = () => {
     } catch {
       // Fullscreen is optional; the game stays playable in the viewport.
     }
+  };
+
+  const closeChallenge = () => {
+    setChallenge(null);
+    bridge.emitUiToGame({ type: "DIALOGUE_CLOSE" });
+    bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: true });
+  };
+
+  const openChallengeFromContent = (placeKey: string) => {
+    const definition = getLandmarkGameDefinitionByLocationKey(placeKey);
+    if (!definition) return;
+    setSelectedLandmarkKey(null);
+    bridge.emitUiToGame({
+      type: "OPEN_LANDMARK_CHALLENGE",
+      questId: definition.questId,
+      placeKey: definition.locationKey,
+    });
   };
 
   return (
@@ -201,24 +272,62 @@ const GameApp: React.FC = () => {
             type="button"
             className="app-header__button"
             onClick={() => {
+              bridge.emitUiToGame({ type: "DIALOGUE_CLOSE" });
               bridge.emitUiToGame({ type: "POSTCARD_CLOSE" });
+              bridge.emitUiToGame({
+                type: "SET_INPUT_ENABLED",
+                enabled: false,
+              });
               setTravelToolsOpen(false);
               setEndingOpen(false);
+              setGalleryOpen(false);
+              setSelectedLandmarkKey(null);
+              setChallenge(null);
               setPassportOpen(true);
             }}
             data-testid="passport-open"
           >
             {language === "vi"
-              ? `Hộ chiếu ${state.memoryFragments}/4`
-              : `Passport ${state.memoryFragments}/4`}
+              ? `Hộ chiếu ${state.memoryFragments}/${QUEST_ORDER.length}`
+              : `Passport ${state.memoryFragments}/${QUEST_ORDER.length}`}
           </button>
           <button
             type="button"
             className="app-header__button"
             onClick={() => {
+              bridge.emitUiToGame({ type: "DIALOGUE_CLOSE" });
               bridge.emitUiToGame({ type: "POSTCARD_CLOSE" });
+              bridge.emitUiToGame({
+                type: "SET_INPUT_ENABLED",
+                enabled: false,
+              });
+              setPassportOpen(false);
+              setTravelToolsOpen(false);
+              setEndingOpen(false);
+              setSelectedLandmarkKey(null);
+              setChallenge(null);
+              setGalleryOpen(true);
+              trackAnalytics("gallery_open");
+            }}
+            data-testid="landmark-gallery-open"
+          >
+            {language === "vi" ? "Khám phá" : "Explore"}
+          </button>
+          <button
+            type="button"
+            className="app-header__button"
+            onClick={() => {
+              bridge.emitUiToGame({ type: "DIALOGUE_CLOSE" });
+              bridge.emitUiToGame({ type: "POSTCARD_CLOSE" });
+              bridge.emitUiToGame({
+                type: "SET_INPUT_ENABLED",
+                enabled: false,
+              });
               setPassportOpen(false);
               setEndingOpen(false);
+              setGalleryOpen(false);
+              setSelectedLandmarkKey(null);
+              setChallenge(null);
               setTravelToolsOpen(true);
             }}
             data-testid="travel-tools-open"
@@ -290,7 +399,10 @@ const GameApp: React.FC = () => {
         {passportOpen ? (
           <PassportPanel
             state={state}
-            onClose={() => setPassportOpen(false)}
+            onClose={() => {
+              setPassportOpen(false);
+              bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: true });
+            }}
             onOpenEnding={() => {
               setPassportOpen(false);
               setEndingOpen(true);
@@ -303,14 +415,65 @@ const GameApp: React.FC = () => {
         {endingOpen ? (
           <JourneyEnding
             language={language}
-            onClose={() => setEndingOpen(false)}
+            onClose={() => {
+              setEndingOpen(false);
+              bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: true });
+            }}
           />
         ) : null}
         {travelToolsOpen ? (
           <TravelToolsPanel
             state={state}
-            onClose={() => setTravelToolsOpen(false)}
+            onClose={() => {
+              setTravelToolsOpen(false);
+              bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: true });
+            }}
             onStateChange={() => setVersion((current) => current + 1)}
+          />
+        ) : null}
+        {galleryOpen ? (
+          <LandmarkGalleryPanel
+            language={language}
+            onClose={() => {
+              setGalleryOpen(false);
+              bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: true });
+            }}
+            onSelectLandmark={(key) => {
+              setGalleryOpen(false);
+              setSelectedLandmarkKey(key);
+            }}
+          />
+        ) : null}
+        {selectedLandmarkKey ? (
+          <LandmarkDetailPanel
+            landmarkKey={selectedLandmarkKey}
+            language={language}
+            onClose={() => {
+              setSelectedLandmarkKey(null);
+              bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: true });
+            }}
+            onOpenChallenge={openChallengeFromContent}
+          />
+        ) : null}
+        {challenge ? (
+          <LandmarkChallengePanel
+            questId={challenge.questId}
+            placeKey={challenge.placeKey}
+            language={language}
+            onClose={closeChallenge}
+            onStart={(questId) => {
+              setChallenge(null);
+              bridge.emitUiToGame({ type: "START_QUEST", questId });
+            }}
+            onOpenDetails={(placeKey) => {
+              setChallenge(null);
+              bridge.emitUiToGame({ type: "DIALOGUE_CLOSE" });
+              bridge.emitUiToGame({
+                type: "SET_INPUT_ENABLED",
+                enabled: false,
+              });
+              setSelectedLandmarkKey(placeKey);
+            }}
           />
         ) : null}
       </main>

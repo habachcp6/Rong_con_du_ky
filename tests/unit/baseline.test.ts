@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { QUESTS, canTransitionQuest } from "../../src/shared/quests.js";
 
 describe("Baseline M0 Tests", () => {
-  it("should have 4 defined quests", () => {
-    expect(Object.keys(QUESTS)).toHaveLength(4);
+  it("should have 10 defined quests", () => {
+    expect(Object.keys(QUESTS)).toHaveLength(10);
   });
 
   it("should validate valid quest state transitions", () => {

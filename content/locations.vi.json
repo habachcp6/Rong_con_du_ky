@@ -5,9 +5,9 @@
     "shortDescription": "Cầu Rồng bắc qua sông Hàn, kết nối khu vực trung tâm với phía đông thành phố. Công trình mang hình tượng rồng và là một dấu mốc quen thuộc trên tuyến tham quan ven sông. Trong game, đây là điểm khởi đầu để Rồng Con khám phá ký ức của Đà Nẵng; hãy kiểm tra cổng du lịch chính thức trước khi lập kế hoạch tham quan thực tế.",
     "funFact": "Theo cổng thông tin du lịch Đà Nẵng, Cầu Rồng dài 666 m, rộng 37,5 m và có sáu làn xe.",
     "visitTip": "Lịch trình phun lửa, phun nước và phương án giao thông có thể thay đổi; hãy kiểm tra thông báo hiện hành của địa phương trước chuyến đi.",
-    "authoredImage": "/assets/landmarks/dragon-bridge.svg",
+    "authoredImage": "/assets/landmarks/dragon-bridge.png",
     "assetId": "landmark_dragon_bridge",
-    "imageAttributionId": "asset_placeholder_original_01",
+    "imageAttributionId": "asset_landmark_art_01",
     "sourceIds": ["source_dragon_bridge_01"]
   },
   "my_khe_beach": {
@@ -16,9 +16,9 @@
     "shortDescription": "Biển Mỹ Khê nằm dọc khu vực ven biển phía đông Đà Nẵng, cách trung tâm thành phố vài ki-lô-mét theo thông tin của cổng du lịch thành phố. Bờ cát, không gian rộng và hoạt động ven biển khiến nơi đây phù hợp cho một điểm dừng ngoài trời. Trong game, nhiệm vụ dọn rác nhắc người chơi giữ sạch bãi biển; đây là thông điệp bảo tồn, không phải dữ liệu vận hành của bãi tắm.",
     "funFact": "Cổng du lịch Đà Nẵng ghi nhận Mỹ Khê được Forbes gọi là một trong những bãi biển quyến rũ nhất hành tinh.",
     "visitTip": "Theo dõi thời tiết, biển báo và hướng dẫn của lực lượng cứu hộ tại chỗ; chỉ xuống nước khi điều kiện an toàn.",
-    "authoredImage": "/assets/landmarks/my-khe.svg",
+    "authoredImage": "/assets/landmarks/my-khe.png",
     "assetId": "landmark_my_khe_beach",
-    "imageAttributionId": "asset_placeholder_original_01",
+    "imageAttributionId": "asset_landmark_art_01",
     "sourceIds": ["source_my_khe_01"]
   },
   "marble_mountains": {
@@ -27,9 +27,9 @@
     "shortDescription": "Ngũ Hành Sơn là quần thể danh thắng ở phía đông nam Đà Nẵng, có hang động, chùa và các lối đi bậc đá. Cổng du lịch thành phố mô tả quần thể gồm Thủy Sơn, Kim Sơn, hai ngọn Hỏa Sơn, Thổ Sơn và Mộc Sơn. Câu đố Ngũ Hành trong game lấy cảm hứng từ tên gọi địa danh, không thay thế hướng dẫn tham quan tại điểm đến.",
     "funFact": "Làng nghề điêu khắc đá mỹ nghệ Non Nước dưới chân núi được công nhận là Di sản văn hóa phi vật thể quốc gia vào năm 2014.",
     "visitTip": "Đi giày có độ bám tốt, đi theo biển chỉ dẫn và kiểm tra thông tin vé, lối lên núi hoặc thang máy trên kênh chính thức trước khi đi.",
-    "authoredImage": "/assets/landmarks/marble-mountains.svg",
+    "authoredImage": "/assets/landmarks/marble-mountains.png",
     "assetId": "landmark_marble_mountains",
-    "imageAttributionId": "asset_placeholder_original_01",
+    "imageAttributionId": "asset_landmark_art_01",
     "sourceIds": ["source_marble_mountains_01"]
   },
   "son_tra_peninsula": {
@@ -38,9 +38,75 @@
     "shortDescription": "Bán đảo Sơn Trà là khu vực thiên nhiên phía đông bắc Đà Nẵng, nơi rừng gặp biển và hệ sinh thái đa dạng được bảo tồn. Cổng du lịch thành phố ghi nhận voọc chà vá chân nâu là loài quý hiếm tại đây; GreenViet cũng có chương trình bảo tồn loài này ở Sơn Trà. Nhiệm vụ trong game yêu cầu quan sát dấu vết, không đuổi theo hay chạm vào động vật hoang dã.",
     "funFact": "Cổng du lịch Đà Nẵng mô tả Sơn Trà là “lá phổi xanh” của thành phố và gọi voọc chà vá chân nâu là “Nữ hoàng linh trưởng”.",
     "visitTip": "Chỉ đi theo tuyến được phép và thông báo hiện hành; giữ khoảng cách yên lặng, không cho động vật ăn, không xả rác hay gây xáo trộn sinh cảnh.",
-    "authoredImage": "/assets/landmarks/son-tra.svg",
+    "authoredImage": "/assets/landmarks/son-tra.png",
     "assetId": "landmark_son_tra_peninsula",
-    "imageAttributionId": "asset_placeholder_original_01",
+    "imageAttributionId": "asset_landmark_art_01",
     "sourceIds": ["source_son_tra_01", "source_son_tra_conservation_01"]
+  },
+  "han_river_bridge": {
+    "key": "han_river_bridge",
+    "name": "Cầu Sông Hàn",
+    "shortDescription": "Cầu Sông Hàn là cây cầu quay đầu tiên ở Việt Nam do chính người Việt Nam thiết kế và xây dựng. Cầu bắc qua sông Hàn, kết nối quận Hải Châu với quận Sơn Trà tại thành phố Đà Nẵng. Trong game, điểm dừng này thể hiện niềm tự hào kiến trúc đô thị; hãy tham khảo thông tin giao thông địa phương trước khi đến tham quan.",
+    "funFact": "Theo cổng thông tin du lịch Đà Nẵng, Cầu Sông Hàn dài 487,7 m, rộng 11,9 m và có phần giữa có thể quay cho tàu thuyền qua lại.",
+    "visitTip": "Thời gian quay của cầu có thể điều chỉnh theo quyết định của địa phương; hãy kiểm tra lịch trình chính thức trên cổng du lịch trước khi đến xem.",
+    "authoredImage": "/assets/landmarks/han-river-bridge.png",
+    "assetId": "landmark_han_river_bridge",
+    "imageAttributionId": "asset_landmark_art_01",
+    "sourceIds": ["source_han_river_bridge_01"]
+  },
+  "linh_ung_son_tra": {
+    "key": "linh_ung_son_tra",
+    "name": "Chùa Linh Ứng Sơn Trà",
+    "shortDescription": "Chùa Linh Ứng Sơn Trà tọa lạc trên bán đảo Sơn Trà, tựa lưng vào đỉnh núi và hướng ra biển Đông. Quần thể chùa nổi tiếng với tượng Phật Bà Quan Thế Âm cao 67 m đứng trên tòa sen. Trong game, điểm dừng này mang lại cảm giác thanh tĩnh; hãy chú ý trang phục lịch sự và giữ trật tự khi ghé thăm.",
+    "funFact": "Cổng du lịch Đà Nẵng ghi nhận tượng Phật Bà Quan Thế Âm tại chùa Linh Ứng Sơn Trà cao 67 m, là một trong những tượng Phật cao nhất Việt Nam.",
+    "visitTip": "Giữ gìn không gian trang nghiêm, ăn mặc lịch sự và mang theo mũ, nước uống khi tham quan khuôn viên rộng lớn của chùa.",
+    "authoredImage": "/assets/landmarks/linh-ung.png",
+    "assetId": "landmark_linh_ung_son_tra",
+    "imageAttributionId": "asset_landmark_art_01",
+    "sourceIds": ["source_linh_ung_son_tra_01"]
+  },
+  "cham_museum": {
+    "key": "cham_museum",
+    "name": "Bảo tàng Điêu khắc Chăm",
+    "shortDescription": "Bảo tàng Điêu khắc Chăm Đà Nẵng tọa lạc tại giao lộ đường 2 Tháng 9 và đường Trưng Nữ Vương, ngay trung tâm thành phố. Bảo tàng lưu giữ một sưu tập hiện vật điêu khắc Chăm Pa quy mô lớn, gồm nhiều Bảo vật Quốc gia. Trong trò chơi, đây là không gian văn hóa đặc sắc giúp người chơi tìm hiểu về lịch sử di sản khu vực miền Trung.",
+    "funFact": "Bảo tàng Điêu khắc Chăm được khởi công từ năm 1915 và lưu giữ nhiều hiện vật tiêu biểu của nghệ thuật Chăm Pa.",
+    "visitTip": "Du khách nên tham quan theo thứ tự các phòng trưng bày theo vùng di tích để hiểu rõ tiến trình phát triển nghệ thuật điêu khắc Chăm.",
+    "authoredImage": "/assets/landmarks/cham-museum.png",
+    "assetId": "landmark_cham_museum",
+    "imageAttributionId": "asset_landmark_art_01",
+    "sourceIds": ["source_cham_museum_01"]
+  },
+  "non_nuoc_stone_village": {
+    "key": "non_nuoc_stone_village",
+    "name": "Làng nghề Đá mỹ nghệ Non Nước",
+    "shortDescription": "Làng nghề điêu khắc đá mỹ nghệ Non Nước nằm dưới chân danh thắng Ngũ Hành Sơn, thuộc phường Hòa Hải, quận Ngũ Hành Sơn. Làng nghề hình thành từ khoảng thế kỷ 17 đến đầu thế kỷ 18 và đã được công nhận là Di sản văn hóa phi vật thể quốc gia. Trong game, đây là điểm dừng làng nghề thể hiện bàn tay khéo léo của các nghệ nhân truyền thống.",
+    "funFact": "Làng nghề đá mỹ nghệ Non Nước dưới chân Ngũ Hành Sơn được chứng nhận là Di sản văn hóa phi vật thể quốc gia vào năm 2014.",
+    "visitTip": "Nên hỏi giá trước khi chọn mua sản phẩm thủ công mỹ nghệ và chú ý đường đi khi tham quan các xưởng điêu khắc đá.",
+    "authoredImage": "/assets/landmarks/non-nuoc.png",
+    "assetId": "landmark_non_nuoc_stone_village",
+    "imageAttributionId": "asset_landmark_art_01",
+    "sourceIds": ["source_non_nuoc_stone_village_01"]
+  },
+  "han_market": {
+    "key": "han_market",
+    "name": "Chợ Hàn",
+    "shortDescription": "Chợ Hàn nằm ở trung tâm thành phố Đà Nẵng, tiếp giáp bốn con đường chính là Trần Phú, Bạch Đằng, Hùng Vương và Nguyễn Thái Học. Chợ xuất hiện từ những năm 1940 và là trung tâm thương mại truyền thống sầm uất nổi tiếng với các đặc sản địa phương. Trong game, điểm dừng này giúp người chơi trải nghiệm không khí mua sắm nhộn nhịp đặc trưng của đô thị ven sông.",
+    "funFact": "Chợ Hàn xuất hiện từ thập niên 1940 và là khu chợ truyền thống lâu đời kết nối giao thương sầm uất bên sông Hàn.",
+    "visitTip": "Tham quan chợ vào buổi sáng để cảm nhận không khí nhộn nhịp và chú ý bảo quản tài sản cá nhân nơi đông người.",
+    "authoredImage": "/assets/landmarks/han-market.png",
+    "assetId": "landmark_han_market",
+    "imageAttributionId": "asset_landmark_art_01",
+    "sourceIds": ["source_han_market_01"]
+  },
+  "ba_na_hills": {
+    "key": "ba_na_hills",
+    "name": "Bà Nà Hills",
+    "shortDescription": "Bà Nà Hills nằm trên núi Chúa, cách trung tâm Đà Nẵng khoảng 25 km về phía tây nam. Quần thể vùng cao này nổi tiếng với cảnh quan núi rừng, kiến trúc lấy cảm hứng từ châu Âu và Cầu Vàng độc đáo. Trong trò chơi, đây là điểm dừng vùng cao đại diện cho cảnh quan núi rừng và hạ tầng du lịch quy mô của thành phố.",
+    "funFact": "Cầu Vàng tại Bà Nà Hills nổi tiếng thế giới với thiết kế hình dải lụa vàng nâng đỡ bởi hai bàn tay đá khổng lồ giữa mây núi.",
+    "visitTip": "Thời tiết trên núi có thể thay đổi nhanh và mát hơn trung tâm; nên mang theo áo khoác mỏng và kiểm tra thông tin vé cáp treo.",
+    "authoredImage": "/assets/landmarks/ba-na-hills.png",
+    "assetId": "landmark_ba_na_hills",
+    "imageAttributionId": "asset_landmark_art_01",
+    "sourceIds": ["source_ba_na_hills_01"]
   }
 }

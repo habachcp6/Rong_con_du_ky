@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" shape-rendering="crispEdges" data-pixel-art="true" data-alpha="false">
+  <!-- Misty mountain sky -->
+  <rect width="320" height="180" fill="#c8dce8"/>
+  <!-- Highland clouds -->
+  <rect x="30" y="15" width="90" height="14" fill="#ffffff"/>
+  <rect x="200" y="10" width="80" height="12" fill="#ffffff"/>
+
+  <!-- Cable car wire -->
+  <rect y="28" width="320" height="2" fill="#8a9aa2"/>
+  <!-- Gondola -->
+  <rect x="90" y="30" width="20" height="14" fill="#c75a3d"/>
+  <rect x="99" y="24" width="2" height="6" fill="#8a9aa2"/>
+
+  <!-- Mountain slopes -->
+  <rect x="0" y="90" width="320" height="90" fill="#2d7a4f"/>
+  <rect x="0" y="65" width="160" height="40" fill="#2d7a4f"/>
+  <rect x="180" y="60" width="140" height="45" fill="#1a5c38"/>
+
+  <!-- Left stone hand -->
+  <rect x="55" y="68" width="50" height="40" fill="#8a9aa2"/> <!-- Palm -->
+  <rect x="50" y="50" width="12" height="30" fill="#c8dce8"/> <!-- Finger 1 -->
+  <rect x="65" y="42" width="12" height="38" fill="#c8dce8"/> <!-- Finger 2 -->
+  <rect x="80" y="45" width="12" height="35" fill="#c8dce8"/> <!-- Finger 3 -->
+  <rect x="95" y="52" width="10" height="28" fill="#c8dce8"/> <!-- Finger 4 -->
+
+  <!-- Right stone hand -->
+  <rect x="210" y="68" width="50" height="40" fill="#8a9aa2"/> <!-- Palm -->
+  <rect x="205" y="52" width="10" height="28" fill="#c8dce8"/> <!-- Finger 1 -->
+  <rect x="218" y="42" width="12" height="38" fill="#c8dce8"/> <!-- Finger 2 -->
+  <rect x="233" y="45" width="12" height="35" fill="#c8dce8"/> <!-- Finger 3 -->
+  <rect x="248" y="50" width="12" height="30" fill="#c8dce8"/> <!-- Finger 4 -->
+
+  <!-- Golden Bridge walkway -->
+  <rect x="10" y="80" width="300" height="12" fill="#ffd166"/>
+  <rect x="10" y="76" width="300" height="4" fill="#f47c48"/>
+
+  <!-- Forest base -->
+  <rect y="140" width="320" height="40" fill="#1a5c38"/>
+</svg>

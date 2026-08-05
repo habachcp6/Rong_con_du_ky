@@ -96,6 +96,26 @@ export class TitleScene extends Phaser.Scene {
       removeStartHandlers();
       this.scene.start("OverworldScene");
     };
+    // The gallery is available before the title screen begins. Preserve that
+    // useful content path by carrying a requested landmark into the map
+    // instead of silently dropping the event while Overworld is not active.
+    const startRequestedLandmarkChallenge = (
+      questId: string,
+      placeKey: string,
+    ) => {
+      if (hasStarted) {
+        return;
+      }
+      hasStarted = true;
+      if (!gameSession.hasPersistedState()) {
+        gameSession.reset();
+      }
+      removeStartHandlers();
+      this.scene.start("OverworldScene", {
+        requestedQuestId: questId,
+        requestedPlaceKey: placeKey,
+      });
+    };
     const startGame = () => (hasSave ? continueGame() : newGame());
     continueButton.on("pointerdown", continueGame);
     newGameButton.on("pointerdown", newGame);
@@ -106,6 +126,9 @@ export class TitleScene extends Phaser.Scene {
     this.input.keyboard?.once("keydown-SPACE", startGame);
     const unsubscribe = bridge.onUiToGame((event) => {
       if (event.type === "SET_LANGUAGE") refreshCopy();
+      if (event.type === "OPEN_LANDMARK_CHALLENGE") {
+        startRequestedLandmarkChallenge(event.questId, event.placeKey);
+      }
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       removeStartHandlers();

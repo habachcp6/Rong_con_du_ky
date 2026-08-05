@@ -1,6 +1,13 @@
 import { spawn } from "node:child_process";
 
 const executable = process.platform === "win32" ? "npx.cmd" : "npx";
+const environment = { ...process.env, VITE_ENABLE_E2E_BRIDGE: "true" };
+// A bridge check is development-only. A stale external URL would make
+// Playwright skip its Vite web server and target a production/container URL.
+delete environment.PLAYWRIGHT_BASE_URL;
+delete environment.PLAYWRIGHT_TEST_BASE_URL;
+delete environment.PLAYWRIGHT_PRODUCTION_E2E;
+
 const child = spawn(
   executable,
   [
@@ -11,7 +18,7 @@ const child = spawn(
     "--workers=1",
   ],
   {
-    env: { ...process.env, VITE_ENABLE_E2E_BRIDGE: "true" },
+    env: environment,
     stdio: "inherit",
   },
 );

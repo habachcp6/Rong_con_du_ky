@@ -5,7 +5,7 @@ import { QUESTS } from "../../shared/quests";
 import type { GameState } from "../../shared/types";
 
 export type GameTestBridge = Readonly<{
-  version: "1";
+  version: "2";
   getState(): GameState;
   teleportTo(placeKey: string): boolean;
   startQuest(questId: string): boolean;
@@ -49,7 +49,7 @@ const applyQuestMutation = (
  */
 export const installGameTestBridge = (): (() => void) => {
   const api: GameTestBridge = Object.freeze({
-    version: "1",
+    version: "2",
     getState: () => gameSession.getState(),
     teleportTo: (placeKey) => {
       const destination = QUEST_INTERACTABLES.find(

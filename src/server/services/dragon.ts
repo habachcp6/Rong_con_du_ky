@@ -7,6 +7,10 @@ import {
   type ItineraryRequest,
   type ItineraryResponse,
 } from "../../shared/schemas.js";
+import {
+  LANDMARK_GAME_DEFINITION_COUNT,
+  type LandmarkQuestId,
+} from "../../shared/landmark-game-definitions.js";
 import type { Language } from "../../shared/types.js";
 import { ContentRepository, type DialogueNode } from "./content.js";
 
@@ -33,12 +37,23 @@ export type DragonServiceOptions = {
   content: ContentRepository;
 };
 
-const NPC_BY_QUEST: Record<string, string> = {
+const NPC_BY_QUEST: Record<LandmarkQuestId, string> = {
   dragon_bridge_lights: "dragon_bridge_npc",
   my_khe_clean_wave: "my_khe_npc",
   marble_five_elements: "marble_npc",
   son_tra_traces: "son_tra_npc",
+  han_river_bridge_turn: "han_river_bridge_guide",
+  linh_ung_quiet_path: "linh_ung_guide",
+  cham_museum_relic_match: "cham_museum_guide",
+  non_nuoc_carving_pattern: "non_nuoc_guide",
+  han_market_basket_sort: "han_market_guide",
+  ba_na_golden_bridge: "ba_na_guide",
 };
+
+function dialogueIdForQuest(questId: string | undefined): string | undefined {
+  if (!questId || !Object.hasOwn(NPC_BY_QUEST, questId)) return undefined;
+  return NPC_BY_QUEST[questId as LandmarkQuestId];
+}
 
 const DRAGON_REPLY_JSON_SCHEMA = {
   type: "object",
@@ -74,7 +89,7 @@ const ITINERARY_JSON_SCHEMA = {
     summary: { type: "string", maxLength: 600 },
     stops: {
       type: "array",
-      maxItems: 4,
+      maxItems: LANDMARK_GAME_DEFINITION_COUNT,
       items: {
         type: "object",
         additionalProperties: false,
@@ -89,7 +104,7 @@ const ITINERARY_JSON_SCHEMA = {
     },
     notes: {
       type: "array",
-      maxItems: 4,
+      maxItems: LANDMARK_GAME_DEFINITION_COUNT,
       items: { type: "string", maxLength: 240 },
     },
   },
@@ -132,7 +147,7 @@ function makeFallbackReply(
 ): DragonReply {
   const node =
     repository.dialogue(request.language)[
-      NPC_BY_QUEST[request.questId ?? ""]
+      dialogueIdForQuest(request.questId) ?? ""
     ] ?? fallbackNode(request.language);
   const asksForHint = /gợi|hint|help|giúp|khó/i.test(request.message);
   const dialogue = asksForHint
@@ -160,7 +175,7 @@ function makeFallbackItinerary(
   const locations = repository.locations(request.language);
   const unlocked = [...new Set(request.unlockedPostcards)]
     .filter((key) => locations[key])
-    .slice(0, 4);
+    .slice(0, LANDMARK_GAME_DEFINITION_COUNT);
   const isVietnamese = request.language === "vi";
   const interests = request.preferences.interests.slice(0, 3).join(", ");
 

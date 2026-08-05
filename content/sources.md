@@ -52,6 +52,66 @@ This file is the canonical registry for the source IDs referenced by `content/*.
 - **License / use:** Facts paraphrased for an educational hackathon game; page text and images remain with GreenViet and are not copied into this repository.
 - **Supports:** GreenViet's red-shanked douc conservation programme in Son Tra Peninsula, Da Nang.
 
+## `source_han_river_bridge_01`
+
+- **Kind:** tourism-fact
+- **Publisher:** Da Nang Tourism Promotion Center / Danang Fantasticity
+- **Title:** Cầu Sông Hàn / Han River Bridge
+- **URL:** https://danangfantasticity.com/cn/han-river-bridge
+- **Accessed:** 2026-08-04
+- **License / use:** Facts paraphrased for an educational hackathon game; page text and images remain with the publisher and are not copied into this repository.
+- **Supports:** Han River Bridge is Vietnam's first swing bridge designed by Vietnamese engineers, connecting Hai Chau and Son Tra districts, 487.7 m long and 11.9 m wide with a rotating central span.
+
+## `source_linh_ung_son_tra_01`
+
+- **Kind:** tourism-fact
+- **Publisher:** Da Nang Tourism Promotion Center / Danang Fantasticity
+- **Title:** Chùa Linh Ứng Sơn Trà / Linh Ung Pagoda Son Tra
+- **URL:** https://danangfantasticity.com/tin-tuc/chua-linh-ung.html
+- **Accessed:** 2026-08-04
+- **License / use:** Facts paraphrased for an educational hackathon game; page text and images remain with the publisher and are not copied into this repository.
+- **Supports:** Linh Ung Pagoda on Son Tra Peninsula features a 67-metre tall Goddess of Mercy statue overlooking Da Nang Bay.
+
+## `source_cham_museum_01`
+
+- **Kind:** tourism-fact
+- **Publisher:** Da Nang Tourism Promotion Center / Danang Fantasticity
+- **Title:** Bảo tàng Điêu khắc Chăm / Cham Museum
+- **URL:** https://danangfantasticity.com/en/bao-tang-dieu-khac-cham
+- **Accessed:** 2026-08-04
+- **License / use:** Facts paraphrased for an educational hackathon game; page text and images remain with the publisher and are not copied into this repository.
+- **Supports:** Cham Museum construction began in 1915 and preserves representative Cham Pa sculpture artifacts and National Treasures.
+
+## `source_non_nuoc_stone_village_01`
+
+- **Kind:** tourism-fact
+- **Publisher:** Da Nang Tourism Promotion Center / Danang Fantasticity
+- **Title:** Làng nghề Đá mỹ nghệ Non Nước / Non Nuoc Stone Village
+- **URL:** https://danangfantasticity.com/cn/culture-en/non-nuoc-traditional-stone-carving-village
+- **Accessed:** 2026-08-04
+- **License / use:** Facts paraphrased for an educational hackathon game; page text and images remain with the publisher and are not copied into this repository.
+- **Supports:** Non Nuoc craft village formed around the 17th through early 18th centuries and was designated National Intangible Cultural Heritage in 2014.
+
+## `source_han_market_01`
+
+- **Kind:** tourism-fact
+- **Publisher:** Da Nang Tourism Promotion Center / Danang Fantasticity
+- **Title:** Chợ Hàn / Han Market
+- **URL:** https://danangfantasticity.com/en/han-market-2/
+- **Accessed:** 2026-08-04
+- **License / use:** Facts paraphrased for an educational hackathon game; page text and images remain with the publisher and are not copied into this repository.
+- **Supports:** Han Market dates back to the 1940s as a historic commercial trading hub in central Da Nang.
+
+## `source_ba_na_hills_01`
+
+- **Kind:** tourism-fact
+- **Publisher:** Da Nang Tourism Promotion Center / Danang Fantasticity
+- **Title:** Bà Nà Hills / Sun World Ba Na Hills
+- **URL:** https://danangfantasticity.com/ja/outstanding-complexes/sun-world-ba-na-hills-3
+- **Accessed:** 2026-08-04
+- **License / use:** Facts paraphrased for an educational hackathon game; page text and images remain with the publisher and are not copied into this repository.
+- **Supports:** Ba Na Hills is about 25 km southwest of central Da Nang, with mountain scenery, European-inspired architecture, and the Golden Bridge held by giant stone hands.
+
 ## `source_food_banh_xeo_ba_duong_01`
 
 - **Kind:** curated-place
@@ -92,6 +152,86 @@ This file is the canonical registry for the source IDs referenced by `content/*.
 - **License / use:** Name, address, and vegetarian classification are referenced from the venue's own site. No rating, review, image, opening hour, or menu price is copied.
 - **Supports:** The curated card's venue name, Nguyễn Xuân Khoát address, and vegetarian classification.
 
+## `source_food_bun_cha_ca_109_01`
+
+- **Kind:** curated-place
+- **Publisher:** Visit Da Nang travel directory
+- **Title:** Bún Chả Cả 109 Nguyễn Chí Thanh
+- **URL:** https://visitdanang.travel/vi/bun-cha-ca-109
+- **Accessed:** 2026-08-04
+- **License / use:** Name and address are used as a short, attributed directory reference. No rating, review, image, opening hour, or menu price is copied.
+- **Supports:** The curated card's venue name, fish cake noodle category, and Nguyễn Chí Thanh address reference.
+
+## `source_food_ans_vegetarian_01`
+
+- **Kind:** curated-place
+- **Publisher:** ANS Vegetarian Restaurant
+- **Title:** Nhà hàng Chay ANS
+- **URL:** https://ansvegetarian.com/
+- **Accessed:** 2026-08-04
+- **License / use:** Name, address, and vegetarian classification are referenced from the venue's own site. No rating, review, image, opening hour, or menu price is copied.
+- **Supports:** The curated card's venue name, Hoàng Sa address, and vegetarian classification.
+
+## `source_food_mi_quang_hong_van_01`
+
+- **Kind:** curated-place
+- **Publisher:** Visit Da Nang travel directory
+- **Title:** Mì Quảng Hồng Vân
+- **URL:** https://visitdanang.travel/vi/mi-quang-hong-van
+- **Accessed:** 2026-08-04
+- **License / use:** Name and address are used as a short, attributed directory reference. No rating, review, image, opening hour, or menu price is copied.
+- **Supports:** The curated card's venue name, Mi Quang category, and Thái Phiên address reference.
+
+## `source_food_haian_seafood_01`
+
+- **Kind:** curated-place
+- **Publisher:** Visit Da Nang travel directory
+- **Title:** Nhà hàng Hải sản Hải An
+- **URL:** https://visitdanang.travel/vi/haian-seafood
+- **Accessed:** 2026-08-04
+- **License / use:** Name and address are used as a short, attributed directory reference. No rating, review, image, opening hour, or menu price is copied.
+- **Supports:** The curated card's venue name, seafood category, and Trường Sa address reference.
+
+## `source_food_khang_lac_vegetarian_01`
+
+- **Kind:** curated-place
+- **Publisher:** Visit Da Nang travel directory
+- **Title:** Quán Chay Khang Lạc
+- **URL:** https://visitdanang.travel/vi/quan-chay-khang-lac
+- **Accessed:** 2026-08-04
+- **License / use:** Name, address, and vegetarian classification are referenced from the directory. No rating, review, image, opening hour, or menu price is copied.
+- **Supports:** The curated card's venue name, Nguyễn Thái Học address, and vegetarian classification.
+
+## `source_food_le_gouren_bana_01`
+
+- **Kind:** curated-place
+- **Publisher:** Sun World Ba Na Hills Dining Directory
+- **Title:** Nhà hàng Le Gouren
+- **URL:** https://banahills.sunworld.vn/en/dining/le-gouren
+- **Accessed:** 2026-08-04
+- **License / use:** Name and venue address are referenced from the official resort directory. No rating, review, image, opening hour, or menu price is copied.
+- **Supports:** The curated card's venue name, Ba Na Hills location, and European cuisine classification.
+
+## `source_food_com_ga_hin_beo_01`
+
+- **Kind:** curated-place
+- **Publisher:** Visit Da Nang travel directory
+- **Title:** Cơm Gà Hin Béo
+- **URL:** https://visitdanang.travel/vi/com-ga-hin-beo
+- **Accessed:** 2026-08-04
+- **License / use:** Name and address are used as a short, attributed directory reference. No rating, review, image, opening hour, or menu price is copied.
+- **Supports:** The curated card's venue name, chicken rice category, and Trần Quốc Toản address reference.
+
+## `source_food_ngoc_chi_vegetarian_01`
+
+- **Kind:** curated-place
+- **Publisher:** Ngoc Chi Vegetarian Restaurant
+- **Title:** Nhà hàng Chay Ngọc Chi
+- **URL:** https://ngocchivegetarian.com/
+- **Accessed:** 2026-08-04
+- **License / use:** Name, address, and vegetarian classification are referenced from the venue's site. No rating, review, image, opening hour, or menu price is copied.
+- **Supports:** The curated card's venue name, Hoàng Diệu address, and vegetarian classification.
+
 ## `source_starter_curation_01`
 
 - **Kind:** curation-policy
@@ -111,3 +251,13 @@ This file is the canonical registry for the source IDs referenced by `content/*.
 - **Accessed:** 2026-08-03
 - **License / use:** Original development placeholders, retained by the team. They may be used in this repository; D-004 owner/rightsholder approval is still required before any public release that replaces or supplements them.
 - **Asset paths:** All paths enumerated in `public/assets/manifest.json` with `attributionId: asset_placeholder_original_01`.
+
+## `asset_landmark_art_01`
+
+- **Kind:** asset-attribution
+- **Author:** Rồng Con Du Ký Hackathon Team
+- **Title:** Original 8/16-bit retro pixel-art Da Nang landmark postcard and map-icon artwork
+- **URL:** local://public/assets/
+- **Accessed:** 2026-08-04
+- **License / use:** Original pixel-art vector graphics created for Rồng Con Du Ký. Free for inclusion in hackathon and educational distribution.
+- **Asset paths:** All 10 landmark postcard SVG paths and all 10 transparent landmark-icon SVG paths enumerated in `public/assets/manifest.json` with `attributionId: asset_landmark_art_01`.

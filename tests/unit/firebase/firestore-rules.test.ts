@@ -8,12 +8,18 @@ const rules = fs.readFileSync(
 );
 
 describe("Firestore game-state rule contract", () => {
-  it("allows exactly the canonical postcard keys and keeps user state owner-scoped", () => {
+  it("allows exactly the ten canonical postcard keys and keeps user state owner-scoped", () => {
     for (const placeKey of [
       "dragon_bridge",
       "my_khe_beach",
       "marble_mountains",
       "son_tra_peninsula",
+      "han_river_bridge",
+      "linh_ung_son_tra",
+      "cham_museum",
+      "non_nuoc_stone_village",
+      "han_market",
+      "ba_na_hills",
     ]) {
       expect(rules).toContain(`'${placeKey}'`);
     }
@@ -31,5 +37,11 @@ describe("Firestore game-state rule contract", () => {
     expect(rules).toContain(
       "state.memoryFragments == rewardedCount(state.quests)",
     );
+    expect(rules).toContain("function validV1ToV2Migration(current, next)");
+    expect(rules).toContain("function validInitialGameState(state)");
+    expect(rules).toContain(
+      "allow create: if isOwner(userId) && validInitialGameState(request.resource.data)",
+    );
+    expect(rules).toContain("state.version == 2");
   });
 });

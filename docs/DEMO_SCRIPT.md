@@ -8,15 +8,15 @@
 
 ## 0:00–0:25 — Lời hứa sản phẩm
 
-Mở title, đổi Việt/Anh, chỉ controls keyboard/touch, mute/fullscreen. Nêu bốn địa danh, mục tiêu 10–15 phút và rằng không cần âm thanh để thắng.
+Mở title, đổi Việt/Anh, chỉ controls keyboard/touch, mute/fullscreen. Nêu mười địa danh, mười thử thách, mục tiêu 10–15 phút và rằng không cần âm thanh để thắng.
 
 ## 0:25–1:20 — Gameplay và nguồn
 
-Vào Overworld, tới Cầu Rồng bằng WASD, mở dialogue bằng E/Space, bắt đầu rhythm game và hoàn thành. Mở postcard, chỉ source ID, rồi mở Passport để chứng minh progress là deterministic.
+Vào Overworld, chỉ icon pixel Cầu Rồng bằng WASD, mở panel thử thách bằng E/Space, bắt đầu rhythm game và hoàn thành. Mở postcard, chỉ source ID, rồi mở Passport để chứng minh progress là deterministic.
 
-## 1:20–2:05 — Ba quest còn lại
+## 1:20–2:05 — Chín thử thách còn lại
 
-Tóm tắt hoặc chạy nhanh Mỹ Khê (8 vật thể/60 s), Ngũ Hành Sơn (5 nguyên tố, tối đa 3 hint), Sơn Trà (3 dấu vết, không đuổi động vật). Mở Passport bốn stamp và ending.
+Tóm tắt hoặc chạy nhanh Mỹ Khê (8 vật thể/60 s), Ngũ Hành Sơn (5 nguyên tố), Sơn Trà (3 dấu vết, không đuổi động vật), sau đó chỉ các icon Cầu Sông Hàn, Linh Ứng, Bảo tàng Chăm, Non Nước, Chợ Hàn và Bà Nà. Mở Passport 10 stamp; ending chỉ mở sau thử thách thứ mười.
 
 ## 2:05–2:40 — Trợ lý và fallback
 

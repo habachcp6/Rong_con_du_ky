@@ -1,10 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" shape-rendering="crispEdges" data-pixel-art="true" data-alpha="false">
-  <rect width="320" height="180" fill="#61C8E8"/>
-  <path fill="#D2DE8A" d="M0 112h320v68H0z"/>
-  <path fill="#6E5140" d="M28 126h48v-20h18v-24h24v-26h18v18h16v24h20v28h24v-14h22v68H28z"/>
-  <path fill="#9A7455" d="M42 126h42v-24h18V82h22V62h10v24h16v22h18v26h24v-14h12v60H42z"/>
-  <path fill="#C9A77B" d="M102 102h20v-14h12v22h14v20h-46zm74 24h18v-14h12v22h-30z"/>
-  <path fill="#182433" d="M126 120h18v20h-18z"/>
-  <path fill="#F5F0D8" d="M130 124h10v12h-10z"/>
-  <path fill="#182433" d="M0 0h320v4H0zM0 176h320v4H0zM0 0h4v180H0zM316 0h4v180h-4z"/>
+  <!-- Misty sky -->
+  <rect width="320" height="180" fill="#dceef4"/>
+  <!-- Soft clouds -->
+  <rect x="40" y="15" width="80" height="12" fill="#ffffff"/>
+  <rect x="200" y="22" width="70" height="10" fill="#ffffff"/>
+
+  <!-- Ground -->
+  <rect y="150" width="320" height="30" fill="#4a8c6f"/>
+
+  <!-- Peak 1 (far left, small) -->
+  <rect x="10" y="100" width="50" height="55" fill="#5a7080"/>
+  <rect x="20" y="80" width="30" height="25" fill="#5a7080"/>
+
+  <!-- Peak 2 (left-mid) -->
+  <rect x="55" y="85" width="50" height="70" fill="#3d5a6e"/>
+  <rect x="65" y="65" width="30" height="25" fill="#3d5a6e"/>
+
+  <!-- Peak 3 (center, tallest - Thủy Sơn) -->
+  <rect x="115" y="55" width="90" height="100" fill="#5a7080"/>
+  <rect x="135" y="30" width="50" height="30" fill="#5a7080"/>
+  <!-- Cave entrance -->
+  <rect x="145" y="110" width="30" height="40" fill="#1a2a3a"/>
+  <!-- Pagoda on peak -->
+  <rect x="152" y="80" width="26" height="6" fill="#c75a3d"/>
+  <rect x="157" y="72" width="16" height="10" fill="#ffffff"/>
+  <rect x="163" y="66" width="4" height="8" fill="#c75a3d"/>
+
+  <!-- Peak 4 (right-mid) -->
+  <rect x="200" y="80" width="55" height="75" fill="#3d5a6e"/>
+  <rect x="215" y="60" width="30" height="25" fill="#3d5a6e"/>
+
+  <!-- Peak 5 (far right, small) -->
+  <rect x="260" y="95" width="50" height="60" fill="#5a7080"/>
+  <rect x="272" y="78" width="26" height="22" fill="#5a7080"/>
 </svg>

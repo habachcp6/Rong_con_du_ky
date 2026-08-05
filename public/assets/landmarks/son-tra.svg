@@ -1,10 +1,39 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" shape-rendering="crispEdges" data-pixel-art="true" data-alpha="false">
-  <rect width="320" height="180" fill="#61C8E8"/>
-  <path fill="#1595C5" d="M0 116h320v64H0z"/>
-  <path fill="#153D2E" d="M0 126h34v-22h26V82h28V64h26v22h22v18h24v22h26v-38h22v18h22v20h24v54H0z"/>
-  <path fill="#24613A" d="M0 140h42v-24h24V94h22V76h18v28h30v20h26v16h22v-28h18v18h28v10h22v40H0z"/>
-  <path fill="#3E8A4F" d="M16 130h22v18H16zm38-20h24v18H54zm38-24h20v16H92zm28 28h22v20h-22zm48 14h24v18h-24zm38-24h24v18h-24zm42 24h22v18h-22z"/>
-  <path fill="#F5F0D8" d="M184 118h12v4h4v8h-4v4h-12v-4h-4v-8h4z"/>
-  <path fill="#D44F65" d="M184 122h4v8h-4z"/>
-  <path fill="#182433" d="M0 0h320v4H0zM0 176h320v4H0zM0 0h4v180H0zM316 0h4v180h-4z"/>
+  <!-- Bright sky -->
+  <rect width="320" height="180" fill="#87ceeb"/>
+
+  <!-- Sun -->
+  <rect x="260" y="15" width="30" height="30" fill="#ffd166"/>
+
+  <!-- Ocean -->
+  <rect y="130" width="320" height="50" fill="#1a7fa0"/>
+
+  <!-- Peninsula mountain silhouette -->
+  <rect x="0" y="80" width="200" height="55" fill="#2d7a4f"/>
+  <rect x="30" y="60" width="120" height="40" fill="#2d7a4f"/>
+  <rect x="60" y="45" width="60" height="25" fill="#2d7a4f"/>
+
+  <!-- Jungle canopy (right side, foreground) -->
+  <rect x="200" y="35" width="120" height="60" fill="#2d7a4f"/>
+  <rect x="220" y="25" width="80" height="20" fill="#2d7a4f"/>
+  <!-- Branch -->
+  <rect x="200" y="95" width="120" height="10" fill="#8b5e3c"/>
+
+  <!-- Voọc Chà Vá (bold, centered on branch) -->
+  <!-- Body -->
+  <rect x="235" y="65" width="30" height="30" fill="#1a2a3a"/>
+  <!-- White beard collar -->
+  <rect x="230" y="58" width="40" height="10" fill="#ffffff"/>
+  <!-- Face -->
+  <rect x="240" y="48" width="20" height="14" fill="#ffd166"/>
+  <!-- Eyes -->
+  <rect x="244" y="54" width="4" height="4" fill="#1a2a3a"/>
+  <rect x="252" y="54" width="4" height="4" fill="#1a2a3a"/>
+  <!-- Head crown -->
+  <rect x="238" y="44" width="24" height="6" fill="#1a2a3a"/>
+  <!-- Red legs -->
+  <rect x="238" y="95" width="10" height="16" fill="#c75a3d"/>
+  <rect x="252" y="95" width="10" height="16" fill="#c75a3d"/>
+  <!-- White tail -->
+  <rect x="260" y="90" width="6" height="35" fill="#ffffff"/>
 </svg>

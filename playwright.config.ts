@@ -1,9 +1,17 @@
 import { defineConfig } from "@playwright/test";
 
 const port = Number(process.env.PLAYWRIGHT_PORT ?? "4173");
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${port}`;
+const baseURL =
+  process.env.PLAYWRIGHT_BASE_URL ??
+  process.env.PLAYWRIGHT_TEST_BASE_URL ??
+  `http://127.0.0.1:${port}`;
 const isCI = Boolean(process.env.CI);
-const usesExternalServer = Boolean(process.env.PLAYWRIGHT_BASE_URL);
+const usesExternalServer = Boolean(
+  process.env.PLAYWRIGHT_BASE_URL ?? process.env.PLAYWRIGHT_TEST_BASE_URL,
+);
+const productionContainerE2e = process.env.PLAYWRIGHT_PRODUCTION_E2E === "true";
+const htmlReportOutputFolder =
+  process.env.PLAYWRIGHT_HTML_OUTPUT_DIR ?? "playwright-report";
 
 if (!Number.isInteger(port) || port < 1 || port > 65535) {
   throw new Error(
@@ -20,6 +28,7 @@ const e2eBridgeEnabled = process.env.VITE_ENABLE_E2E_BRIDGE === "true";
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  testIgnore: productionContainerE2e ? ["**/e2e-bridge-enabled.spec.ts"] : [],
   outputDir: "test-results/playwright",
   fullyParallel: true,
   forbidOnly: isCI,
@@ -31,7 +40,7 @@ export default defineConfig({
   },
   reporter: [
     ["list"],
-    ["html", { open: "never", outputFolder: "playwright-report" }],
+    ["html", { open: "never", outputFolder: htmlReportOutputFolder }],
   ],
   use: {
     baseURL,

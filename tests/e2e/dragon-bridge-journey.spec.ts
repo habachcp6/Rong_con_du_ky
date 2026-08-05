@@ -8,7 +8,7 @@ import {
   waitForGameCanvas,
 } from "./support/evidence";
 
-const GAME_STATE_STORAGE_KEY = "rong-con-du-ky.game-state.v1";
+const GAME_STATE_STORAGE_KEY = "rong-con-du-ky.game-state.v2";
 const DRAGON_BRIDGE_QUEST_ID = "dragon_bridge_lights";
 
 type PersistedGameState = {
@@ -27,12 +27,9 @@ async function readPersistedGameState(
 }
 
 async function moveKeyboardPlayerToDragonBridge(page: Page): Promise<void> {
-  await page.keyboard.down("ArrowUp");
-  await page.waitForTimeout(1_800);
-  await page.keyboard.up("ArrowUp");
-
+  // Player spawns at (830, 630), within interaction radius of Dragon Bridge (880, 630).
   await page.keyboard.down("ArrowRight");
-  await page.waitForTimeout(5_400);
+  await page.waitForTimeout(200);
   await page.keyboard.up("ArrowRight");
 }
 
@@ -48,9 +45,9 @@ async function pressPhaserKey(page: Page, key: string): Promise<void> {
 async function beginDragonBridgeQuest(page: Page): Promise<void> {
   await expect(page.getByTestId("interaction-hint")).toBeVisible();
   await pressPhaserKey(page, "KeyE");
-  await expect(page.getByTestId("dragon-dialogue")).toBeVisible();
-  await page.getByTestId("dragon-quest-start").click();
-  await expect(page.getByTestId("dragon-dialogue")).toBeHidden();
+  await expect(page.getByTestId("landmark-challenge-panel")).toBeVisible();
+  await page.getByTestId("landmark-challenge-start").click();
+  await expect(page.getByTestId("landmark-challenge-panel")).toBeHidden();
 }
 
 async function playWinningRhythm(page: Page): Promise<void> {

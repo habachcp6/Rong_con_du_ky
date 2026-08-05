@@ -3,6 +3,7 @@ import {
   DRAGON_BRIDGE_POSTCARD_KEY,
   DRAGON_BRIDGE_QUEST_ID,
   GAME_STATE_STORAGE_KEY,
+  LEGACY_GAME_STATE_STORAGE_KEY,
   GameSession,
   LocalGameStateStore,
   createInitialGameState,
@@ -89,9 +90,9 @@ describe("LocalGameStateStore", () => {
   });
 
   it("falls back safely when stored JSON is malformed or incompatible", () => {
-    expect(normalizeGameState({ version: 99 })).toMatchObject(
-      createInitialGameState(),
-    );
+    const expected = createInitialGameState();
+    const actual = normalizeGameState({ version: 99 });
+    expect({ ...actual, updatedAt: expected.updatedAt }).toEqual(expected);
     expect(
       normalizeGameState({
         version: 1,
@@ -101,11 +102,48 @@ describe("LocalGameStateStore", () => {
         unlockedPostcards: ["dragon_bridge", "dragon_bridge", 42],
       }),
     ).toMatchObject({
-      player: { x: 248, y: 12 },
+      player: { x: 830, y: 12 },
       quests: { [DRAGON_BRIDGE_QUEST_ID]: "AVAILABLE" },
       unlockedPostcards: [],
       memoryFragments: 0,
     });
+  });
+
+  it("reads a V1 local save once, normalizes it to V2, and removes the legacy key on persist", () => {
+    const storage = new MemoryStorage();
+    storage.setItem(
+      LEGACY_GAME_STATE_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        language: "en",
+        player: { scene: "OverworldScene", x: 320, y: 480 },
+        quests: {
+          dragon_bridge_lights: "REWARDED",
+          my_khe_clean_wave: "REWARDED",
+          marble_five_elements: "REWARDED",
+          son_tra_traces: "REWARDED",
+        },
+        unlockedPostcards: [
+          "dragon_bridge",
+          "my_khe_beach",
+          "marble_mountains",
+          "son_tra_peninsula",
+        ],
+        memoryFragments: 4,
+        preferences: { interests: ["heritage"] },
+        updatedAt: "2026-08-04T00:00:00.000Z",
+      }),
+    );
+
+    const store = new LocalGameStateStore(storage, 1);
+    const migrated = store.getState();
+    expect(migrated.version).toBe(2);
+    expect(migrated.memoryFragments).toBe(4);
+    expect(migrated.quests.han_river_bridge_turn).toBe("AVAILABLE");
+
+    store.flush();
+    expect(storage.getItem(GAME_STATE_STORAGE_KEY)).not.toBeNull();
+    expect(storage.getItem(LEGACY_GAME_STATE_STORAGE_KEY)).toBeNull();
   });
 
   it("unlocks the next quest only through the shared deterministic reward reducer", () => {
@@ -118,6 +156,24 @@ describe("LocalGameStateStore", () => {
     session.rewardQuest(DRAGON_BRIDGE_QUEST_ID);
 
     expect(session.getState().quests.my_khe_clean_wave).toBe("AVAILABLE");
+  });
+
+  it("keeps a completed quest recoverable to its one-time reward after interruption", () => {
+    const storage = new MemoryStorage();
+    const session = new GameSession(new LocalGameStateStore(storage, 1));
+
+    session.startQuest(DRAGON_BRIDGE_QUEST_ID);
+    session.completeQuest(DRAGON_BRIDGE_QUEST_ID);
+    const restored = new GameSession(new LocalGameStateStore(storage, 1));
+
+    expect(restored.getState().quests[DRAGON_BRIDGE_QUEST_ID]).toBe(
+      "COMPLETED",
+    );
+    expect(restored.rewardQuest(DRAGON_BRIDGE_QUEST_ID)?.current).toBe(
+      "REWARDED",
+    );
+    expect(restored.rewardQuest(DRAGON_BRIDGE_QUEST_ID)).toBeNull();
+    expect(restored.getState().memoryFragments).toBe(1);
   });
 
   it("persists language and preferences through the same local state boundary", () => {
@@ -170,14 +226,14 @@ describe("LocalGameStateStore", () => {
       });
     });
 
-    session.updatePlayer("OverworldScene", 248, 772);
-    session.updatePlayer("OverworldScene", 249.4, 772);
+    session.updatePlayer("OverworldScene", 830, 630);
+    session.updatePlayer("OverworldScene", 831.4, 630);
     session.setLanguage("en");
     unsubscribe();
 
     expect(changes).toEqual([
-      { persistence: "debounced", x: 249, language: "vi" },
-      { persistence: "immediate", x: 249, language: "en" },
+      { persistence: "debounced", x: 831, language: "vi" },
+      { persistence: "immediate", x: 831, language: "en" },
     ]);
   });
 });

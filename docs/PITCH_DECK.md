@@ -5,21 +5,22 @@ Tài liệu này là nội dung nguồn cho deck 5–7 slide. Dùng đúng bảy
 ## Slide 1 — Rồng Con Du Ký: khám phá Đà Nẵng qua chơi ngắn
 
 - Web game pixel Việt–Anh cho hành trình 10–15 phút.
-- Người chơi là Rồng Con; mục tiêu là gom bốn Mảnh Ký Ức thay vì chỉ đọc một danh sách địa danh.
+- Người chơi là Rồng Con; mục tiêu là gom mười Mảnh Ký Ức qua mười địa danh thay vì chỉ đọc một danh sách địa danh.
 - Câu hỏi mở đầu: làm sao để một chuyến đi Đà Nẵng vừa đáng nhớ, vừa có nguồn nội dung và vẫn chơi được khi dịch vụ AI vắng mặt?
 
 Visual: title screen desktop hoặc mobile từ Playwright evidence.
 
 ## Slide 2 — Core loop có thể demo trong ba phút
 
-`Khám phá → gặp NPC → mini-game deterministic → postcard có source ID → passport → lịch trình chỉ từ điểm đã mở khóa`
+`Khám phá icon landmark → panel thử thách → mini-game deterministic → postcard có source ID → passport → lịch trình chỉ từ điểm đã mở khóa`
 
 - Cầu Rồng: nhịp đèn, cần 7/10 trong 60 giây.
 - Mỹ Khê: dọn 8 vật thể trong 60 giây.
 - Ngũ Hành Sơn: chuỗi năm nguyên tố, tối đa ba hint.
 - Sơn Trà: quan sát ba dấu vết, không cổ vũ đuổi động vật.
+- Sáu điểm tiếp theo: Cầu Sông Hàn, Linh Ứng, Bảo tàng Chăm, Non Nước, Chợ Hàn và Bà Nà đều có game riêng.
 
-Visual: một postcard, Passport bốn stamp và một mini-game.
+Visual: một postcard, Passport 10 stamp và một mini-game.
 
 ## Slide 3 — AI là người đồng hành, không phải game master
 

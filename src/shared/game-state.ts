@@ -1,16 +1,25 @@
-import { INITIAL_QUESTS_STATE, QUESTS, canTransitionQuest } from "./quests.js";
+import {
+  LANDMARK_GAME_DEFINITIONS,
+  getLandmarkGameDefinitionByQuestId,
+  type LandmarkQuestId,
+} from "./landmark-game-definitions.js";
+import { INITIAL_QUESTS_STATE, canTransitionQuest } from "./quests.js";
 import type { GameState, Language, QuestStatus } from "./types.js";
 
-export const GAME_STATE_VERSION = 1 as const;
+export const GAME_STATE_VERSION = 2 as const;
+export const LEGACY_GAME_STATE_VERSION = 1 as const;
 
-export const QUEST_ORDER = [
-  "dragon_bridge_lights",
-  "my_khe_clean_wave",
-  "marble_five_elements",
-  "son_tra_traces",
-] as const;
+/** The campaign order is derived from the canonical landmark/game bindings. */
+export const QUEST_ORDER: readonly LandmarkQuestId[] =
+  LANDMARK_GAME_DEFINITIONS.map((definition) => definition.questId);
 
-export type QuestId = (typeof QUEST_ORDER)[number];
+/** V1 stored only the original Dragon Bridge through Son Tra vertical slice. */
+export const LEGACY_QUEST_ORDER: readonly LandmarkQuestId[] = QUEST_ORDER.slice(
+  0,
+  4,
+);
+
+export type QuestId = LandmarkQuestId;
 
 export type GameStateMutation =
   | { ok: true; state: GameState; changed: boolean }
@@ -21,7 +30,18 @@ export type GameStateStore = {
   save(state: GameState): Promise<void>;
 };
 
-const isQuestId = (value: string): value is QuestId => value in QUESTS;
+type PersistedStateCandidate = Partial<Omit<GameState, "version">> & {
+  version?: unknown;
+  quests?: unknown;
+  unlockedPostcards?: unknown;
+  player?: unknown;
+  preferences?: unknown;
+  updatedAt?: unknown;
+  language?: unknown;
+};
+
+const isQuestId = (value: string): value is QuestId =>
+  getLandmarkGameDefinitionByQuestId(value) !== undefined;
 
 const isQuestStatus = (value: unknown): value is QuestStatus =>
   value === "LOCKED" ||
@@ -29,6 +49,9 @@ const isQuestStatus = (value: unknown): value is QuestStatus =>
   value === "ACTIVE" ||
   value === "COMPLETED" ||
   value === "REWARDED";
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
 const nowIso = () => new Date().toISOString();
 
@@ -43,7 +66,7 @@ export function createInitialGameState(
   return {
     version: GAME_STATE_VERSION,
     language,
-    player: { scene: "OverworldScene", x: 248, y: 772 },
+    player: { scene: "OverworldScene", x: 830, y: 630 },
     quests: cloneQuests(INITIAL_QUESTS_STATE),
     unlockedPostcards: [],
     memoryFragments: 0,
@@ -99,8 +122,8 @@ export function transitionQuest(
   let memoryFragments = state.memoryFragments;
 
   if (nextStatus === "REWARDED") {
-    const placeKey = QUESTS[questId].landmarkKey;
-    if (!unlockedPostcards.includes(placeKey)) {
+    const placeKey = getLandmarkGameDefinitionByQuestId(questId)?.locationKey;
+    if (placeKey && !unlockedPostcards.includes(placeKey)) {
       unlockedPostcards = [...unlockedPostcards, placeKey];
       memoryFragments += 1;
     }
@@ -191,78 +214,72 @@ export function setLanguage(
 }
 
 /**
- * Accepts persisted JSON defensively. This is a migration boundary, not a game
- * authority: invalid values fall back to the first-run state instead of blocking play.
+ * Reduces persisted quest input to one contiguous campaign frontier: every
+ * leading reward survives, the next unfinished quest remains actionable, and
+ * every later quest is locked. This makes V1-to-V2 migration safe while also
+ * rejecting hand-edited jumps into new destinations.
  */
-export function hydrateGameState(
-  value: unknown,
-  fallbackLanguage: Language = "vi",
+function normalizeCampaignQuests(
+  rawQuests: unknown,
+  allowedQuestIds: readonly QuestId[],
+): Record<string, QuestStatus> {
+  const source = isRecord(rawQuests) ? rawQuests : {};
+  const allowed = new Set<string>(allowedQuestIds);
+  const quests = cloneQuests(INITIAL_QUESTS_STATE);
+
+  for (const questId of QUEST_ORDER) {
+    const rawStatus = allowed.has(questId) ? source[questId] : undefined;
+    if (rawStatus === "REWARDED") {
+      quests[questId] = "REWARDED";
+    } else if (
+      rawStatus === "AVAILABLE" ||
+      rawStatus === "ACTIVE" ||
+      rawStatus === "COMPLETED"
+    ) {
+      quests[questId] = rawStatus;
+    } else {
+      quests[questId] = "AVAILABLE";
+    }
+  }
+
+  return quests;
+}
+
+function normalizeGameStateCandidate(
+  candidate: PersistedStateCandidate,
+  fallbackLanguage: Language,
+  allowedQuestIds: readonly QuestId[],
 ): GameState {
   const fallback = createInitialGameState(fallbackLanguage);
-  if (!value || typeof value !== "object") {
-    return fallback;
-  }
-
-  const candidate = value as Partial<GameState>;
-  if (candidate.version !== GAME_STATE_VERSION) {
-    return fallback;
-  }
-
   const language: Language = candidate.language === "en" ? "en" : "vi";
-  const quests = cloneQuests(INITIAL_QUESTS_STATE);
-  if (candidate.quests && typeof candidate.quests === "object") {
-    for (const questId of QUEST_ORDER) {
-      const status = candidate.quests[questId];
-      if (isQuestStatus(status)) {
-        quests[questId] = status;
-      }
-    }
-  }
+  const quests = normalizeCampaignQuests(candidate.quests, allowedQuestIds);
+  const unlockedPostcards = QUEST_ORDER.flatMap((questId) => {
+    if (quests[questId] !== "REWARDED") return [];
+    const definition = getLandmarkGameDefinitionByQuestId(questId);
+    return definition ? [definition.locationKey] : [];
+  });
 
-  // The campaign is intentionally linear. A stale or hand-edited save cannot
-  // jump to a later mini-game before the preceding reward has been earned.
-  for (let index = 1; index < QUEST_ORDER.length; index += 1) {
-    const previousQuest = QUEST_ORDER[index - 1];
-    const questId = QUEST_ORDER[index];
-    if (quests[previousQuest] !== "REWARDED") {
-      quests[questId] = "LOCKED";
-    }
-  }
-
-  const rewardedPlaceKeys = QUEST_ORDER.filter(
-    (questId) => quests[questId] === "REWARDED",
-  ).map((questId) => QUESTS[questId].landmarkKey);
-  const requestedPostcards = Array.isArray(candidate.unlockedPostcards)
-    ? candidate.unlockedPostcards.filter(
-        (placeKey): placeKey is string => typeof placeKey === "string",
-      )
-    : [];
-  const unlockedPostcards = rewardedPlaceKeys.filter((placeKey) =>
-    requestedPostcards.includes(placeKey),
-  );
-
-  const rawPlayer = candidate.player;
+  const rawPlayer = isRecord(candidate.player) ? candidate.player : undefined;
   const player = {
     scene:
-      rawPlayer &&
-      typeof rawPlayer.scene === "string" &&
-      rawPlayer.scene.trim().length > 0
+      typeof rawPlayer?.scene === "string" && rawPlayer.scene.trim().length > 0
         ? rawPlayer.scene
         : fallback.player.scene,
     x:
-      rawPlayer && Number.isFinite(rawPlayer.x)
+      typeof rawPlayer?.x === "number" && Number.isFinite(rawPlayer.x)
         ? Math.round(rawPlayer.x)
         : fallback.player.x,
     y:
-      rawPlayer && Number.isFinite(rawPlayer.y)
+      typeof rawPlayer?.y === "number" && Number.isFinite(rawPlayer.y)
         ? Math.round(rawPlayer.y)
         : fallback.player.y,
   };
 
-  const rawPreferences = candidate.preferences;
+  const rawPreferences = isRecord(candidate.preferences)
+    ? candidate.preferences
+    : undefined;
   const preferences = {
-    ...(rawPreferences &&
-    typeof rawPreferences.budgetVnd === "number" &&
+    ...(typeof rawPreferences?.budgetVnd === "number" &&
     rawPreferences.budgetVnd > 0
       ? { budgetVnd: Math.round(rawPreferences.budgetVnd) }
       : {}),
@@ -294,4 +311,47 @@ export function hydrateGameState(
         ? candidate.updatedAt
         : fallback.updatedAt,
   };
+}
+
+/**
+ * Migrates the persisted four-quest campaign to V2. Only V1's original quest
+ * fields are read, so a hand-edited V1 save cannot grant future rewards.
+ */
+export function migrateGameStateV1(
+  value: unknown,
+  fallbackLanguage: Language = "vi",
+): GameState {
+  if (!isRecord(value) || value.version !== LEGACY_GAME_STATE_VERSION) {
+    return createInitialGameState(fallbackLanguage);
+  }
+
+  return normalizeGameStateCandidate(
+    value as PersistedStateCandidate,
+    fallbackLanguage,
+    LEGACY_QUEST_ORDER,
+  );
+}
+
+/**
+ * Accepts persisted JSON defensively. This is a migration boundary, not a game
+ * authority: invalid values fall back to the first-run state instead of blocking play.
+ */
+export function hydrateGameState(
+  value: unknown,
+  fallbackLanguage: Language = "vi",
+): GameState {
+  if (!isRecord(value)) return createInitialGameState(fallbackLanguage);
+
+  if (value.version === LEGACY_GAME_STATE_VERSION) {
+    return migrateGameStateV1(value, fallbackLanguage);
+  }
+  if (value.version !== GAME_STATE_VERSION) {
+    return createInitialGameState(fallbackLanguage);
+  }
+
+  return normalizeGameStateCandidate(
+    value as PersistedStateCandidate,
+    fallbackLanguage,
+    QUEST_ORDER,
+  );
 }

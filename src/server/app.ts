@@ -109,10 +109,26 @@ export async function createApp(
   await app.register(fastifyRateLimit, {
     max: 100,
     timeWindow: "1 minute",
-    errorResponseBuilder: () => ({
-      error: "RATE_LIMITED",
-      message: "Too many requests. Please try again shortly.",
-    }),
+    allowList: (req) => {
+      const url = req.raw.url || req.url || "";
+      const pathname = url.split("?")[0];
+      if (
+        pathname === "/api/health" ||
+        pathname.startsWith("/assets/") ||
+        pathname === "/favicon.ico" ||
+        !pathname.startsWith("/api/")
+      ) {
+        return true;
+      }
+      return false;
+    },
+    errorResponseBuilder: (_req, context) => {
+      const err = new Error("Too many requests. Please try again shortly.");
+      (err as unknown as Record<string, unknown>).statusCode =
+        context.statusCode;
+      (err as unknown as Record<string, unknown>).error = "RATE_LIMITED";
+      return err;
+    },
   });
 
   // The frontend, Firebase browser SDK and API all share one Cloud Run origin.
@@ -315,8 +331,47 @@ export async function createApp(
   }
 
   app.setErrorHandler((error, request, reply) => {
+    const errObj = error as
+      | (Error & { statusCode?: number; error?: string; code?: string })
+      | undefined;
+    const statusCode =
+      typeof errObj?.statusCode === "number"
+        ? errObj.statusCode
+        : errObj?.error === "RATE_LIMITED"
+          ? 429
+          : 500;
+
+    if (
+      statusCode === 429 ||
+      errObj?.error === "RATE_LIMITED" ||
+      errObj?.code === "FST_ERR_RATE_LIMIT_EXCEEDED"
+    ) {
+      return noStore(reply)
+        .status(429)
+        .send({
+          error: "RATE_LIMITED",
+          message:
+            typeof errObj?.message === "string"
+              ? errObj.message
+              : "Too many requests. Please try again shortly.",
+        });
+    }
+
+    if (statusCode >= 400 && statusCode < 500) {
+      return noStore(reply)
+        .status(statusCode)
+        .send({
+          error:
+            typeof errObj?.error === "string" ? errObj.error : "CLIENT_ERROR",
+          message:
+            typeof errObj?.message === "string"
+              ? errObj.message
+              : "Request failed.",
+        });
+    }
+
     request.log.error(
-      { err: error, requestId: request.id, route: request.routeOptions.url },
+      { err: error, requestId: request.id, route: request.routeOptions?.url },
       "Unhandled API error",
     );
     return noStore(reply).status(500).send({

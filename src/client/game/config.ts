@@ -7,6 +7,14 @@ import { DragonBridgeQuestScene } from "./scenes/DragonBridgeQuestScene";
 import { MyKheCleanupScene } from "./scenes/MyKheCleanupScene";
 import { MarbleMountainsPuzzleScene } from "./scenes/MarbleMountainsPuzzleScene";
 import { SonTraWildlifeScene } from "./scenes/SonTraWildlifeScene";
+import {
+  BaNaGoldenBridgeQuestScene,
+  ChamMuseumQuestScene,
+  HanMarketQuestScene,
+  HanRiverBridgeQuestScene,
+  LinhUngQuestScene,
+  NonNuocQuestScene,
+} from "./scenes/LandmarkChallengeScenes";
 
 export const gameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -36,5 +44,11 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
     MyKheCleanupScene,
     MarbleMountainsPuzzleScene,
     SonTraWildlifeScene,
+    HanRiverBridgeQuestScene,
+    LinhUngQuestScene,
+    ChamMuseumQuestScene,
+    NonNuocQuestScene,
+    HanMarketQuestScene,
+    BaNaGoldenBridgeQuestScene,
   ],
 };

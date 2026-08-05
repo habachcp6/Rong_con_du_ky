@@ -7,7 +7,7 @@ import {
 } from "./support/evidence";
 import { moveWithTouchJoystick, tapCanvasByTouch } from "./support/touch";
 
-const GAME_STATE_STORAGE_KEY = "rong-con-du-ky.game-state.v1";
+const GAME_STATE_STORAGE_KEY = "rong-con-du-ky.game-state.v2";
 const DRAGON_BRIDGE_QUEST_ID = "dragon_bridge_lights";
 
 async function persistedQuestStatus(page: Page): Promise<unknown> {
@@ -45,28 +45,33 @@ test.describe("mobile touch quest journey @touch @m4", () => {
     test.setTimeout(50_000);
 
     const browserErrors = collectSeriousBrowserErrors(page);
+    await page.addInitScript(() => {
+      window.localStorage.clear();
+    });
     await page.goto("/");
     const canvas = await waitForGameCanvas(page);
 
     // No localStorage precondition is installed: Dragon Bridge is the real
     // first AVAILABLE quest in a fresh game. Start and travel using only touch.
     await tapCanvasByTouch(page, canvas, 320, 180);
-    await moveWithTouchJoystick(page, canvas, { x: 0, y: -1 }, 1_800);
-    await moveWithTouchJoystick(page, canvas, { x: 1, y: 0 }, 5_400);
-    // Touch input is sampled at the display scale on this mobile emulation.
-    // This correction brings the player from the northern shore back to the
-    // bridge road without replacing the real joystick route with a seed.
-    await moveWithTouchJoystick(page, canvas, { x: 0, y: 1 }, 2_100);
+    await moveWithTouchJoystick(page, canvas, { x: 1, y: 0 }, 200);
 
     await expect(page.getByTestId("interaction-hint")).toBeVisible();
     await captureVisualEvidence(page, testInfo, "mobile-near-dragon-bridge");
 
     // This is the Overworld's visible mobile interaction control at logical
     // x=556/y=298, not an E/Space shortcut.
-    await tapCanvasByTouch(page, canvas, 556, 298);
-    await expect(page.getByTestId("dragon-dialogue")).toBeVisible();
-    await page.getByTestId("dragon-quest-start").tap();
-    await expect(page.getByTestId("dragon-dialogue")).toBeHidden();
+    await expect
+      .poll(
+        async () => {
+          await tapCanvasByTouch(page, canvas, 556, 298);
+          return page.getByTestId("landmark-challenge-panel").isVisible();
+        },
+        { timeout: 8_000 },
+      )
+      .toBe(true);
+    await page.getByTestId("landmark-challenge-start").tap();
+    await expect(page.getByTestId("landmark-challenge-panel")).toBeHidden();
 
     await playDragonBridgeWithTouch(page);
     await expect

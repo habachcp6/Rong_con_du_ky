@@ -1,22 +1,32 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  LANDMARK_GAME_DEFINITIONS,
+  getLandmarkGameDefinitionByLocationKey,
+  validateLandmarkGameDefinitions,
+} from "../src/shared/landmark-game-definitions.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const EXPECTED_LOCATION_KEYS = [
-  "dragon_bridge",
-  "my_khe_beach",
-  "marble_mountains",
-  "son_tra_peninsula",
-] as const;
+/** Location content is keyed by the canonical game registry, not a second
+ * handwritten campaign list. */
+export const EXPECTED_LOCATION_KEYS = LANDMARK_GAME_DEFINITIONS.map(
+  (definition) => definition.locationKey,
+);
 
 export const EXPECTED_DIALOGUE_KEYS = [
   "dragon_bridge_npc",
   "my_khe_npc",
   "marble_npc",
   "son_tra_npc",
+  "han_river_bridge_guide",
+  "linh_ung_guide",
+  "cham_museum_guide",
+  "non_nuoc_guide",
+  "han_market_guide",
+  "ba_na_guide",
 ] as const;
 
 const LOCATION_FIELDS = [
@@ -378,6 +388,18 @@ function createAssetIndex(manifest: unknown, issues: ValidationIssue[]) {
   return assets;
 }
 
+function validateLandmarkGameDefinitionContract(issues: ValidationIssue[]) {
+  const result = validateLandmarkGameDefinitions();
+  for (const error of result.errors) {
+    addIssue(
+      issues,
+      "LANDMARK_GAME_DEFINITION_INVALID",
+      "landmark-game-definitions",
+      error,
+    );
+  }
+}
+
 function validateLocation(
   key: string,
   locationVi: unknown,
@@ -397,6 +419,30 @@ function validateLocation(
       "Both Vietnamese and English locations must be objects.",
     );
     return;
+  }
+
+  const definition = getLandmarkGameDefinitionByLocationKey(key);
+  if (!definition) {
+    addIssue(
+      issues,
+      "LOCATION_GAME_DEFINITION_MISSING",
+      key,
+      `Location '${key}' has no canonical landmark game definition.`,
+    );
+  } else {
+    for (const [language, location, basePath] of [
+      ["vi", locationVi, viPath],
+      ["en", locationEn, enPath],
+    ] as const) {
+      if (location.assetId !== definition.postcardAssetId) {
+        addIssue(
+          issues,
+          "LOCATION_POSTCARD_BINDING_MISMATCH",
+          `${basePath}.assetId`,
+          `${language} location '${key}' must use postcard asset '${definition.postcardAssetId}'.`,
+        );
+      }
+    }
   }
 
   validateExactFields(locationVi, LOCATION_FIELDS, viPath, issues);
@@ -708,12 +754,12 @@ function validateCuratedPlaces(
     );
     return;
   }
-  if (curatedPlaces.cards.length < EXPECTED_LOCATION_KEYS.length) {
+  if (curatedPlaces.cards.length < 12) {
     addIssue(
       issues,
       "CURATED_PLACES_INCOMPLETE",
       "curated-places.cards",
-      "Provide at least one Starter card for every MVP landmark.",
+      "Provide at least 12 Starter food cards covering all MVP landmarks.",
     );
   }
 
@@ -899,6 +945,7 @@ export function validateContentData(
   input: ContentValidationInput,
 ): ValidationResult {
   const issues: ValidationIssue[] = [];
+  validateLandmarkGameDefinitionContract(issues);
   const sourceRegistry = parseSourceRegistry(input.sourcesMarkdown);
   issues.push(...sourceRegistry.issues);
   const assets = createAssetIndex(input.assetManifest, issues);

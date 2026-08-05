@@ -1,5 +1,10 @@
 import { doc, getDoc, setDoc, type Firestore } from "firebase/firestore";
-import { hydrateGameState } from "../../shared/game-state.js";
+import {
+  GAME_STATE_VERSION,
+  LEGACY_GAME_STATE_VERSION,
+  QUEST_ORDER,
+  hydrateGameState,
+} from "../../shared/game-state.js";
 import type { GameState, QuestStatus } from "../../shared/types.js";
 import {
   ensureAnonymousFirebaseIdentity,
@@ -41,7 +46,7 @@ const browserFirestoreOperations: FirestoreOperations = {
 };
 
 export type FirestoreGameStateDocument = {
-  version: 1;
+  version: 2;
   language: GameState["language"];
   player: GameState["player"];
   quests: GameState["quests"];
@@ -55,7 +60,13 @@ export type GameStateSyncStatus =
   | { mode: "disabled"; reason: "FIREBASE_NOT_CONFIGURED" }
   | { mode: "idle" }
   | { mode: "ready"; uid: string }
-  | { mode: "offline"; reason: "AUTH_UNAVAILABLE" | "REMOTE_UNAVAILABLE" };
+  | {
+      mode: "offline";
+      reason:
+        | "AUTH_UNAVAILABLE"
+        | "REMOTE_UNAVAILABLE"
+        | "LOCAL_PROGRESS_REQUIRES_MIGRATION";
+    };
 
 export type GameStateBootstrapResult = {
   state: GameState;
@@ -115,10 +126,29 @@ const progressValue = (state: GameState): number =>
     0,
   );
 
-const isPersistedGameState = (value: unknown): value is GameState =>
+/** Firestore only allows a canonical initial document at create time. Existing
+ * local progress remains playable locally until it can be migrated through an
+ * authorized path; a browser must never synthesize a first-write ending. */
+const isInitialCampaignState = (state: GameState): boolean =>
+  state.memoryFragments === 0 &&
+  state.unlockedPostcards.length === 0 &&
+  QUEST_ORDER.every((questId, index) =>
+    index === 0
+      ? state.quests[questId] === "AVAILABLE"
+      : state.quests[questId] === "LOCKED",
+  );
+
+/** V1 remains readable so the mirror can upgrade it in a valid V2 write. */
+const isPersistedGameState = (value: unknown): boolean =>
   Boolean(value) &&
   typeof value === "object" &&
-  (value as Partial<GameState>).version === 1;
+  ((value as { version?: unknown }).version === LEGACY_GAME_STATE_VERSION ||
+    (value as { version?: unknown }).version === GAME_STATE_VERSION);
+
+const isCurrentPersistedGameState = (value: unknown): boolean =>
+  Boolean(value) &&
+  typeof value === "object" &&
+  (value as { version?: unknown }).version === GAME_STATE_VERSION;
 
 const sameFirestoreDocument = (left: GameState, right: GameState): boolean =>
   JSON.stringify(toFirestoreGameStateDocument(left)) ===
@@ -241,6 +271,7 @@ export class FirebaseGameStateMirror implements GameStateMirror {
   private uid: string | null = null;
   private status: GameStateSyncStatus = { mode: "idle" };
   private activeFlush: Promise<GameStateSyncResult> | null = null;
+  private localProgressRequiresMigration = false;
 
   public constructor(
     private readonly auth: AnonymousAuthPort,
@@ -264,11 +295,25 @@ export class FirebaseGameStateMirror implements GameStateMirror {
 
     try {
       const remoteValue = await this.remoteStore.read(uid);
+      if (remoteValue === null && !isInitialCampaignState(local)) {
+        this.localProgressRequiresMigration = true;
+        this.status = {
+          mode: "offline",
+          reason: "LOCAL_PROGRESS_REQUIRES_MIGRATION",
+        };
+        return {
+          state: cloneGameState(local),
+          status: this.getStatus(),
+          source: "local",
+        };
+      }
+
+      this.localProgressRequiresMigration = false;
       const result = reconcileGameStates(local, remoteValue);
       this.latestState = result.state;
 
       if (
-        !isPersistedGameState(remoteValue) ||
+        !isCurrentPersistedGameState(remoteValue) ||
         !sameFirestoreDocument(result.state, hydrateGameState(remoteValue))
       ) {
         await this.remoteStore.write(uid, result.state);
@@ -292,6 +337,11 @@ export class FirebaseGameStateMirror implements GameStateMirror {
 
   public queueSave(state: GameState): void {
     this.latestState = hydrateGameState(state);
+    if (this.localProgressRequiresMigration) {
+      if (!isInitialCampaignState(this.latestState)) return;
+      this.localProgressRequiresMigration = false;
+      this.status = { mode: "idle" };
+    }
     if (this.pendingSave) clearTimeout(this.pendingSave);
 
     const debounceMs = this.options.debounceMs ?? 2_000;
@@ -315,6 +365,14 @@ export class FirebaseGameStateMirror implements GameStateMirror {
     if (!stateAtStart) {
       return {
         state: hydrateGameState(null),
+        status: this.getStatus(),
+        saved: false,
+      };
+    }
+
+    if (this.localProgressRequiresMigration) {
+      return {
+        state: stateAtStart,
         status: this.getStatus(),
         saved: false,
       };

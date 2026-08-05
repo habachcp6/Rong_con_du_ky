@@ -22,13 +22,41 @@ service cloud.firestore {
       return quests is map &&
         exactKeys(
           quests,
-          ['dragon_bridge_lights', 'my_khe_clean_wave', 'marble_five_elements', 'son_tra_traces'],
-          ['dragon_bridge_lights', 'my_khe_clean_wave', 'marble_five_elements', 'son_tra_traces']
+          [
+            'dragon_bridge_lights',
+            'my_khe_clean_wave',
+            'marble_five_elements',
+            'son_tra_traces',
+            'han_river_bridge_turn',
+            'linh_ung_quiet_path',
+            'cham_museum_relic_match',
+            'non_nuoc_carving_pattern',
+            'han_market_basket_sort',
+            'ba_na_golden_bridge'
+          ],
+          [
+            'dragon_bridge_lights',
+            'my_khe_clean_wave',
+            'marble_five_elements',
+            'son_tra_traces',
+            'han_river_bridge_turn',
+            'linh_ung_quiet_path',
+            'cham_museum_relic_match',
+            'non_nuoc_carving_pattern',
+            'han_market_basket_sort',
+            'ba_na_golden_bridge'
+          ]
         ) &&
         isQuestStatus(quests.dragon_bridge_lights) &&
         isQuestStatus(quests.my_khe_clean_wave) &&
         isQuestStatus(quests.marble_five_elements) &&
-        isQuestStatus(quests.son_tra_traces);
+        isQuestStatus(quests.son_tra_traces) &&
+        isQuestStatus(quests.han_river_bridge_turn) &&
+        isQuestStatus(quests.linh_ung_quiet_path) &&
+        isQuestStatus(quests.cham_museum_relic_match) &&
+        isQuestStatus(quests.non_nuoc_carving_pattern) &&
+        isQuestStatus(quests.han_market_basket_sort) &&
+        isQuestStatus(quests.ba_na_golden_bridge);
     }
 
     function validPlayer(player) {
@@ -54,14 +82,26 @@ service cloud.firestore {
       return (quests.dragon_bridge_lights == 'REWARDED' ? 1 : 0) +
         (quests.my_khe_clean_wave == 'REWARDED' ? 1 : 0) +
         (quests.marble_five_elements == 'REWARDED' ? 1 : 0) +
-        (quests.son_tra_traces == 'REWARDED' ? 1 : 0);
+        (quests.son_tra_traces == 'REWARDED' ? 1 : 0) +
+        (quests.han_river_bridge_turn == 'REWARDED' ? 1 : 0) +
+        (quests.linh_ung_quiet_path == 'REWARDED' ? 1 : 0) +
+        (quests.cham_museum_relic_match == 'REWARDED' ? 1 : 0) +
+        (quests.non_nuoc_carving_pattern == 'REWARDED' ? 1 : 0) +
+        (quests.han_market_basket_sort == 'REWARDED' ? 1 : 0) +
+        (quests.ba_na_golden_bridge == 'REWARDED' ? 1 : 0);
     }
 
     function validQuestOrder(quests) {
       return quests.dragon_bridge_lights != 'LOCKED' &&
         (quests.my_khe_clean_wave == 'LOCKED' || quests.dragon_bridge_lights == 'REWARDED') &&
         (quests.marble_five_elements == 'LOCKED' || quests.my_khe_clean_wave == 'REWARDED') &&
-        (quests.son_tra_traces == 'LOCKED' || quests.marble_five_elements == 'REWARDED');
+        (quests.son_tra_traces == 'LOCKED' || quests.marble_five_elements == 'REWARDED') &&
+        (quests.han_river_bridge_turn == 'LOCKED' || quests.son_tra_traces == 'REWARDED') &&
+        (quests.linh_ung_quiet_path == 'LOCKED' || quests.han_river_bridge_turn == 'REWARDED') &&
+        (quests.cham_museum_relic_match == 'LOCKED' || quests.linh_ung_quiet_path == 'REWARDED') &&
+        (quests.non_nuoc_carving_pattern == 'LOCKED' || quests.cham_museum_relic_match == 'REWARDED') &&
+        (quests.han_market_basket_sort == 'LOCKED' || quests.non_nuoc_carving_pattern == 'REWARDED') &&
+        (quests.ba_na_golden_bridge == 'LOCKED' || quests.han_market_basket_sort == 'REWARDED');
     }
 
     function postcardsMatchRewards(state) {
@@ -69,7 +109,13 @@ service cloud.firestore {
         (state.unlockedPostcards.hasAll(['dragon_bridge']) == (state.quests.dragon_bridge_lights == 'REWARDED')) &&
         (state.unlockedPostcards.hasAll(['my_khe_beach']) == (state.quests.my_khe_clean_wave == 'REWARDED')) &&
         (state.unlockedPostcards.hasAll(['marble_mountains']) == (state.quests.marble_five_elements == 'REWARDED')) &&
-        (state.unlockedPostcards.hasAll(['son_tra_peninsula']) == (state.quests.son_tra_traces == 'REWARDED'));
+        (state.unlockedPostcards.hasAll(['son_tra_peninsula']) == (state.quests.son_tra_traces == 'REWARDED')) &&
+        (state.unlockedPostcards.hasAll(['han_river_bridge']) == (state.quests.han_river_bridge_turn == 'REWARDED')) &&
+        (state.unlockedPostcards.hasAll(['linh_ung_son_tra']) == (state.quests.linh_ung_quiet_path == 'REWARDED')) &&
+        (state.unlockedPostcards.hasAll(['cham_museum']) == (state.quests.cham_museum_relic_match == 'REWARDED')) &&
+        (state.unlockedPostcards.hasAll(['non_nuoc_stone_village']) == (state.quests.non_nuoc_carving_pattern == 'REWARDED')) &&
+        (state.unlockedPostcards.hasAll(['han_market']) == (state.quests.han_market_basket_sort == 'REWARDED')) &&
+        (state.unlockedPostcards.hasAll(['ba_na_hills']) == (state.quests.ba_na_golden_bridge == 'REWARDED'));
     }
 
     function validQuestTransition(current, next) {
@@ -84,7 +130,13 @@ service cloud.firestore {
       return validQuestTransition(current.dragon_bridge_lights, next.dragon_bridge_lights) &&
         validQuestTransition(current.my_khe_clean_wave, next.my_khe_clean_wave) &&
         validQuestTransition(current.marble_five_elements, next.marble_five_elements) &&
-        validQuestTransition(current.son_tra_traces, next.son_tra_traces);
+        validQuestTransition(current.son_tra_traces, next.son_tra_traces) &&
+        validQuestTransition(current.han_river_bridge_turn, next.han_river_bridge_turn) &&
+        validQuestTransition(current.linh_ung_quiet_path, next.linh_ung_quiet_path) &&
+        validQuestTransition(current.cham_museum_relic_match, next.cham_museum_relic_match) &&
+        validQuestTransition(current.non_nuoc_carving_pattern, next.non_nuoc_carving_pattern) &&
+        validQuestTransition(current.han_market_basket_sort, next.han_market_basket_sort) &&
+        validQuestTransition(current.ba_na_golden_bridge, next.ba_na_golden_bridge);
     }
 
     function validGameState(state) {
@@ -94,15 +146,26 @@ service cloud.firestore {
           ['version', 'language', 'player', 'quests', 'unlockedPostcards', 'memoryFragments', 'preferences', 'updatedAt'],
           ['version', 'language', 'player', 'quests', 'unlockedPostcards', 'memoryFragments', 'preferences', 'updatedAt']
         ) &&
-        state.version == 1 &&
+        state.version == 2 &&
         (state.language == 'vi' || state.language == 'en') &&
         validPlayer(state.player) &&
         validQuests(state.quests) &&
         state.unlockedPostcards is list &&
-        state.unlockedPostcards.size() <= 4 &&
-        state.unlockedPostcards.hasOnly(['dragon_bridge', 'my_khe_beach', 'marble_mountains', 'son_tra_peninsula']) &&
+        state.unlockedPostcards.size() <= 10 &&
+        state.unlockedPostcards.hasOnly([
+          'dragon_bridge',
+          'my_khe_beach',
+          'marble_mountains',
+          'son_tra_peninsula',
+          'han_river_bridge',
+          'linh_ung_son_tra',
+          'cham_museum',
+          'non_nuoc_stone_village',
+          'han_market',
+          'ba_na_hills'
+        ]) &&
         state.memoryFragments is int &&
-        state.memoryFragments >= 0 && state.memoryFragments <= 4 &&
+        state.memoryFragments >= 0 && state.memoryFragments <= 10 &&
         state.memoryFragments == rewardedCount(state.quests) &&
         state.memoryFragments == state.unlockedPostcards.size() &&
         validQuestOrder(state.quests) &&
@@ -111,16 +174,234 @@ service cloud.firestore {
         state.updatedAt is string && state.updatedAt.size() > 0 && state.updatedAt.size() <= 40;
     }
 
+    // The first write must be the canonical frontier. Without this gate, a
+    // caller could create an otherwise well-shaped terminal V2 document and
+    // bypass every persisted transition in the campaign.
+    function validInitialGameState(state) {
+      return validGameState(state) &&
+        state.quests.dragon_bridge_lights == 'AVAILABLE' &&
+        state.quests.my_khe_clean_wave == 'LOCKED' &&
+        state.quests.marble_five_elements == 'LOCKED' &&
+        state.quests.son_tra_traces == 'LOCKED' &&
+        state.quests.han_river_bridge_turn == 'LOCKED' &&
+        state.quests.linh_ung_quiet_path == 'LOCKED' &&
+        state.quests.cham_museum_relic_match == 'LOCKED' &&
+        state.quests.non_nuoc_carving_pattern == 'LOCKED' &&
+        state.quests.han_market_basket_sort == 'LOCKED' &&
+        state.quests.ba_na_golden_bridge == 'LOCKED' &&
+        state.unlockedPostcards.size() == 0 &&
+        state.memoryFragments == 0;
+    }
+
+    // The V1 migration is evaluated separately from normal V2 updates. Calling
+    // `validGameState(next)` before this migration path combines the ten-quest
+    // V2 validator with every legacy-frontier branch and exceeds Firestore's
+    // 1,000-expression evaluation ceiling for a four-reward V1 save.
+    //
+    // Every migration result uses the complete V2 document shape. Quest values,
+    // cards, and fragments are asserted by the selected frontier below, which
+    // is cheaper than evaluating the generic ten-quest validator a second time.
+    function validMigrationResultShell(state) {
+      return state is map &&
+        state.keys().hasOnly(['version', 'language', 'player', 'quests', 'unlockedPostcards', 'memoryFragments', 'preferences', 'updatedAt']) &&
+        state.version == 2 &&
+        (state.language == 'vi' || state.language == 'en') &&
+        validPlayer(state.player) &&
+        state.quests is map &&
+        state.quests.keys().hasOnly([
+          'dragon_bridge_lights',
+          'my_khe_clean_wave',
+          'marble_five_elements',
+          'son_tra_traces',
+          'han_river_bridge_turn',
+          'linh_ung_quiet_path',
+          'cham_museum_relic_match',
+          'non_nuoc_carving_pattern',
+          'han_market_basket_sort',
+          'ba_na_golden_bridge'
+        ]) &&
+        state.unlockedPostcards is list &&
+        state.memoryFragments is int &&
+        validPreferences(state.preferences) &&
+        state.updatedAt is string && state.updatedAt.size() > 0 && state.updatedAt.size() <= 40;
+    }
+
+    // Size plus hasAll makes an exact set here: every expected postcard is
+    // unique, so no extra or duplicate value can fit in a list of that size.
+    function hasExactMigrationPostcards(postcards, expected, fragments) {
+      return postcards.size() == fragments && postcards.hasAll(expected);
+    }
+
+    // Mirrors the pure V1 hydrator: AVAILABLE/ACTIVE/COMPLETED is retained
+    // exactly; LOCKED, missing, or invalid legacy frontier data is normalized
+    // to AVAILABLE. Future V1 fields are deliberately ignored.
+    function normalizedLegacyFrontierStatus(currentStatus, nextStatus) {
+      return (currentStatus == 'AVAILABLE' && nextStatus == 'AVAILABLE') ||
+        (currentStatus == 'ACTIVE' && nextStatus == 'ACTIVE') ||
+        (currentStatus == 'COMPLETED' && nextStatus == 'COMPLETED') ||
+        (currentStatus != 'REWARDED' &&
+          currentStatus != 'AVAILABLE' &&
+          currentStatus != 'ACTIVE' &&
+          currentStatus != 'COMPLETED' &&
+          nextStatus == 'AVAILABLE');
+    }
+
+    function lockedAfterDragonBridge(quests) {
+      return quests.my_khe_clean_wave == 'LOCKED' &&
+        quests.marble_five_elements == 'LOCKED' &&
+        quests.son_tra_traces == 'LOCKED' &&
+        quests.han_river_bridge_turn == 'LOCKED' &&
+        quests.linh_ung_quiet_path == 'LOCKED' &&
+        quests.cham_museum_relic_match == 'LOCKED' &&
+        quests.non_nuoc_carving_pattern == 'LOCKED' &&
+        quests.han_market_basket_sort == 'LOCKED' &&
+        quests.ba_na_golden_bridge == 'LOCKED';
+    }
+
+    function lockedAfterMyKhe(quests) {
+      return quests.marble_five_elements == 'LOCKED' &&
+        quests.son_tra_traces == 'LOCKED' &&
+        quests.han_river_bridge_turn == 'LOCKED' &&
+        quests.linh_ung_quiet_path == 'LOCKED' &&
+        quests.cham_museum_relic_match == 'LOCKED' &&
+        quests.non_nuoc_carving_pattern == 'LOCKED' &&
+        quests.han_market_basket_sort == 'LOCKED' &&
+        quests.ba_na_golden_bridge == 'LOCKED';
+    }
+
+    function lockedAfterMarbleMountains(quests) {
+      return quests.son_tra_traces == 'LOCKED' &&
+        quests.han_river_bridge_turn == 'LOCKED' &&
+        quests.linh_ung_quiet_path == 'LOCKED' &&
+        quests.cham_museum_relic_match == 'LOCKED' &&
+        quests.non_nuoc_carving_pattern == 'LOCKED' &&
+        quests.han_market_basket_sort == 'LOCKED' &&
+        quests.ba_na_golden_bridge == 'LOCKED';
+    }
+
+    function lockedAfterSonTra(quests) {
+      return quests.han_river_bridge_turn == 'LOCKED' &&
+        quests.linh_ung_quiet_path == 'LOCKED' &&
+        quests.cham_museum_relic_match == 'LOCKED' &&
+        quests.non_nuoc_carving_pattern == 'LOCKED' &&
+        quests.han_market_basket_sort == 'LOCKED' &&
+        quests.ba_na_golden_bridge == 'LOCKED';
+    }
+
+    function lockedAfterHanRiverBridge(quests) {
+      return quests.linh_ung_quiet_path == 'LOCKED' &&
+        quests.cham_museum_relic_match == 'LOCKED' &&
+        quests.non_nuoc_carving_pattern == 'LOCKED' &&
+        quests.han_market_basket_sort == 'LOCKED' &&
+        quests.ba_na_golden_bridge == 'LOCKED';
+    }
+
+    function migrationAtDragonBridge(current, next) {
+      return normalizedLegacyFrontierStatus(
+          current.quests.get('dragon_bridge_lights', 'LOCKED'),
+          next.quests.dragon_bridge_lights
+        ) &&
+        lockedAfterDragonBridge(next.quests) &&
+        next.memoryFragments == 0 &&
+        hasExactMigrationPostcards(next.unlockedPostcards, [], 0);
+    }
+
+    function migrationAtMyKhe(current, next) {
+      return next.quests.dragon_bridge_lights == 'REWARDED' &&
+        normalizedLegacyFrontierStatus(
+          current.quests.get('my_khe_clean_wave', 'LOCKED'),
+          next.quests.my_khe_clean_wave
+        ) &&
+        lockedAfterMyKhe(next.quests) &&
+        next.memoryFragments == 1 &&
+        hasExactMigrationPostcards(next.unlockedPostcards, ['dragon_bridge'], 1);
+    }
+
+    function migrationAtMarbleMountains(current, next) {
+      return next.quests.dragon_bridge_lights == 'REWARDED' &&
+        next.quests.my_khe_clean_wave == 'REWARDED' &&
+        normalizedLegacyFrontierStatus(
+          current.quests.get('marble_five_elements', 'LOCKED'),
+          next.quests.marble_five_elements
+        ) &&
+        lockedAfterMarbleMountains(next.quests) &&
+        next.memoryFragments == 2 &&
+        hasExactMigrationPostcards(
+          next.unlockedPostcards,
+          ['dragon_bridge', 'my_khe_beach'],
+          2
+        );
+    }
+
+    function migrationAtSonTra(current, next) {
+      return next.quests.dragon_bridge_lights == 'REWARDED' &&
+        next.quests.my_khe_clean_wave == 'REWARDED' &&
+        next.quests.marble_five_elements == 'REWARDED' &&
+        normalizedLegacyFrontierStatus(
+          current.quests.get('son_tra_traces', 'LOCKED'),
+          next.quests.son_tra_traces
+        ) &&
+        lockedAfterSonTra(next.quests) &&
+        next.memoryFragments == 3 &&
+        hasExactMigrationPostcards(
+          next.unlockedPostcards,
+          ['dragon_bridge', 'my_khe_beach', 'marble_mountains'],
+          3
+        );
+    }
+
+    function migrationAfterLegacyCampaign(next) {
+      return next.quests.dragon_bridge_lights == 'REWARDED' &&
+        next.quests.my_khe_clean_wave == 'REWARDED' &&
+        next.quests.marble_five_elements == 'REWARDED' &&
+        next.quests.son_tra_traces == 'REWARDED' &&
+        next.quests.han_river_bridge_turn == 'AVAILABLE' &&
+        lockedAfterHanRiverBridge(next.quests) &&
+        next.memoryFragments == 4 &&
+        hasExactMigrationPostcards(
+          next.unlockedPostcards,
+          ['dragon_bridge', 'my_khe_beach', 'marble_mountains', 'son_tra_peninsula'],
+          4
+        );
+    }
+
+    // Only the original four quest fields are read. Once a non-rewarded legacy
+    // quest is found, later V1 fields are ignored so a hand-edited save cannot
+    // grant a future reward. The nested conditional evaluates one V2 frontier.
+    function validLegacyFrontierMigration(current, next) {
+      return current.quests.get('dragon_bridge_lights', 'LOCKED') == 'REWARDED'
+        ? (current.quests.get('my_khe_clean_wave', 'LOCKED') == 'REWARDED'
+          ? (current.quests.get('marble_five_elements', 'LOCKED') == 'REWARDED'
+            ? (current.quests.get('son_tra_traces', 'LOCKED') == 'REWARDED'
+              ? migrationAfterLegacyCampaign(next)
+              : migrationAtSonTra(current, next))
+            : migrationAtMarbleMountains(current, next))
+          : migrationAtMyKhe(current, next))
+        : migrationAtDragonBridge(current, next);
+    }
+
+    // Existing V1 documents remain readable. A V2 client may replace one only
+    // with the canonical ten-quest schema that represents its contiguous legacy
+    // reward prefix. No later quest, postcard, or fragment can be forged.
+    function validV1ToV2Migration(current, next) {
+      return current.version == 1 &&
+        current.quests is map &&
+        validMigrationResultShell(next) &&
+        validLegacyFrontierMigration(current, next);
+    }
+
     // Point reads/writes only. No parent user document, collection listing, or
     // arbitrary itinerary/provider payload is stored from the browser.
     match /users/{userId}/game/state {
       allow get: if isOwner(userId);
       allow list: if false;
-      // Creation can import valid local-first progress after an offline session.
-      // Later writes may only use the deterministic transition graph.
-      allow create: if isOwner(userId) && validGameState(request.resource.data);
-      allow update: if isOwner(userId) && validGameState(request.resource.data) &&
-        validQuestUpdate(resource.data.quests, request.resource.data.quests);
+      allow create: if isOwner(userId) && validInitialGameState(request.resource.data);
+      allow update: if isOwner(userId) &&
+        ((resource.data.version == 1 &&
+            validV1ToV2Migration(resource.data, request.resource.data)) ||
+          (resource.data.version == 2 &&
+            validGameState(request.resource.data) &&
+            validQuestUpdate(resource.data.quests, request.resource.data.quests)));
       allow delete: if isOwner(userId);
     }
   }

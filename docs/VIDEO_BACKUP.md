@@ -7,34 +7,42 @@
 
 ## Tạo technical capture
 
-Từ shell đã cài Chromium, chạy:
+Từ **Windows PowerShell native** đã cài Chromium, chạy:
 
-```bash
+```powershell
+Set-Location "D:\Hackthon-GG2026"
+
+if ((node -p "process.platform").Trim() -ne "win32") {
+  throw "Phải chạy bằng Node native Windows."
+}
+
 npm run test:e2e:record
 ```
 
 Video WebM được Playwright lưu dưới `test-results/playwright/**/video.webm`; thư mục này bị Git ignore vì là evidence tái tạo được. Lệnh chỉ bật video cho một journey desktop black-box; không bật E2E bridge.
 
-## Evidence local mới nhất
+Khi operator cho phép WSL/Linux, có thể chạy cùng lệnh bằng Linux Node 24 và
+Chromium Linux đã cài, với `node_modules` Linux riêng. Capture này vẫn chỉ là
+technical capture bổ sung; Docker release evidence phải đến từ
+`run-wsl-docker-e2e.sh` trong bundle shell-specific, không phải từ root
+`test-results/playwright/`.
+
+## Evidence local lịch sử
 
 Ngày 2026-08-03, lệnh đã PASS trên local release candidate. Artifact hiện có tại `test-results/playwright/dragon-bridge-journey-Drag-ce566--the-postcard-after-refresh-chromium-desktop/video.webm` (1,524,690 bytes). Đây là output local bị Git ignore; hãy chạy lại lệnh trước khi chia sẻ để tạo artifact tương ứng với commit/release candidate được duyệt.
 
-Trong WSL fallback hiện tại, cần môi trường Chromium đã provision:
-
-```bash
-export PATH=/home/bach/.local/node-v24.18.1/bin:$PATH
-export TMPDIR=/tmp TEMP=/tmp TMP=/tmp
-export LD_LIBRARY_PATH=/tmp/gg2026-playwright-libs/root/usr/lib/x86_64-linux-gnu
-npm run test:e2e:record
-```
+Không dùng lại artifact WSL lịch sử cho campaign V2. Khi runner native hoặc WSL
+được chạy lại cho commit hiện tại, lưu timestamp và đường dẫn video/report trong
+bundle tương ứng (`native-docker-e2e/` hoặc `wsl-docker-e2e/`); không gắn nhãn
+bundle WSL là evidence Windows-native.
 
 ## Shot list video demo 3 phút
 
 | Mốc       | Khung hình                                         | Câu nói cần kiểm chứng                                                |
 | --------- | -------------------------------------------------- | --------------------------------------------------------------------- |
-| 0:00–0:25 | Title, đổi ngôn ngữ, keyboard/touch                | Bốn quest, hành trình ngắn và không bắt buộc âm thanh.                |
+| 0:00–0:25 | Title, đổi ngôn ngữ, keyboard/touch                | Mười quest, hành trình ngắn và không bắt buộc âm thanh.               |
 | 0:25–1:20 | Cầu Rồng: đi, dialogue, fail/retry, thắng          | Rule 7/10, reward deterministic, postcard có source ID.               |
-| 1:20–2:05 | Tóm tắt ba quest còn lại, Passport/ending          | Nội dung học qua hành động, không ép người chơi đuổi động vật.        |
+| 1:20–2:05 | Sáu quest V2, Passport 10/10 và ending             | Nội dung học qua hành động, không ép người chơi đuổi động vật.        |
 | 2:05–2:40 | Companion, curated card, Maps link, fallback       | Starter curated, nguồn rõ ràng và fallback authored.                  |
 | 2:40–3:00 | Privacy/Terms, `/api/health`, Cloud Run URL nếu có | Key server-side, persistence fallback và trạng thái deploy chính xác. |
 

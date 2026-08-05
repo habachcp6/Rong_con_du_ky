@@ -98,6 +98,29 @@ describe("M1 canonical content validation", () => {
     ).toBe(true);
   });
 
+  it("fails when a location no longer points to its canonical postcard asset", () => {
+    const input = canonicalInput();
+    const locationsVi = structuredClone(input.locationsVi) as Record<
+      string,
+      Record<string, unknown>
+    >;
+    const locationsEn = structuredClone(input.locationsEn) as Record<
+      string,
+      Record<string, unknown>
+    >;
+    locationsVi.dragon_bridge.assetId = "landmark_my_khe_beach";
+    locationsEn.dragon_bridge.assetId = "landmark_my_khe_beach";
+
+    const result = validateContentData({ ...input, locationsVi, locationsEn });
+
+    expect(result.ok).toBe(false);
+    expect(
+      result.issues.some(
+        (issue) => issue.code === "LOCATION_POSTCARD_BINDING_MISMATCH",
+      ),
+    ).toBe(true);
+  });
+
   it("fails if a Starter card fabricates an unverified Place ID", () => {
     const input = canonicalInput();
     const curatedPlaces = structuredClone(input.curatedPlaces) as {

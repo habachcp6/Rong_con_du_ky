@@ -5,25 +5,27 @@
 > Nguồn yêu cầu: GG2026_Rong_Con_Du_Ky_AI_Agent_Blueprint.md, bản tại C:\Users\hahoa\Downloads\GG2026_Rong_Con_Du_Ky_AI_Agent_Blueprint.md.
 >
 > Track mặc định hiện tại: Starter Tier, dùng curated place cards và Google Maps URLs. Places API (New) chỉ là nhánh Standard sau khi có chấp thuận billing.
+>
+> Ràng buộc hiện hành (2026-08-04, operator revision): Windows PowerShell native vẫn là evidence Windows-authoritative. WSL/Linux được phép chạy local Docker/Playwright qua runner Bash riêng khi operator cho phép; evidence phải nằm trong `wsl-docker-e2e/` và không được gắn nhãn PowerShell/native Windows.
 
-## Execution snapshot — 2026-08-03
+## Execution snapshot — 2026-08-04, Campaign V2
 
 Đây là trạng thái do O0 kiểm soát sau các wave local; section P0 bên dưới là gap snapshot ban đầu và đã được thay thế bởi evidence này.
 
-| Gate  | O0 verdict                                | Evidence hiện có                                                                                                                                                                      | Cổng còn lại                                                                   |
-| ----- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| G0–G4 | PASS local                                | Node 24.18.1 trong WSL fallback được user cho phép; 4 quest, keyboard/touch, content/assets validation và E2E.                                                                        | Native Windows PowerShell pass chưa được thực hiện.                            |
-| G5    | PASS local/emulator                       | Firebase Auth + Firestore Rules Emulator 7/7; browser emulator smoke `npm run test:firebase:browser` reports `Đã đồng bộ`; local-first fallback.                                      | Firebase project/browser Anonymous Auth smoke trên project thật cần owner.     |
-| G6–G7 | PASS local / provider-live pending        | Starter curated cards/Maps, Fastify API, Gemini schema/retry/fallback mock coverage.                                                                                                  | Gemini key/production call và any Standard approval cần owner.                 |
-| G8–G9 | PASS local pre-release                    | 19 unit files/75 tests, full Playwright 22 pass/18 intentional skips/0 failures, Rules Emulator 7/7, focus cycle/return, client-bundle guard, latest local production-artifact smoke. | Real mobile-network performance measurement vẫn cần trước khi công bố KPI.     |
-| G10   | BLOCKED external                          | Google Cloud SDK 578.0.0 đã cài nhưng `gcloud auth list` rỗng; Docker Desktop chưa bật WSL integration; chưa có project/IAM/secrets/public-access approval.                           | Human login/2FA, project, billing/quota (nếu cần), secret và publish approval. |
-| G11   | PREPARED local; public submission blocked | Pitch 7 slide, demo script, technical WebM capture, checklist và handoff đã có.                                                                                                       | Public URL + incognito Cloud smoke + narrated video + asset rights.            |
+| Gate  | O0 verdict                                | Evidence hiện có                                                                                                          | Cổng còn lại                                                                                                                                  |
+| ----- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| G0–G4 | Integrated; shell-runner gate pending     | Campaign V2 có 10 quest theo thứ tự, migration V1→V2, 10 postcard/icon, keyboard/touch và E2E black-box cho sáu game mới. | Chạy native PowerShell, hoặc WSL runner đã được cho phép: `npm run verify`, `npm run test:rules`, Docker health và desktop/mobile Playwright. |
+| G5    | Historical pre-V2; rerun pending          | Evidence Rules Emulator/browser smoke trước Campaign V2 không xác nhận schema/rules V2 hiện tại.                          | Chạy `npm run test:rules` trong shell Node 24 đã chọn; Firebase project/browser Anonymous Auth smoke trên project thật cần owner.             |
+| G6–G7 | PASS local / provider-live pending        | Starter curated cards/Maps, Fastify API, Gemini schema/retry/fallback mock coverage.                                      | Gemini key/production call và any Standard approval cần owner.                                                                                |
+| G8–G9 | Historical pre-V2; rerun pending          | Kết quả unit/Playwright/Rules/smoke cũ là baseline lịch sử, không phải evidence cho Campaign V2.                          | Chạy full timestamped runner gate và lưu health/report/trace/video; visual human sign-off trước khi công bố KPI.                              |
+| G10   | BLOCKED external                          | Chưa có project/IAM/secrets/public-access approval; không có public Cloud Run URL.                                        | Human login/2FA, project, billing/quota (nếu cần), secret và publish approval.                                                                |
+| G11   | PREPARED local; public submission blocked | Pitch 7 slide, demo script, technical WebM capture, checklist và handoff đã có.                                           | Public URL + incognito Cloud smoke + narrated video + asset rights.                                                                           |
 
 O0 không được chuyển G10/G11 thành PASS chỉ từ local test; các URL và external approval phải do owner cung cấp/duyệt.
 
 ## 1. Kết quả cần đạt
 
-Đội phải bàn giao một web game pixel song ngữ Việt–Anh, chơi được trong 10–15 phút, có bốn quest hoàn chỉnh, lưu tiến trình, gợi ý du lịch, Gemini có fallback, và URL Cloud Run công khai. Phạm vi không bao gồm combat, multiplayer, inventory phức tạp, economy, crafting, procedural world hoặc bản đồ Đà Nẵng theo tỷ lệ thật.
+Đội phải bàn giao một web game pixel song ngữ Việt–Anh, chơi được trong 10–15 phút, có mười quest hoàn chỉnh, lưu tiến trình, gợi ý du lịch, Gemini có fallback, và URL Cloud Run công khai. Phạm vi không bao gồm combat, multiplayer, inventory phức tạp, economy, crafting, procedural world hoặc bản đồ Đà Nẵng theo tỷ lệ thật.
 
 Thứ tự không được đảo:
 
@@ -31,7 +33,7 @@ Thứ tự không được đảo:
 2. M1 content và asset contract.
 3. M2 core movement.
 4. M3 Dragon Bridge vertical slice hoàn chỉnh.
-5. Chỉ sau G3 mới nhân bản sang ba quest còn lại.
+5. Chỉ sau G3 mới nhân bản pattern sang chín quest còn lại, trong đó sáu quest V2 có rules module riêng.
 6. Tích hợp persistence, Starter recommendations và Gemini.
 7. Hardening, deploy, submission.
 
@@ -53,7 +55,7 @@ Không được tiếp tục feature work dựa đơn thuần vào dòng M0 PASS
 
 **Owner:** O0 Orchestrator. Không giao P0 cho nhiều writer.
 
-1. Ghi quyết định D-001: dùng toàn bộ Windows PowerShell native hoặc toàn bộ WSL2. Với checkout ở ổ Windows, mặc định khuyến nghị PowerShell native; người dùng đã chấp thuận WSL chỉ như fallback khi native không thành công. Nếu dùng WSL thì mọi Node/Firebase/gcloud/node_modules phải nằm trong WSL và evidence phải ghi đúng là WSL, không gắn nhãn PowerShell.
+1. Ghi quyết định D-001 (đã được operator revision cho run hiện tại): Windows PowerShell native giữ evidence-authoritative; WSL/Linux chỉ chạy khi operator cho phép, qua runner riêng và không gắn bất kỳ evidence WSL nào nhãn PowerShell/native Windows.
 2. Xác nhận đúng source-of-truth. Nếu đây là bản copy, không tự ý push; xác định repository/remote do người dùng sở hữu trước.
 3. Bảo đảm Node 24.x, npm tương ứng và package-lock nhất quán; tạo sạch dependency chỉ trong môi trường đã chọn.
 4. Chạy lại các lệnh nền: npm ci, npm run typecheck, npm run lint, npm run test, npm run build, npm run validate:content và npm run validate:assets.
@@ -205,7 +207,7 @@ Chỉ A2 được là feature writer của flow Dragon Bridge; đây là nơi tr
 
 **G3 PASS — không có ngoại lệ:** từ title đến Cầu Rồng đến quest đến postcard chạy hoàn chỉnh, keyboard và touch đều hoạt động, refresh không mất local progress, fallback UI không chặn input. M4 không được bắt đầu trước G3.
 
-### M4 — Three remaining quests
+### M4 — Three remaining quests (historical vertical slice)
 
 Ba agent A6a/A6b/A6c chạy song song, mỗi agent chỉ sở hữu scene mình:
 
@@ -217,7 +219,19 @@ Ba agent A6a/A6b/A6c chạy song song, mỗi agent chỉ sở hữu scene mình:
 
 O0 lần lượt tích hợp mỗi scene qua canonical reward/unlock; sau đó thêm passport, four memory fragments và ending. A3 chạy regression sau mỗi merge, không đợi cuối batch.
 
-**G4 PASS:** bốn quest không placeholder, có flow giới thiệu–tutorial–feedback–retry–win–reward–postcard–autosave, một lượt chơi hợp lý 10–15 phút.
+**G4 historical PASS:** bốn quest không placeholder, có flow giới thiệu–tutorial–feedback–retry–win–reward–postcard–autosave. Campaign V2 ở addendum dưới đây thay thế tiêu chí completion hiện hành.
+
+### Campaign V2 addendum — 10 địa danh, 10 game, 10 icon
+
+| Owner            | Scope V2                                                                                                 | Gate hiện hành                                                                                                    |
+| ---------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| O0 Orchestrator  | `LandmarkGameDefinition`, quest order, migration review, integration, `docs/STATUS.md`, release evidence | Không nhận milestone nếu mapping 10 điểm hoặc transition không pass timestamped shell-runner verify.              |
+| Domain & Content | V2 state, Firestore rules, content/dialogue/source, validators                                           | 10 location/quest/postcard/source hợp lệ; V1→V2 giữ frontier đúng.                                                |
+| Art & UI         | 10 icon SVG 32px, 10 postcard 320×180, manifest/preload, gallery/detail/challenge panel                  | Icon minh bạch, nhận diện được ở 32/48px; human visual sign-off.                                                  |
+| Gameplay         | Icon interaction, six rules/Phaser scenes mới, reward lifecycle                                          | Start/fail/retry/success/Esc; unlock tuyến tính đến quest 10.                                                     |
+| QA runtime       | Docker production, Playwright desktop/mobile, visual artifacts                                           | Native PowerShell là Windows-authoritative; WSL chỉ khi được cho phép và lưu health/report/trace/video tách biệt. |
+
+V2 giữ bốn vertical slice cũ và bổ sung: Cầu Sông Hàn, Linh Ứng Sơn Trà, Bảo tàng Chăm, Làng đá Non Nước, Chợ Hàn, Bà Nà Hills. Passport/ending dùng `QUEST_ORDER.length` và chỉ mở sau reward thứ 10.
 
 ### M5 — Firebase persistence
 
@@ -321,22 +335,22 @@ Worker không ghi PASS cho milestone. O0 chỉ chấp nhận handoff khi có fil
 
 ## 8. Decision log và escalation
 
-| ID    | Quyết định                     | Owner                  | Mặc định / deadline                                                                                                                                                                            |
-| ----- | ------------------------------ | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D-001 | Shell và dependency ownership  | O0                     | Ưu tiên PowerShell native; user cho phép WSL fallback nếu native không thành công. Hiện evidence là WSL Node 24; native PowerShell vẫn cần output thật trước khi tuyên bố đã xác nhận Windows. |
-| D-002 | Starter hay Standard           | O0 + user              | Starter đã chọn trong STATUS; Standard chỉ sau billing/quota approval.                                                                                                                         |
-| D-003 | Git source-of-truth/remote     | O0 + user nếu không rõ | Chặn push/deploy cho đến khi xác nhận.                                                                                                                                                         |
-| D-004 | Asset license/rights           | A1 + user              | Placeholder hợp lệ cho development; release cần source/license được duyệt.                                                                                                                     |
-| D-005 | Gemini model name/availability | O0 + A5                | Một env/config source sau khi kiểm tra official docs trước integration/deploy.                                                                                                                 |
-| D-006 | Places photo endpoint          | O0 + A5                | Chuẩn hóa: có authenticated proxy Standard-only hoặc không expose nếu chưa dùng.                                                                                                               |
-| D-007 | Firestore conflict merge       | O0 + A4                | Viết ADR và test trước M5; không tự suy đoán field-level merge.                                                                                                                                |
+| ID    | Quyết định                     | Owner                  | Mặc định / deadline                                                                                                                                                                                      |
+| ----- | ------------------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D-001 | Shell và dependency ownership  | O0                     | Native PowerShell giữ evidence Windows-authoritative. Operator có thể cho phép WSL/Linux qua runner riêng, Node 24 và `node_modules` Linux riêng; evidence WSL không thay thế hoặc được gắn nhãn native. |
+| D-002 | Starter hay Standard           | O0 + user              | Starter đã chọn trong STATUS; Standard chỉ sau billing/quota approval.                                                                                                                                   |
+| D-003 | Git source-of-truth/remote     | O0 + user nếu không rõ | Chặn push/deploy cho đến khi xác nhận.                                                                                                                                                                   |
+| D-004 | Asset license/rights           | A1 + user              | Placeholder hợp lệ cho development; release cần source/license được duyệt.                                                                                                                               |
+| D-005 | Gemini model name/availability | O0 + A5                | Một env/config source sau khi kiểm tra official docs trước integration/deploy.                                                                                                                           |
+| D-006 | Places photo endpoint          | O0 + A5                | Chuẩn hóa: có authenticated proxy Standard-only hoặc không expose nếu chưa dùng.                                                                                                                         |
+| D-007 | Firestore conflict merge       | O0 + A4                | Viết ADR và test trước M5; không tự suy đoán field-level merge.                                                                                                                                          |
 
 Escalate ngay thay vì tự quyết khi cần billing, consent, credentials, IAM, copyright, public release, thay đổi stack, thêm dependency major, hoặc có policy/privacy uncertainty. Lỗi implementation nhỏ phải được worker tự xử lý trong scope.
 
 ## 9. Definition of done do O0 xác nhận
 
 - Public Cloud Run URL mở không cần đăng nhập ngoài anonymous game auth.
-- Bốn quest hoàn chỉnh, sourced postcard VI/EN, keyboard và touch.
+- Mười quest hoàn chỉnh, sourced postcard VI/EN, keyboard và touch.
 - Save/load có Firebase + local fallback; isolation/rules được test.
 - Starter curated path hoặc Standard Places path đúng track, Maps URL/attribution/persistence policy đúng.
 - Gemini chat/recommendation/itinerary có schema, rate-limit, timeout/retry và fallback; không điều khiển game state.

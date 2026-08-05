@@ -148,4 +148,39 @@ describe("API boundary", () => {
     expect(api.statusCode).toBe(404);
     expect(api.json()).toMatchObject({ error: "NOT_FOUND" });
   });
+
+  it("does not rate limit health endpoint or non-API static asset routes", async () => {
+    const instance = await app();
+    // Fire 110 requests to health check to ensure allowList skips rate limiting
+    const requests = Array.from({ length: 110 }, () =>
+      instance.inject({ method: "GET", url: "/api/health" }),
+    );
+    const responses = await Promise.all(requests);
+    for (const res of responses) {
+      expect(res.statusCode).toBe(200);
+      expect(res.json()).toMatchObject({ status: "ok" });
+    }
+  });
+
+  it("returns HTTP 429 for rate-limited API endpoints instead of HTTP 500", async () => {
+    const instance = await app();
+    // Fire >100 requests to an unauthenticated API endpoint (e.g. POST /api/dragon/chat)
+    let rateLimitedResponse = null;
+    for (let i = 0; i < 105; i++) {
+      const res = await instance.inject({
+        method: "POST",
+        url: "/api/dragon/chat",
+        payload: { language: "vi", message: "test" },
+      });
+      if (res.statusCode === 429) {
+        rateLimitedResponse = res;
+        break;
+      }
+    }
+    expect(rateLimitedResponse).not.toBeNull();
+    expect(rateLimitedResponse?.statusCode).toBe(429);
+    expect(rateLimitedResponse?.json()).toMatchObject({
+      error: "RATE_LIMITED",
+    });
+  });
 });

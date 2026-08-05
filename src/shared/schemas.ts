@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LANDMARK_GAME_DEFINITION_COUNT } from "./landmark-game-definitions.js";
 
 export const DragonReplySchema = z.object({
   dialogue: z.string().max(700),
@@ -17,7 +18,10 @@ export const DragonChatRequestSchema = z.object({
   language: z.enum(["vi", "en"]).default("vi"),
   questId: z.string().max(80).optional(),
   message: z.string().trim().min(1).max(500),
-  unlockedPostcards: z.array(z.string().max(80)).max(4).default([]),
+  unlockedPostcards: z
+    .array(z.string().max(80))
+    .max(LANDMARK_GAME_DEFINITION_COUNT)
+    .default([]),
 });
 
 export const PlaceSearchSchema = z.object({
@@ -38,7 +42,9 @@ export const RecommendationRequestSchema = z.object({
 
 export const ItineraryRequestSchema = z.object({
   language: z.enum(["vi", "en"]).default("vi"),
-  unlockedPostcards: z.array(z.string()),
+  unlockedPostcards: z
+    .array(z.string().max(80))
+    .max(LANDMARK_GAME_DEFINITION_COUNT),
   preferences: z.object({
     budgetVnd: z.number().optional(),
     dietary: z.enum(["any", "vegetarian"]).optional(),
@@ -58,8 +64,8 @@ export const ItineraryResponseSchema = z.object({
         googleMapsUri: z.string().url().optional(),
       }),
     )
-    .max(4),
-  notes: z.array(z.string().max(240)).max(4),
+    .max(LANDMARK_GAME_DEFINITION_COUNT),
+  notes: z.array(z.string().max(240)).max(LANDMARK_GAME_DEFINITION_COUNT),
 });
 
 export const CuratedPlaceCardSchema = z.object({

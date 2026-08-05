@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { LANDMARK_GAME_DEFINITIONS } from "../../../shared/landmark-game-definitions.js";
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -67,6 +68,30 @@ export class PreloadScene extends Phaser.Scene {
     this.load.svg("npc_son_tra", "/assets/characters/son-tra-ranger-npc.svg", {
       width: 32,
       height: 32,
+    });
+    // Load baked 1600x960 pixel-art night map background
+    this.load.image(
+      "map_background_overworld_night",
+      "/assets/map/overworld-night.png",
+    );
+
+    // Load 10 PNG map icons and 10 PNG landmark postcards
+    LANDMARK_GAME_DEFINITIONS.forEach((definition) => {
+      this.load.image(definition.mapIconAssetId, definition.mapIconPath);
+      const postcardFilename =
+        definition.locationKey === "my_khe_beach"
+          ? "my-khe"
+          : definition.locationKey === "son_tra_peninsula"
+            ? "son-tra"
+            : definition.locationKey === "linh_ung_son_tra"
+              ? "linh-ung"
+              : definition.locationKey === "non_nuoc_stone_village"
+                ? "non-nuoc"
+                : definition.locationKey.replace(/_/g, "-");
+      this.load.image(
+        definition.postcardAssetId,
+        `/assets/landmarks/${postcardFilename}.png`,
+      );
     });
   }
 

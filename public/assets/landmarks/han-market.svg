@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" shape-rendering="crispEdges" data-pixel-art="true" data-alpha="false">
+  <!-- Evening sky -->
+  <rect width="320" height="180" fill="#1a2a3a"/>
+
+  <!-- Street/ground -->
+  <rect y="150" width="320" height="30" fill="#2a4050"/>
+
+  <!-- Market main wall -->
+  <rect x="40" y="55" width="240" height="95" fill="#ffd166"/>
+
+  <!-- Roof tiers -->
+  <rect x="30" y="45" width="260" height="12" fill="#c75a3d"/>
+  <!-- Central tower/gable -->
+  <rect x="120" y="20" width="80" height="25" fill="#c75a3d"/>
+  <rect x="140" y="25" width="40" height="12" fill="#ffffff"/> <!-- Sign -->
+
+  <!-- Upper windows row -->
+  <rect x="60" y="65" width="20" height="20" fill="#1a2a3a"/>
+  <rect x="100" y="65" width="20" height="20" fill="#1a2a3a"/>
+  <rect x="200" y="65" width="20" height="20" fill="#1a2a3a"/>
+  <rect x="240" y="65" width="20" height="20" fill="#1a2a3a"/>
+
+  <!-- Central entrance -->
+  <rect x="130" y="95" width="60" height="55" fill="#c75a3d"/>
+  <rect x="138" y="103" width="44" height="47" fill="#1a2a3a"/>
+
+  <!-- Ground floor side openings -->
+  <rect x="55" y="105" width="35" height="30" fill="#1a2a3a"/>
+  <rect x="230" y="105" width="35" height="30" fill="#1a2a3a"/>
+
+  <!-- Market baskets (foreground) -->
+  <rect x="10" y="140" width="35" height="16" fill="#8b5e3c"/>
+  <rect x="275" y="140" width="35" height="16" fill="#8b5e3c"/>
+  <rect x="15" y="134" width="12" height="8" fill="#2d7a4f"/>
+  <rect x="280" y="134" width="12" height="8" fill="#2d7a4f"/>
+</svg>

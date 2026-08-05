@@ -1,7 +1,7 @@
 {
   "dragon_bridge_npc": {
-    "greeting": "Chào mừng Rồng Con đến với Cầu Rồng trên sông Hàn. Cây cầu đang chờ năm ngọn đèn ký ức được thắp sáng.",
-    "questPrompt": "Con có sẵn sàng tham gia thử thách nhịp điệu để thắp sáng năm đoạn cầu trong game không?",
+    "greeting": "Chào mừng Rồng Con đến với Cầu Rồng trên sông Hàn. Cây cầu đang chờ những nhịp đèn ký ức được thắp sáng.",
+    "questPrompt": "Con có sẵn sàng canh đúng ít nhất 7 trong 10 nhịp để thắp sáng Cầu Rồng trong game không?",
     "successMessage": "Tuyệt vời! Cầu Rồng trong hành trình của chúng ta đã bừng sáng. Đây là Mảnh Ký Ức Cầu Rồng của con.",
     "failureMessage": "Chưa đủ nhịp điệu rồi. Hãy thử lại và quan sát tín hiệu thật kỹ nhé.",
     "sourceIds": ["source_dragon_bridge_01"]
@@ -26,5 +26,47 @@
     "successMessage": "Xuất sắc! Con đã hoàn thành thử thách quan sát có trách nhiệm ở Sơn Trà.",
     "failureMessage": "Đừng nản lòng. Hãy quan sát kỹ tán cây, lối mòn và các dấu hiệu quanh mình nhé.",
     "sourceIds": ["source_son_tra_01", "source_son_tra_conservation_01"]
+  },
+  "han_river_bridge_guide": {
+    "greeting": "Cầu Sông Hàn là một dấu mốc ven sông của Đà Nẵng. Trong hành trình này, các nhịp cầu đang chờ được căn đúng hướng.",
+    "questPrompt": "Hãy xoay bốn nhịp cầu theo tín hiệu sáng để nối lối đi trong 60 giây.",
+    "successMessage": "Tuyệt vời! Dòng chảy ký ức đã nối hai bờ sông Hàn.",
+    "failureMessage": "Các nhịp cầu chưa khớp. Hãy quan sát hướng sáng của từng đoạn rồi thử lại.",
+    "sourceIds": ["source_han_river_bridge_01"]
+  },
+  "linh_ung_guide": {
+    "greeting": "Linh Ứng là điểm dừng để quan sát với sự tôn trọng dành cho không gian chung và cảnh quan Sơn Trà.",
+    "questPrompt": "Hãy chọn năm điểm dừng theo một lộ trình yên tĩnh, an toàn và có trách nhiệm.",
+    "successMessage": "Con đã hoàn thành lối đi quan sát tĩnh lặng.",
+    "failureMessage": "Hãy chọn lại theo trình tự của lối đi được hướng dẫn và tránh khu vực không vào.",
+    "sourceIds": ["source_linh_ung_son_tra_01"]
+  },
+  "cham_museum_guide": {
+    "greeting": "Bảo tàng Điêu khắc Chăm lưu giữ nhiều hiện vật và câu chuyện văn hóa. Trò chơi chỉ dùng motif minh họa, không thay thế thông tin trưng bày.",
+    "questPrompt": "Hãy ghép bốn motif với nhãn theo thứ tự của bảng trưng bày.",
+    "successMessage": "Các nhãn minh họa đã được ghép đúng. Một mảnh ký ức mới đã mở khóa.",
+    "failureMessage": "Hãy đọc lại thứ tự nhãn rồi thử ghép lại từ motif đầu tiên.",
+    "sourceIds": ["source_cham_museum_01"]
+  },
+  "non_nuoc_guide": {
+    "greeting": "Làng đá mỹ nghệ Non Nước gắn với nghề thủ công dưới chân Ngũ Hành Sơn. Đây là mẫu chạm khắc hư cấu, tôn trọng nghề truyền thống.",
+    "questPrompt": "Chọn sáu nét đục theo mẫu silhouette từ viền ngoài vào giữa.",
+    "successMessage": "Mẫu chạm khắc đã hoàn chỉnh và mảnh ký ức đã thuộc về con.",
+    "failureMessage": "Mẫu đá vẫn thiếu nét. Hãy bắt đầu lại từ viền ngoài.",
+    "sourceIds": ["source_non_nuoc_stone_village_01"]
+  },
+  "han_market_guide": {
+    "greeting": "Chợ Hàn là một điểm mua sắm quen thuộc ở trung tâm Đà Nẵng. Các vật phẩm trong game là minh họa đã biên soạn, không phải dữ liệu hàng hóa trực tiếp.",
+    "questPrompt": "Sắp tám vật phẩm vào giỏ đặc sản, quà tặng hoặc dùng ngay.",
+    "successMessage": "Các giỏ hàng đã được sắp xếp gọn gàng.",
+    "failureMessage": "Hãy xem kỹ nhãn của từng giỏ rồi chạm lại để đổi vị trí.",
+    "sourceIds": ["source_han_market_01"]
+  },
+  "ba_na_guide": {
+    "greeting": "Bà Nà Hills là một điểm tham quan trên cao. Trong game, lối đi trên Cầu Vàng là minh họa pixel-art do đội tạo.",
+    "questPrompt": "Bật đúng 6 tile để nối lối đi qua Cầu Vàng trong 60 giây.",
+    "successMessage": "Con đường trên mây đã sáng; mảnh ký ức cuối cùng đang chờ con.",
+    "failureMessage": "Lối đi chưa liền mạch. Hãy thử lại và chỉ bật các tile thuộc tuyến sáng.",
+    "sourceIds": ["source_ba_na_hills_01"]
   }
 }

@@ -1,12 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180" shape-rendering="crispEdges" data-pixel-art="true" data-alpha="false">
-  <rect width="320" height="180" fill="#61C8E8"/>
-  <path fill="#C7F4FF" d="M0 80h320v22H0z"/>
-  <path fill="#1595C5" d="M0 102h320v78H0z"/>
-  <path fill="#0B6E99" d="M0 120h320v60H0z"/>
-  <path fill="#E8D3A3" d="M0 132h320v48H0z"/>
-  <path fill="#FAEBC9" d="M0 138h320v42H0z"/>
-  <path fill="#C9A77B" d="M16 150h18v4H16zm44 12h30v4H60zm80-16h12v4h-12zm74 18h26v4h-26zm72-20h18v4h-18z"/>
-  <path fill="#182433" d="M28 94h4v38h-4zm-8 10h20v4H20z"/>
-  <path fill="#D44F65" d="M18 104h24v6H18z"/>
-  <path fill="#182433" d="M0 0h320v4H0zM0 176h320v4H0zM0 0h4v180H0zM316 0h4v180h-4z"/>
+  <!-- Bright Sky -->
+  <rect width="320" height="180" fill="#87ceeb"/>
+
+  <!-- Sun -->
+  <rect x="240" y="20" width="40" height="40" fill="#ffd166"/>
+
+  <!-- Cloud -->
+  <rect x="30" y="30" width="60" height="14" fill="#ffffff"/>
+  <rect x="40" y="22" width="40" height="12" fill="#ffffff"/>
+
+  <!-- Ocean - deep -->
+  <rect y="85" width="320" height="30" fill="#1a7fa0"/>
+  <!-- Waves -->
+  <rect x="20" y="90" width="80" height="4" fill="#ffffff"/>
+  <rect x="160" y="95" width="100" height="4" fill="#ffffff"/>
+
+  <!-- Shore water -->
+  <rect y="115" width="320" height="10" fill="#5ec4d6"/>
+
+  <!-- Sandy beach -->
+  <rect y="125" width="320" height="55" fill="#f0d68a"/>
+
+  <!-- Single palm tree - clean silhouette -->
+  <!-- Trunk -->
+  <rect x="60" y="60" width="8" height="80" fill="#8b5e3c"/>
+  <!-- Canopy - simple cross shape -->
+  <rect x="20" y="45" width="80" height="16" fill="#2d8f5e"/>
+  <rect x="40" y="36" width="50" height="14" fill="#2d8f5e"/>
+  <rect x="55" y="52" width="30" height="12" fill="#2d8f5e"/>
 </svg>

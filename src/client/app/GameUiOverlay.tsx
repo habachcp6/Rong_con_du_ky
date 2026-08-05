@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { getDialogueContent, getLocationContent } from "../content";
+import {
+  getDialogueContent,
+  getLocationContent,
+  getPrerequisiteLandmarkName,
+} from "../content";
 import { gameSession } from "../game/state/GameStateStore";
 import { bridge } from "./PhaserBridge";
 import { useModalAccessibility } from "./useModalAccessibility";
@@ -35,6 +39,7 @@ export const GameUiOverlay = ({ language }: GameUiOverlayProps) => {
     () => gameSession.getState().unlockedPostcards.at(-1) ?? null,
   );
   const lastKnownPostcardRef = useRef<string | null>(postcardPlaceKey);
+  const postcardVisibleRef = useRef(Boolean(postcardPlaceKey));
   const dialogueRef = useRef<HTMLElement | null>(null);
   const postcardRef = useRef<HTMLElement | null>(null);
 
@@ -47,6 +52,9 @@ export const GameUiOverlay = ({ language }: GameUiOverlayProps) => {
           setNearbyLabel(event.label);
         if (event.type === "POSTCARD_UNLOCKED")
           setPostcardPlaceKey(event.placeKey);
+        if (event.type === "OVERWORLD_READY" && postcardVisibleRef.current) {
+          bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: false });
+        }
       }),
     [],
   );
@@ -79,7 +87,10 @@ export const GameUiOverlay = ({ language }: GameUiOverlayProps) => {
     bridge.emitUiToGame({ type: "DIALOGUE_CLOSE" });
     bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: true });
   };
-  const closePostcard = () => bridge.emitUiToGame({ type: "POSTCARD_CLOSE" });
+  const closePostcard = () => {
+    bridge.emitUiToGame({ type: "POSTCARD_CLOSE" });
+    bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: true });
+  };
 
   useModalAccessibility(dialogueRef, closeDialogue, Boolean(dialogue));
   useModalAccessibility(postcardRef, closePostcard, Boolean(postcardPlaceKey));
@@ -89,7 +100,16 @@ export const GameUiOverlay = ({ language }: GameUiOverlayProps) => {
     bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: false });
   }, [dialogue]);
 
+  useEffect(() => {
+    postcardVisibleRef.current = Boolean(postcardPlaceKey);
+    if (!postcardPlaceKey) return;
+    bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: false });
+  }, [postcardPlaceKey]);
+
   const questId = dialogue ? QUEST_BY_NPC[dialogue.npcId] : undefined;
+  const prereqLandmarkName = questId
+    ? getPrerequisiteLandmarkName(questId, language)
+    : undefined;
   const dialogueContent = dialogue
     ? getDialogueContent(language, dialogue.npcId)
     : undefined;
@@ -106,9 +126,13 @@ export const GameUiOverlay = ({ language }: GameUiOverlayProps) => {
       : "A friend on the journey");
   const dialogueBody =
     dialogue?.nodeId === "quest_locked"
-      ? language === "vi"
-        ? "Hãy hoàn thành địa danh trước đó để mở khóa thử thách này nhé."
-        : "Complete the previous landmark to unlock this challenge."
+      ? prereqLandmarkName
+        ? language === "vi"
+          ? `Hoàn thành ${prereqLandmarkName} để mở khóa.`
+          : `Complete ${prereqLandmarkName} to unlock.`
+        : language === "vi"
+          ? "Hãy hoàn thành địa danh trước đó để mở khóa thử thách này nhé."
+          : "Complete the previous landmark to unlock this challenge."
       : dialogue?.nodeId === "quest_rewarded"
         ? dialogueContent?.successMessage
         : dialogueContent

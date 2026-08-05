@@ -127,8 +127,8 @@ export const PassportPanel = ({
       ) : (
         <p className="passport-panel__next">
           {language === "vi"
-            ? "Hãy tiếp tục theo dấu NPC đang mở khóa trên bản đồ."
-            : "Follow the available NPC marker on the map to continue."}
+            ? "Hãy tiếp tục theo biểu tượng địa danh đang phát sáng trên bản đồ."
+            : "Follow the softly glowing landmark icon on the map to continue."}
         </p>
       )}
     </section>
@@ -158,8 +158,8 @@ export const JourneyEnding = ({ language, onClose }: JourneyEndingProps) => {
       </p>
       <h2 id="journey-ending-title">
         {language === "vi"
-          ? "Rồng Con đã gom đủ bốn Mảnh Ký Ức!"
-          : "Little Dragon gathered all four Memory Fragments!"}
+          ? `Rồng Con đã gom đủ ${QUEST_ORDER.length} Mảnh Ký Ức!`
+          : `Little Dragon gathered all ${QUEST_ORDER.length} Memory Fragments!`}
       </h2>
       <p>
         {language === "vi"

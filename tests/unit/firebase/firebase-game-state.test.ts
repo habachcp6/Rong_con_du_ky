@@ -43,10 +43,11 @@ describe("Firestore game-state projection", () => {
     );
 
     expect(document).toMatchObject({
-      version: 1,
+      version: 2,
       language: "vi",
       preferences: { interests: [] },
     });
+    expect(document.quests).toHaveProperty("ba_na_golden_bridge", "AVAILABLE");
     expect(document.preferences).not.toHaveProperty("budgetVnd");
     expect(document.preferences).not.toHaveProperty("dietary");
     expect(document).not.toHaveProperty("places");
@@ -81,7 +82,7 @@ describe("Firestore game-state projection", () => {
     );
     expect(operations.setDoc).toHaveBeenCalledWith(
       reference,
-      expect.objectContaining({ version: 1, language: "en" }),
+      expect.objectContaining({ version: 2, language: "en" }),
     );
   });
 });
@@ -119,6 +120,54 @@ describe("FirebaseGameStateMirror", () => {
     ).toBe("REWARDED");
   });
 
+  it("reads a V1 remote document and writes its normalized V2 migration", async () => {
+    const legacyRemote = {
+      version: 1,
+      language: "en",
+      player: { scene: "OverworldScene", x: 320, y: 480 },
+      quests: {
+        dragon_bridge_lights: "REWARDED",
+        my_khe_clean_wave: "REWARDED",
+        marble_five_elements: "REWARDED",
+        son_tra_traces: "REWARDED",
+      },
+      unlockedPostcards: [
+        "dragon_bridge",
+        "my_khe_beach",
+        "marble_mountains",
+        "son_tra_peninsula",
+      ],
+      memoryFragments: 4,
+      preferences: { interests: ["heritage"] },
+      updatedAt: "2026-08-03T00:00:00.000Z",
+    };
+    const write = vi.fn(async () => undefined);
+    const mirror = new FirebaseGameStateMirror(
+      { getUid: vi.fn(async () => "anon-123") },
+      { read: vi.fn(async () => legacyRemote), write },
+    );
+
+    const result = await mirror.bootstrap(
+      createInitialGameState("vi", "2026-08-03T00:00:00.000Z"),
+    );
+
+    expect(result.state).toMatchObject({
+      version: 2,
+      language: "en",
+      memoryFragments: 4,
+      unlockedPostcards: legacyRemote.unlockedPostcards,
+      quests: {
+        dragon_bridge_lights: "REWARDED",
+        son_tra_traces: "REWARDED",
+        han_river_bridge_turn: "AVAILABLE",
+      },
+    });
+    expect(write).toHaveBeenCalledWith(
+      "anon-123",
+      expect.objectContaining({ version: 2 }),
+    );
+  });
+
   it("returns local state instead of throwing when anonymous Auth is unavailable", async () => {
     const local = createInitialGameState("en", "2026-08-03T00:00:00.000Z");
     const store: RemoteGameStateStore = {
@@ -136,6 +185,38 @@ describe("FirebaseGameStateMirror", () => {
       source: "local",
     });
     expect(store.read).not.toHaveBeenCalled();
+  });
+
+  it("keeps rewarded local progress local when no remote document exists", async () => {
+    const local = rewardDragonBridge(
+      createInitialGameState("vi", "2026-08-03T00:00:00.000Z"),
+    );
+    const write = vi.fn(async () => undefined);
+    const mirror = new FirebaseGameStateMirror(
+      { getUid: vi.fn(async () => "anon-123") },
+      { read: vi.fn(async () => null), write },
+    );
+
+    await expect(mirror.bootstrap(local)).resolves.toMatchObject({
+      state: local,
+      status: {
+        mode: "offline",
+        reason: "LOCAL_PROGRESS_REQUIRES_MIGRATION",
+      },
+      source: "local",
+    });
+    expect(write).not.toHaveBeenCalled();
+
+    mirror.queueSave(local);
+    await expect(mirror.flush()).resolves.toMatchObject({
+      state: local,
+      status: {
+        mode: "offline",
+        reason: "LOCAL_PROGRESS_REQUIRES_MIGRATION",
+      },
+      saved: false,
+    });
+    expect(write).not.toHaveBeenCalled();
   });
 
   it("coalesces a save through the remote store and keeps local state on write failure", async () => {

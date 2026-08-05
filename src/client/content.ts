@@ -4,6 +4,8 @@ import curatedPlaces from "../../content/curated-places.json";
 import locationsEn from "../../content/locations.en.json";
 import locationsVi from "../../content/locations.vi.json";
 import type { Language, PlaceCard } from "../shared/types.js";
+import { QUEST_ORDER } from "../shared/game-state.js";
+import { QUESTS } from "../shared/quests.js";
 
 export type ClientLocationContent = {
   key: string;
@@ -46,6 +48,10 @@ export const getLocationContent = (
   placeKey: string,
 ): ClientLocationContent | undefined => locationsByLanguage[language][placeKey];
 
+export const getAllLocationContent = (
+  language: Language,
+): ClientLocationContent[] => Object.values(locationsByLanguage[language]);
+
 export const getDialogueContent = (
   language: Language,
   npcId: string,
@@ -81,3 +87,16 @@ export const getCuratedPlaceCards = (language: Language): PlaceCard[] =>
     googleMapsUri: place.googleMapsUri,
     sourceIds: [...place.sourceIds],
   }));
+
+export function getPrerequisiteLandmarkName(
+  questId: string,
+  language: Language,
+): string | undefined {
+  const index = QUEST_ORDER.indexOf(questId as (typeof QUEST_ORDER)[number]);
+  if (index <= 0) return undefined;
+  const prereqQuestId = QUEST_ORDER[index - 1];
+  const prereqLandmarkKey = QUESTS[prereqQuestId]?.landmarkKey;
+  if (!prereqLandmarkKey) return undefined;
+  const location = getLocationContent(language, prereqLandmarkKey);
+  return location?.name;
+}

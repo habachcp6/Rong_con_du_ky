@@ -12,7 +12,10 @@ import type {
   QuestStatus,
 } from "../../../shared/types.js";
 
-export const GAME_STATE_STORAGE_KEY = "rong-con-du-ky.game-state.v1";
+/** V2 carries the ten-landmark campaign. V1 is read once and normalized by
+ * the shared migration boundary before being persisted under this key. */
+export const GAME_STATE_STORAGE_KEY = "rong-con-du-ky.game-state.v2";
+export const LEGACY_GAME_STATE_STORAGE_KEY = "rong-con-du-ky.game-state.v1";
 export const DRAGON_BRIDGE_QUEST_ID = "dragon_bridge_lights";
 export const DRAGON_BRIDGE_POSTCARD_KEY = "dragon_bridge";
 
@@ -113,6 +116,7 @@ export class LocalGameStateStore {
     this.state = createInitialGameState();
     try {
       this.storage?.removeItem(GAME_STATE_STORAGE_KEY);
+      this.storage?.removeItem(LEGACY_GAME_STATE_STORAGE_KEY);
     } catch {
       // Clearing local state is best effort only.
     }
@@ -120,7 +124,10 @@ export class LocalGameStateStore {
 
   public hasPersistedState(): boolean {
     try {
-      return this.storage?.getItem(GAME_STATE_STORAGE_KEY) !== null;
+      return (
+        this.storage?.getItem(GAME_STATE_STORAGE_KEY) !== null ||
+        this.storage?.getItem(LEGACY_GAME_STATE_STORAGE_KEY) !== null
+      );
     } catch {
       return false;
     }
@@ -128,7 +135,9 @@ export class LocalGameStateStore {
 
   private read(): GameState {
     try {
-      const serialized = this.storage?.getItem(GAME_STATE_STORAGE_KEY);
+      const serialized =
+        this.storage?.getItem(GAME_STATE_STORAGE_KEY) ??
+        this.storage?.getItem(LEGACY_GAME_STATE_STORAGE_KEY);
       return serialized
         ? normalizeGameState(JSON.parse(serialized))
         : createInitialGameState();
@@ -140,6 +149,7 @@ export class LocalGameStateStore {
   private persist(): void {
     try {
       this.storage?.setItem(GAME_STATE_STORAGE_KEY, JSON.stringify(this.state));
+      this.storage?.removeItem(LEGACY_GAME_STATE_STORAGE_KEY);
     } catch {
       // Local play continues when browser storage is unavailable or full.
     }

@@ -14,6 +14,7 @@ import {
   type MovementVector,
 } from "../world";
 import { gameText } from "../locale";
+import { getPrerequisiteLandmarkName } from "../../content";
 
 type MovementKeys = {
   up: Phaser.Input.Keyboard.Key;
@@ -24,6 +25,11 @@ type MovementKeys = {
 
 type Facing = "south" | "north" | "west" | "east";
 
+type OverworldSceneData = {
+  requestedQuestId?: string;
+  requestedPlaceKey?: string;
+};
+
 const PLAYER_SPEED = 170;
 
 export class OverworldScene extends Phaser.Scene {
@@ -32,9 +38,9 @@ export class OverworldScene extends Phaser.Scene {
   private movementKeys?: MovementKeys;
   private interactKey?: Phaser.Input.Keyboard.Key;
   private spaceKey?: Phaser.Input.Keyboard.Key;
-  private escapeKey?: Phaser.Input.Keyboard.Key;
   private inputEnabled = true;
-  private dialogueOpen = false;
+  private challengeOpen = false;
+  private openedQuestId: string | null = null;
   private nearbyInteractable: QuestInteractable | null = null;
   private facing: Facing = "south";
   private joystick!: TouchJoystick;
@@ -47,11 +53,58 @@ export class OverworldScene extends Phaser.Scene {
     super({ key: "OverworldScene" });
   }
 
-  public create(): void {
+  public create(data: OverworldSceneData = {}): void {
+    this.nearbyInteractable = null;
+    this.openedQuestId = null;
+    this.challengeOpen = false;
+    // Scene instances are reused after a quest. A quest deliberately locks
+    // movement before starting, so each map entry must restore its baseline;
+    // an open DOM modal immediately acquires the lock again via the bridge.
+    this.inputEnabled = true;
     this.physics.world.setBounds(0, 0, WORLD_BOUNDS.width, WORLD_BOUNDS.height);
     this.drawWorld();
 
-    const state = gameSession.getState();
+    let state = gameSession.getState();
+    const recoveredQuestUpdates: Array<{
+      questId: string;
+      state: "AVAILABLE" | "REWARDED";
+      placeKey?: string;
+    }> = [];
+
+    // A refresh during an active mini-game resumes safely at the overworld and
+    // exposes a fresh deterministic attempt instead of leaving a stuck state.
+    const activeQuest = QUEST_INTERACTABLES.find(
+      (interactable) => state.quests[interactable.questId] === "ACTIVE",
+    );
+    if (activeQuest) {
+      const restoredQuest = gameSession.retryQuest(activeQuest.questId);
+      if (restoredQuest) {
+        recoveredQuestUpdates.push({
+          questId: activeQuest.questId,
+          state: "AVAILABLE",
+        });
+        state = restoredQuest.state;
+      }
+    }
+
+    // A browser can also refresh in the short success-animation window after
+    // ACTIVE → COMPLETED. Finish that deterministic reducer transition before
+    // drawing icon state so no quest becomes stranded without its reward.
+    const completedQuest = QUEST_INTERACTABLES.find(
+      (interactable) => state.quests[interactable.questId] === "COMPLETED",
+    );
+    if (completedQuest) {
+      const recoveredReward = gameSession.rewardQuest(completedQuest.questId);
+      if (recoveredReward) {
+        recoveredQuestUpdates.push({
+          questId: completedQuest.questId,
+          state: "REWARDED",
+          placeKey: completedQuest.placeKey,
+        });
+        state = recoveredReward.state;
+      }
+    }
+
     const hasRecoverablePosition =
       state.player.scene === "OverworldScene" ||
       Object.values(QUEST_SCENE_BY_ID).includes(state.player.scene);
@@ -83,7 +136,7 @@ export class OverworldScene extends Phaser.Scene {
     this.player.setDepth(20).setCollideWorldBounds(true);
 
     this.addColliders();
-    this.createQuestNpcs();
+    this.createQuestLandmarks();
     this.createHud();
     this.createInput();
 
@@ -98,16 +151,24 @@ export class OverworldScene extends Phaser.Scene {
 
     this.bridgeUnsubscribe = bridge.onUiToGame((event) => {
       if (event.type === "DIALOGUE_CLOSE") {
-        this.closeDialogue();
+        this.closeChallenge();
       }
       if (event.type === "SET_INPUT_ENABLED") {
-        this.inputEnabled = event.enabled && !this.dialogueOpen;
+        this.inputEnabled = event.enabled && !this.challengeOpen;
         if (!this.inputEnabled) {
           this.player.setVelocity(0, 0);
         }
       }
       if (event.type === "START_QUEST") {
         this.startQuest(event.questId);
+      }
+      if (event.type === "OPEN_LANDMARK_CHALLENGE") {
+        const interactable = QUEST_INTERACTABLES.find(
+          (candidate) =>
+            candidate.questId === event.questId &&
+            candidate.placeKey === event.placeKey,
+        );
+        if (interactable) this.openLandmarkChallenge(interactable, true);
       }
       if (event.type === "SET_LANGUAGE") {
         // Recreate only presentation; saved position and deterministic quest
@@ -116,38 +177,50 @@ export class OverworldScene extends Phaser.Scene {
       }
     });
 
-    // A refresh during an active mini-game resumes safely at the overworld and
-    // exposes a fresh deterministic attempt instead of leaving a stuck state.
-    const activeQuest = QUEST_INTERACTABLES.find(
-      (interactable) =>
-        state.quests[interactable.questId] === "ACTIVE" &&
-        state.player.scene === QUEST_SCENE_BY_ID[interactable.questId],
-    );
-    if (activeQuest) {
-      const restoredQuest = gameSession.retryQuest(activeQuest.questId);
-      if (restoredQuest) {
+    for (const recovered of recoveredQuestUpdates) {
+      bridge.emitGameToUi({
+        type: "QUEST_UPDATED",
+        questId: recovered.questId,
+        state: recovered.state,
+      });
+      if (recovered.placeKey) {
         bridge.emitGameToUi({
-          type: "QUEST_UPDATED",
-          questId: activeQuest.questId,
-          state: restoredQuest.current,
+          type: "POSTCARD_UNLOCKED",
+          placeKey: recovered.placeKey,
         });
       }
     }
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanUp, this);
     this.updateInteractionState();
+
+    if (
+      import.meta.env.VITE_ENABLE_E2E_BRIDGE === "true" &&
+      typeof window !== "undefined"
+    ) {
+      (window as any).__QUEST_POSITIONS__ = QUEST_INTERACTABLES.map((q) => ({
+        id: q.id,
+        key: q.placeKey,
+        questId: q.questId,
+        x: q.x,
+        y: q.y,
+      }));
+      (window as any).__RIVER_BOUNDS__ = RIVER_BOUNDS;
+    }
+
+    bridge.emitGameToUi({ type: "OVERWORLD_READY" });
+
+    const requestedLandmark = QUEST_INTERACTABLES.find(
+      (interactable) =>
+        interactable.questId === data.requestedQuestId &&
+        interactable.placeKey === data.requestedPlaceKey,
+    );
+    if (requestedLandmark) {
+      this.openLandmarkChallenge(requestedLandmark, true);
+    }
   }
 
   public update(): void {
-    if (
-      this.dialogueOpen &&
-      this.escapeKey &&
-      Phaser.Input.Keyboard.JustDown(this.escapeKey)
-    ) {
-      bridge.emitUiToGame({ type: "DIALOGUE_CLOSE" });
-      return;
-    }
-
     if (!this.inputEnabled) {
       this.player.setVelocity(0, 0);
       return;
@@ -166,63 +239,135 @@ export class OverworldScene extends Phaser.Scene {
       ((this.interactKey && Phaser.Input.Keyboard.JustDown(this.interactKey)) ||
         (this.spaceKey && Phaser.Input.Keyboard.JustDown(this.spaceKey)))
     ) {
-      this.openQuestDialogue();
+      if (this.nearbyInteractable) {
+        this.openLandmarkChallenge(this.nearbyInteractable);
+      }
     }
 
     gameSession.updatePlayer("OverworldScene", this.player.x, this.player.y);
   }
 
   private drawWorld(): void {
-    const graphics = this.add.graphics();
-    graphics.fillStyle(0x244a4d, 1);
-    graphics.fillRect(0, 0, WORLD_BOUNDS.width, WORLD_BOUNDS.height);
+    this.add
+      .image(0, 0, "map_background_overworld_night")
+      .setOrigin(0, 0)
+      .setDepth(0);
 
-    // Authored map layers: land, river, road, then landmark decoration.
-    graphics.fillStyle(0x2d6d5e, 1);
-    graphics.fillRect(0, 0, 650, WORLD_BOUNDS.height);
-    graphics.fillRect(1000, 0, WORLD_BOUNDS.width - 1000, WORLD_BOUNDS.height);
-    graphics.fillStyle(0x14648d, 1);
-    graphics.fillRect(650, 0, 350, WORLD_BOUNDS.height);
-    graphics.lineStyle(2, 0x6ce5ff, 0.32);
-    for (let y = 24; y < WORLD_BOUNDS.height; y += 38) {
-      graphics.lineBetween(664, y, 978, y);
+    this.createAnimationOverlays();
+  }
+
+  private createAnimationOverlays(): void {
+    // 1. River water waves on Han River (x=760 to 940)
+    const riverWaveGraphics = this.add.graphics().setDepth(1);
+    riverWaveGraphics.lineStyle(2, 0x6ce5ff, 0.4);
+    for (let y = 30; y < WORLD_BOUNDS.height; y += 45) {
+      riverWaveGraphics.lineBetween(760, y, 940, y);
+    }
+    this.tweens.add({
+      targets: riverWaveGraphics,
+      x: { from: -8, to: 8 },
+      alpha: { from: 0.3, to: 0.75 },
+      duration: 2200,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut",
+    });
+
+    // 2. Lantern flickering: Alpha flickering tweens on decorative lantern light points
+    const lanternPositions = [
+      { x: 260, y: 240 }, // Ba Na Hills
+      { x: 480, y: 490 }, // Han Market
+      { x: 710, y: 470 }, // Cham Museum
+      { x: 830, y: 250 }, // Han River Bridge
+      { x: 880, y: 630 }, // Dragon Bridge
+      { x: 1250, y: 210 }, // Son Tra Peninsula
+      { x: 1420, y: 220 }, // Linh Ung
+      { x: 1200, y: 480 }, // My Khe Beach
+      { x: 740, y: 850 }, // Marble Mountains
+      { x: 660, y: 880 }, // Non Nuoc
+      { x: 230, y: 800 }, // Starter Village
+    ];
+    lanternPositions.forEach((pos, index) => {
+      const outerGlow = this.add
+        .circle(pos.x, pos.y, 10, 0xffa500, 0.4)
+        .setDepth(2);
+      const innerCore = this.add
+        .circle(pos.x, pos.y, 4, 0xffd166, 0.85)
+        .setDepth(3);
+
+      this.tweens.add({
+        targets: [outerGlow, innerCore],
+        alpha: { from: 0.25, to: 0.9 },
+        scale: { from: 0.85, to: 1.25 },
+        duration: 450 + (index % 5) * 150,
+        yoyo: true,
+        repeat: -1,
+        ease: "Sine.easeInOut",
+      });
+    });
+
+    // 3. Dragon Bridge fire particles: Particle emitter at dragon head (880, 630) emitting orange/red fire spark particles
+    if (!this.textures.exists("fire_particle")) {
+      const canvas = this.textures.createCanvas("fire_particle", 8, 8);
+      if (canvas) {
+        const ctx = canvas.getContext();
+        ctx.fillStyle = "#ff5500";
+        ctx.beginPath();
+        ctx.arc(4, 4, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#ffd166";
+        ctx.beginPath();
+        ctx.arc(4, 4, 2, 0, Math.PI * 2);
+        ctx.fill();
+        canvas.refresh();
+      }
     }
 
-    graphics.fillStyle(0xb79061, 1);
-    graphics.fillRect(188, 430, 1110, 88);
-    graphics.fillRect(202, 500, 92, 350);
-    graphics.fillStyle(0x4f5567, 1);
-    graphics.fillRoundedRect(570, 408, 510, 132, 10);
-    graphics.lineStyle(3, 0xffd166, 0.88);
-    graphics.strokeRoundedRect(570, 408, 510, 132, 10);
-
-    for (let x = 615; x <= 1030; x += 58) {
-      graphics.fillStyle(0xffc857, 0.66);
-      graphics.fillRect(x, 423, 22, 9);
-      graphics.fillRect(x, 516, 22, 9);
+    try {
+      const fireEmitter = this.add.particles(880, 630, "fire_particle", {
+        speed: { min: 25, max: 65 },
+        angle: { min: 220, max: 320 },
+        scale: { start: 1.2, end: 0 },
+        alpha: { start: 1, end: 0 },
+        lifespan: { min: 400, max: 850 },
+        frequency: 120,
+        blendMode: "ADD",
+      });
+      fireEmitter.setDepth(5);
+    } catch {
+      const fallbackFire = this.add
+        .circle(880, 630, 16, 0xff5500, 0.6)
+        .setDepth(5);
+      this.tweens.add({
+        targets: fallbackFire,
+        scale: { from: 0.8, to: 1.5 },
+        alpha: { from: 0.3, to: 0.9 },
+        duration: 400,
+        yoyo: true,
+        repeat: -1,
+      });
     }
 
-    graphics.fillStyle(0x163343, 0.9);
-    graphics.fillCircle(1105, 446, 38);
-    graphics.fillStyle(0xffd166, 1);
-    graphics.fillTriangle(1100, 416, 1138, 445, 1095, 454);
-
-    this.add
-      .text(825, 380, gameText("CẦU RỒNG", "DRAGON BRIDGE"), {
-        fontFamily: "sans-serif",
-        fontStyle: "bold",
-        fontSize: "18px",
-        color: "#fff3bf",
-      })
-      .setOrigin(0.5)
-      .setDepth(5);
-    this.add
-      .text(214, 890, gameText("LÀNG KHỞI HÀNH", "STARTING VILLAGE"), {
-        fontFamily: "sans-serif",
-        fontSize: "13px",
-        color: "#e8f7ff",
-      })
-      .setDepth(5);
+    // 4. My Khe sea waves: Sine wave position/alpha tweens on ocean wave graphics (x > 1200)
+    const seaWaveGraphics = this.add.graphics().setDepth(1);
+    seaWaveGraphics.lineStyle(3, 0x8ee5ff, 0.5);
+    for (let y = 60; y < WORLD_BOUNDS.height; y += 60) {
+      seaWaveGraphics.beginPath();
+      seaWaveGraphics.arc(1250, y, 25, 0, Math.PI, false);
+      seaWaveGraphics.strokePath();
+      seaWaveGraphics.beginPath();
+      seaWaveGraphics.arc(1350, y + 30, 30, 0, Math.PI, false);
+      seaWaveGraphics.strokePath();
+    }
+    this.tweens.add({
+      targets: seaWaveGraphics,
+      x: { from: 0, to: 18 },
+      alpha: { from: 0.25, to: 0.8 },
+      duration: 2500,
+      yoyo: true,
+      repeat: -1,
+      ease: "Sine.easeInOut",
+    });
   }
 
   private addColliders(): void {
@@ -236,32 +381,95 @@ export class OverworldScene extends Phaser.Scene {
           definition.color,
         )
         .setDepth(8);
-      obstacle.setStrokeStyle(2, 0xe8f7ff, 0.22);
+      obstacle.setVisible(false);
       this.physics.add.existing(obstacle, true);
       this.physics.add.collider(this.player, obstacle);
     });
   }
 
-  private createQuestNpcs(): void {
+  /**
+   * The landmark icon is the interactive object for every destination. NPCs
+   * remain only as four nearby guides; no generic circle marker is used.
+   */
+  private createQuestLandmarks(): void {
     QUEST_INTERACTABLES.forEach((interactable) => {
       const copy = getQuestInteractableCopy(
         interactable,
         gameSession.getState().language,
       );
+      const status = gameSession.getState().quests[interactable.questId];
+
+      if (status === "AVAILABLE") {
+        const glow = this.add
+          .sprite(interactable.x, interactable.y, interactable.mapIconAssetId)
+          .setTint(interactable.color)
+          .setScale(1.55)
+          .setAlpha(0.22)
+          .setDepth(16);
+        this.tweens.add({
+          targets: glow,
+          scaleX: 1.92,
+          scaleY: 1.92,
+          alpha: 0.03,
+          duration: 1250,
+          repeat: -1,
+          yoyo: true,
+          ease: "Sine.easeInOut",
+        });
+      }
+
+      const icon = this.add
+        .sprite(interactable.x, interactable.y, interactable.mapIconAssetId)
+        .setScale(1.48)
+        .setDepth(18)
+        .setInteractive({ useHandCursor: true });
+      if (status === "LOCKED") {
+        icon.setTint(0x718092).setAlpha(0.58);
+      }
+      icon.on("pointerdown", () => this.openLandmarkChallenge(interactable));
+
+      if (status === "LOCKED") {
+        this.add
+          .text(interactable.x + 17, interactable.y + 16, "🔒", {
+            fontFamily: "sans-serif",
+            fontSize: "13px",
+          })
+          .setOrigin(0.5)
+          .setDepth(20);
+      } else if (status === "REWARDED") {
+        this.add
+          .text(interactable.x + 17, interactable.y + 16, "★", {
+            fontFamily: "sans-serif",
+            fontSize: "18px",
+            color: "#ffd166",
+            stroke: "#17243c",
+            strokeThickness: 2,
+          })
+          .setOrigin(0.5)
+          .setDepth(20);
+      }
+
       this.add
-        .sprite(interactable.x, interactable.y, interactable.npcTexture)
-        .setTint(interactable.color)
-        .setDepth(18);
-      this.add
-        .text(interactable.x, interactable.y - 34, copy.npcLabel, {
+        .text(interactable.x, interactable.y - 35, copy.name, {
           fontFamily: "sans-serif",
-          fontSize: "13px",
+          fontSize: "12px",
           color: "#e8f7ff",
           backgroundColor: "#10233dcc",
           padding: { x: 5, y: 3 },
         })
         .setOrigin(0.5)
         .setDepth(19);
+      if (interactable.guide) {
+        this.add
+          .sprite(
+            interactable.x + 31,
+            interactable.y + 18,
+            interactable.guide.npcTexture,
+          )
+          .setTint(interactable.color)
+          .setScale(0.8)
+          .setDepth(19);
+      }
     });
   }
 
@@ -315,9 +523,6 @@ export class OverworldScene extends Phaser.Scene {
     this.spaceKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.SPACE,
     );
-    this.escapeKey = this.input.keyboard.addKey(
-      Phaser.Input.Keyboard.KeyCodes.ESC,
-    );
   }
 
   private getKeyboardDirection(): MovementVector {
@@ -352,71 +557,92 @@ export class OverworldScene extends Phaser.Scene {
   }
 
   private updateInteractionState(): void {
-    const nextInteractable =
+    const nextQuest =
       QUEST_INTERACTABLES.find((interactable) =>
         isWithinInteractionRange(this.player, interactable),
       ) ?? null;
-    if (this.nearbyInteractable?.id === nextInteractable?.id) {
+    if (this.nearbyInteractable?.id === nextQuest?.id) {
       return;
     }
 
-    this.nearbyInteractable = nextInteractable;
-    const status = nextInteractable
-      ? gameSession.getState().quests[nextInteractable.questId]
-      : undefined;
-    const localized = nextInteractable
-      ? getQuestInteractableCopy(
-          nextInteractable,
-          gameSession.getState().language,
-        )
-      : null;
-    const label = localized
-      ? status === "LOCKED"
-        ? gameText(
-            `${localized.npcLabel} — hoàn thành điểm trước để mở khóa`,
-            `${localized.npcLabel} — finish the previous landmark to unlock`,
-          )
-        : localized.label
-      : null;
+    this.nearbyInteractable = nextQuest;
+
+    let label: string | null = null;
+
+    if (nextQuest) {
+      const currentLanguage = gameSession.getState().language;
+      const status = gameSession.getState().quests[nextQuest.questId];
+      const localized = getQuestInteractableCopy(nextQuest, currentLanguage);
+      if (status === "LOCKED") {
+        const prereqName = getPrerequisiteLandmarkName(
+          nextQuest.questId,
+          currentLanguage,
+        );
+        const lockedTextVi = prereqName
+          ? `${localized.name} — Hoàn thành ${prereqName} để mở khóa`
+          : `${localized.name} — hoàn thành điểm trước để mở khóa`;
+        const lockedTextEn = prereqName
+          ? `${localized.name} — Complete ${prereqName} to unlock`
+          : `${localized.name} — finish the previous landmark to unlock`;
+        label = gameText(lockedTextVi, lockedTextEn);
+      } else {
+        label =
+          status === "REWARDED"
+            ? gameText(
+                `${localized.name} — xem postcard`,
+                `${localized.name} — view postcard`,
+              )
+            : localized.label;
+      }
+    }
+
     this.interactionText.setText(label ?? "").setVisible(Boolean(label));
     this.touchInteractButton.setVisible(Boolean(label));
     this.touchInteractLabel.setVisible(Boolean(label));
     bridge.emitGameToUi({ type: "PLAYER_NEAR_INTERACTABLE", label });
   }
 
-  private openQuestDialogue(): void {
-    if (!this.nearbyInteractable || this.dialogueOpen) {
+  private openLandmarkChallenge(
+    interactable: QuestInteractable,
+    fromUi = false,
+  ): void {
+    if (this.challengeOpen || (!fromUi && !this.inputEnabled)) {
       return;
     }
 
-    const currentStatus =
-      gameSession.getState().quests[this.nearbyInteractable.questId];
-    this.dialogueOpen = true;
+    const currentStatus = gameSession.getState().quests[interactable.questId];
+    if (currentStatus === "REWARDED") {
+      this.inputEnabled = false;
+      bridge.emitGameToUi({
+        type: "OPEN_LANDMARK_DETAIL",
+        locationKey: interactable.placeKey,
+      });
+      return;
+    }
+
+    this.challengeOpen = true;
+    this.openedQuestId = interactable.questId;
     this.inputEnabled = false;
     this.player.setVelocity(0, 0);
     bridge.emitGameToUi({
-      type: "DIALOGUE_OPEN",
-      npcId: this.nearbyInteractable.npcId,
-      nodeId:
-        currentStatus === "LOCKED"
-          ? "quest_locked"
-          : currentStatus === "REWARDED"
-            ? "quest_rewarded"
-            : "quest_intro",
+      type: "LANDMARK_CHALLENGE_OPEN",
+      questId: interactable.questId,
+      placeKey: interactable.placeKey,
     });
   }
 
-  private closeDialogue(): void {
-    if (!this.dialogueOpen) {
+  private closeChallenge(): void {
+    if (!this.challengeOpen) {
       return;
     }
 
-    this.dialogueOpen = false;
+    this.challengeOpen = false;
+    this.openedQuestId = null;
     this.inputEnabled = true;
   }
 
   private startQuest(questId: string): void {
-    if (!this.dialogueOpen || this.nearbyInteractable?.questId !== questId) {
+    if (!this.challengeOpen || this.openedQuestId !== questId) {
       return;
     }
 
@@ -430,7 +656,8 @@ export class OverworldScene extends Phaser.Scene {
       questId,
       state: started.current,
     });
-    this.dialogueOpen = false;
+    this.challengeOpen = false;
+    this.openedQuestId = null;
     this.inputEnabled = false;
     this.player.setVelocity(0, 0);
     bridge.emitGameToUi({ type: "PLAYER_NEAR_INTERACTABLE", label: null });
@@ -453,7 +680,7 @@ export class OverworldScene extends Phaser.Scene {
       pointer.y - this.touchInteractButton.y,
     );
     if (distance <= 70) {
-      this.openQuestDialogue();
+      this.openLandmarkChallenge(this.nearbyInteractable);
     }
   }
 

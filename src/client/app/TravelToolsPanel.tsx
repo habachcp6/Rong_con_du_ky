@@ -8,6 +8,7 @@ import { gameSession } from "../game/state/GameStateStore";
 import { trackAnalytics } from "../services/analytics";
 import { createBrowserApiClient } from "../services/api-client";
 import type { GameState, Language, PlaceCard } from "../../shared/types";
+import { QUEST_ORDER } from "../../shared/game-state";
 import { useModalAccessibility } from "./useModalAccessibility";
 
 type TravelToolsPanelProps = {
@@ -16,7 +17,7 @@ type TravelToolsPanelProps = {
   onStateChange: () => void;
 };
 
-type ChatResult = {
+export type ChatResult = {
   dialogue: string;
   hint?: string;
   source: "gemini" | "fallback" | "authored";
@@ -45,6 +46,43 @@ const toBudget = (value: string): number | undefined => {
 
 const mapsSearchUrl = (name: string): string =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} Da Nang`)}`;
+
+/** Every canonical quest has an authored dialogue node. Keeping this total
+ * mapping beside the companion entry point makes a missing new-landmark hint a
+ * type error rather than silently falling back to Dragon Bridge copy. */
+const DIALOGUE_NODE_BY_QUEST: Record<(typeof QUEST_ORDER)[number], string> = {
+  dragon_bridge_lights: "dragon_bridge_npc",
+  my_khe_clean_wave: "my_khe_npc",
+  marble_five_elements: "marble_npc",
+  son_tra_traces: "son_tra_npc",
+  han_river_bridge_turn: "han_river_bridge_guide",
+  linh_ung_quiet_path: "linh_ung_guide",
+  cham_museum_relic_match: "cham_museum_guide",
+  non_nuoc_carving_pattern: "non_nuoc_guide",
+  han_market_basket_sort: "han_market_guide",
+  ba_na_golden_bridge: "ba_na_guide",
+};
+
+/** Prefer a live challenge for a hint, then the one available campaign
+ * frontier. The order comes from the canonical game state, never a UI list. */
+export const getCompanionQuestId = (
+  state: GameState,
+): (typeof QUEST_ORDER)[number] | undefined =>
+  QUEST_ORDER.find((questId) => state.quests[questId] === "ACTIVE") ??
+  QUEST_ORDER.find((questId) => state.quests[questId] === "AVAILABLE");
+
+export const createCompanionChatRequest = (
+  state: GameState,
+  message: string,
+) => {
+  const questId = getCompanionQuestId(state);
+  return {
+    language: state.language,
+    message,
+    unlockedPostcards: state.unlockedPostcards,
+    ...(questId ? { questId } : {}),
+  };
+};
 
 const localRecommendations = (
   language: Language,
@@ -100,14 +138,10 @@ const authoredItinerary = (state: GameState): ItineraryView => {
   };
 };
 
-const authoredChat = (state: GameState): ChatResult => {
-  const npcId =
-    Object.entries(state.quests).find(
-      ([, status]) => status === "ACTIVE",
-    )?.[0] === "my_khe_clean_wave"
-      ? "my_khe_npc"
-      : "dragon_bridge_npc";
-  const node = getDialogueContent(state.language, npcId);
+export const authoredChat = (state: GameState): ChatResult => {
+  const questId = getCompanionQuestId(state);
+  const npcId = questId ? DIALOGUE_NODE_BY_QUEST[questId] : undefined;
+  const node = npcId ? getDialogueContent(state.language, npcId) : undefined;
   return {
     dialogue:
       node?.questPrompt ??
@@ -179,11 +213,9 @@ export const TravelToolsPanel = ({
     setChatBusy(true);
     try {
       const client = await createBrowserApiClient();
-      const response = await client.chat({
-        language,
-        message: trimmed,
-        unlockedPostcards: state.unlockedPostcards,
-      });
+      const response = await client.chat(
+        createCompanionChatRequest(state, trimmed),
+      );
       setChat({
         dialogue: response.reply.dialogue,
         hint: response.reply.hint,
