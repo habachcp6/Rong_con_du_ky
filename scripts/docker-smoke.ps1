@@ -24,7 +24,7 @@ Write-Host "Building $Image..."
 docker build --tag $Image .
 if ($LASTEXITCODE -ne 0) { throw "docker build failed." }
 
-docker rm --force $container 2>$null | Out-Null
+try { docker rm --force $container 2>&1 | Out-Null } catch {}
 Write-Host "Starting $container on http://127.0.0.1:$HostPort ..."
 $containerId = docker run --detach --name $container --publish "$HostPort`:8080" --env NODE_ENV=production --env PORT=8080 $Image
 if ($LASTEXITCODE -ne 0) { throw "docker run failed." }
@@ -57,5 +57,5 @@ try {
     Write-Host "Open http://127.0.0.1:$HostPort/ to test the game."
 }
 finally {
-    docker rm --force $container 2>$null | Out-Null
+    try { docker rm --force $container 2>&1 | Out-Null } catch {}
 }

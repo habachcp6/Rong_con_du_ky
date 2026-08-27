@@ -49,7 +49,7 @@ export const LANDMARK_CHALLENGE_RULES: Readonly<
   han_river_bridge_turn: {
     questId: "han_river_bridge_turn",
     mode: "rotate",
-    durationMs: 60_000,
+    durationMs: 90_000,
     title: text("NHỊP CẦU XOAY", "TURN THE BRIDGE"),
     subtitle: text("Cầu Sông Hàn", "Han River Bridge"),
     objective: text(
@@ -74,7 +74,7 @@ export const LANDMARK_CHALLENGE_RULES: Readonly<
   linh_ung_quiet_path: {
     questId: "linh_ung_quiet_path",
     mode: "sequence",
-    durationMs: 60_000,
+    durationMs: 90_000,
     title: text("LỐI ĐI TĨNH LẶNG", "QUIET PATH"),
     subtitle: text("Chùa Linh Ứng Sơn Trà", "Linh Ung Pagoda Son Tra"),
     objective: text(
@@ -105,7 +105,7 @@ export const LANDMARK_CHALLENGE_RULES: Readonly<
   cham_museum_relic_match: {
     questId: "cham_museum_relic_match",
     mode: "sequence",
-    durationMs: 75_000,
+    durationMs: 112_500,
     title: text("GHÉP NHÃN TRƯNG BÀY", "RELIC LABEL MATCH"),
     subtitle: text("Bảo tàng Điêu khắc Chăm", "Museum of Cham Sculpture"),
     objective: text(
@@ -135,7 +135,7 @@ export const LANDMARK_CHALLENGE_RULES: Readonly<
   non_nuoc_carving_pattern: {
     questId: "non_nuoc_carving_pattern",
     mode: "sequence",
-    durationMs: 60_000,
+    durationMs: 90_000,
     title: text("MẪU CHẠM KHẮC", "CARVING PATTERN"),
     subtitle: text(
       "Làng đá mỹ nghệ Non Nước",
@@ -166,7 +166,7 @@ export const LANDMARK_CHALLENGE_RULES: Readonly<
   han_market_basket_sort: {
     questId: "han_market_basket_sort",
     mode: "cycle",
-    durationMs: 75_000,
+    durationMs: 112_500,
     title: text("SẮP GIỎ HÀNG", "MARKET BASKET SORT"),
     subtitle: text("Chợ Hàn", "Han Market"),
     objective: text(
@@ -203,7 +203,7 @@ export const LANDMARK_CHALLENGE_RULES: Readonly<
   ba_na_golden_bridge: {
     questId: "ba_na_golden_bridge",
     mode: "toggle",
-    durationMs: 60_000,
+    durationMs: 90_000,
     title: text("LỐI QUA CẦU VÀNG", "GOLDEN BRIDGE PATH"),
     subtitle: text("Bà Nà Hills", "Ba Na Hills"),
     objective: text(

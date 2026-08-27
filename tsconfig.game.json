@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "erasableSyntaxOnly": false,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.game.tsbuildinfo"
+  },
+  "include": [
+    "src/client/game/landmark-challenge-rules.ts",
+    "src/client/game/locale.ts",
+    "src/client/game/marble-puzzle.ts",
+    "src/client/game/my-khe.ts",
+    "src/client/game/rhythm.ts",
+    "src/client/game/son-tra.ts",
+    "src/client/game/world.ts",
+    "src/client/game/input/TouchJoystick.ts",
+    "src/client/game/state/GameStateStore.ts",
+    "src/client/game/scenes/DragonBridgeQuestScene.ts",
+    "src/client/game/scenes/LandmarkChallengeScenes.ts",
+    "src/client/game/scenes/MarbleMountainsPuzzleScene.ts",
+    "src/client/game/scenes/MyKheCleanupScene.ts",
+    "src/client/game/scenes/SonTraWildlifeScene.ts",
+    "src/client/app/PhaserBridge.ts",
+    "src/shared/**/*.ts"
+  ]
+}

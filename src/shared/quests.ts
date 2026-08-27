@@ -38,7 +38,7 @@ export const QUESTS: Record<LandmarkQuestId, QuestDefinition> = {
   son_tra_traces: {
     id: "son_tra_traces",
     landmarkKey: "son_tra_peninsula",
-    nameVi: "Dấu Dân Sơn Trà",
+    nameVi: "Dấu Vết Sơn Trà",
     nameEn: "Son Tra Traces",
     descriptionVi: "Quan sát và tìm 3 dấu vết của Voọc chà vá chân nâu!",
     descriptionEn: "Observe and find 3 traces of the Red-shanked douc langur!",

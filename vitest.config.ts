@@ -7,6 +7,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     exclude: [
+      ".agents/**",
       "tests/e2e/**",
       "tests/integration/**",
       "node_modules/**",

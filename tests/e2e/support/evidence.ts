@@ -1,4 +1,6 @@
 import { createHash } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
 import {
   expect,
   type Locator,
@@ -16,15 +18,35 @@ export async function captureVisualEvidence(
   testInfo: TestInfo,
   checkpoint: string,
 ): Promise<string> {
-  const filename = `${checkpoint}-${testInfo.project.name}.png`;
+  const sanitizedCheckpoint = checkpoint.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const timestamp = Date.now();
+  const filename = `${sanitizedCheckpoint}-${testInfo.project.name}-${timestamp}.png`;
   const path = testInfo.outputPath("screenshots", filename);
 
-  await page.screenshot({
-    path,
+  const buffer = await page.screenshot({
     animations: "disabled",
   });
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      await mkdir(dirname(path), { recursive: true });
+      await writeFile(path, buffer);
+      break;
+    } catch (err: unknown) {
+      const code = (err as { code?: string })?.code;
+      if (
+        (code === "EBUSY" || code === "EPERM" || code === "EACCES") &&
+        attempt < 4
+      ) {
+        await new Promise((resolve) => setTimeout(resolve, 50 * (attempt + 1)));
+      } else {
+        break;
+      }
+    }
+  }
+
   await testInfo.attach(`visual:${checkpoint}`, {
-    path,
+    body: buffer,
     contentType: "image/png",
   });
 

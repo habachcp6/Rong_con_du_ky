@@ -79,7 +79,10 @@ export function useModalAccessibility(
         const anotherModal = document.querySelector(
           '[role="dialog"][aria-modal="true"]',
         );
-        if (!anotherModal && returnFocusTarget?.isConnected) {
+        if (
+          (!anotherModal || anotherModal === panel) &&
+          returnFocusTarget?.isConnected
+        ) {
           returnFocusTarget.focus({ preventScroll: true });
         }
       });

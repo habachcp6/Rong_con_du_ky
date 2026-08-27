@@ -40,6 +40,18 @@ test.describe("polish, accessibility, and legal routes @m8", () => {
     await expect(
       page.getByRole("button", { name: "Close journey companion" }),
     ).toBeFocused();
+    const galleryHeader = page.getByTestId("landmark-gallery-open");
+    const galleryHeaderBox = await galleryHeader.boundingBox();
+    expect(galleryHeaderBox).not.toBeNull();
+    await page.mouse.click(
+      galleryHeaderBox!.x + galleryHeaderBox!.width / 2,
+      galleryHeaderBox!.y + galleryHeaderBox!.height / 2,
+    );
+    await expect(companion).toBeVisible();
+    await expect(page.getByTestId("landmark-gallery-panel")).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Close journey companion" }),
+    ).toBeFocused();
     await page.keyboard.press("Escape");
     await expect(companion).toBeHidden();
     await expect(page.getByTestId("travel-tools-open")).toBeFocused();
@@ -50,11 +62,50 @@ test.describe("polish, accessibility, and legal routes @m8", () => {
     await expect(
       page.getByRole("button", { name: "Close passport" }),
     ).toBeFocused();
+    const passportGalleryHeaderBox = await galleryHeader.boundingBox();
+    expect(passportGalleryHeaderBox).not.toBeNull();
+    await page.mouse.click(
+      passportGalleryHeaderBox!.x + passportGalleryHeaderBox!.width / 2,
+      passportGalleryHeaderBox!.y + passportGalleryHeaderBox!.height / 2,
+    );
+    await expect(passport).toBeVisible();
+    await expect(page.getByTestId("landmark-gallery-panel")).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: "Close passport" }),
+    ).toBeFocused();
     await page.keyboard.press("Escape");
     await expect(passport).toBeHidden();
     await expect(page.getByTestId("passport-open")).toBeFocused();
 
     await captureVisualEvidence(page, testInfo, "desktop-polish-en");
+    await expectNoSeriousBrowserErrors(testInfo, browserErrors);
+  });
+
+  test("blocks header touch-through while the companion is open", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "chromium-mobile",
+      "Modal touch isolation is exercised once on mobile.",
+    );
+    const browserErrors = collectSeriousBrowserErrors(page);
+    await page.goto("/");
+    await waitForGameCanvas(page);
+
+    await page.getByTestId("travel-tools-open").tap();
+    const companion = page.getByTestId("travel-tools-panel");
+    await expect(companion).toBeVisible();
+    const galleryHeader = page.getByTestId("landmark-gallery-open");
+    const galleryHeaderBox = await galleryHeader.boundingBox();
+    expect(galleryHeaderBox).not.toBeNull();
+    await page.touchscreen.tap(
+      galleryHeaderBox!.x + galleryHeaderBox!.width / 2,
+      galleryHeaderBox!.y + galleryHeaderBox!.height / 2,
+    );
+    await expect(companion).toBeVisible();
+    await expect(page.getByTestId("landmark-gallery-panel")).toBeHidden();
+    await page.keyboard.press("Escape");
+    await expect(companion).toBeHidden();
     await expectNoSeriousBrowserErrors(testInfo, browserErrors);
   });
 

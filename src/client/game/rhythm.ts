@@ -2,8 +2,8 @@ export const DRAGON_BRIDGE_RHYTHM = {
   totalBeats: 10,
   minimumScorePercent: 70,
   beatIntervalMs: 750,
-  hitWindowMs: 500,
-  maximumDurationMs: 60_000,
+  hitWindowMs: 1500,
+  maximumDurationMs: 90_000,
 } as const;
 
 export const requiredRhythmScore = (): number =>

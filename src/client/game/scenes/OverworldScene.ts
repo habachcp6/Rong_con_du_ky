@@ -141,6 +141,7 @@ export class OverworldScene extends Phaser.Scene {
     this.createInput();
 
     this.cameras.main.setBounds(0, 0, WORLD_BOUNDS.width, WORLD_BOUNDS.height);
+    this.cameras.main.centerOn(this.player.x, this.player.y);
     this.cameras.main.startFollow(this.player, true, 0.13, 0.13);
     this.cameras.main.setRoundPixels(true);
 

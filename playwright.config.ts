@@ -33,7 +33,11 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
-  workers: isCI ? 1 : undefined,
+  workers: process.env.PLAYWRIGHT_WORKERS
+    ? Number(process.env.PLAYWRIGHT_WORKERS)
+    : isCI
+      ? 1
+      : 2,
   timeout: 30_000,
   expect: {
     timeout: 8_000,

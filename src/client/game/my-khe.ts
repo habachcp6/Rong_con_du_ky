@@ -8,7 +8,7 @@ export const MY_KHE_POSTCARD_KEY = "my_khe_beach";
 
 export const MY_KHE_CLEANUP_RULES = {
   requiredTrash: 8,
-  maximumDurationMs: 60_000,
+  maximumDurationMs: 90_000,
   pickupRadius: 38,
   playerSpeed: 175,
   playfield: { minX: 20, maxX: 620, minY: 70, maxY: 338 },
@@ -30,6 +30,17 @@ export type MyKheObstacle = {
   height: number;
   color: number;
   label: string;
+};
+
+/**
+ * The Arcade Physics shape is deliberately expressed in world coordinates.
+ * Visual scenery can live in a Container, but its static collider must not.
+ */
+export type MyKheObstacleCollider = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
 };
 
 /** Fixed item positions make every retry fair and reproducible. */
@@ -75,9 +86,22 @@ export const MY_KHE_OBSTACLES: readonly MyKheObstacle[] = [
   },
 ];
 
+export const getMyKheObstacleCollider = (
+  obstacle: MyKheObstacle,
+): MyKheObstacleCollider => ({
+  x: obstacle.x,
+  y: obstacle.y,
+  width: obstacle.width,
+  height: obstacle.height,
+});
+
 export type CleanupAttempt = {
   startedAtMs: number;
   collectedIds: readonly string[];
+  /** Wall-clock timestamp while the in-game timer is paused, if any. */
+  pausedAtMs: number | null;
+  /** Completed pause time excluded from the deterministic attempt clock. */
+  pausedDurationMs: number;
 };
 
 export type CollectTrashResult = {
@@ -94,11 +118,50 @@ const knownTrashIds = new Set(MY_KHE_TRASH.map((trash) => trash.id));
 export const createCleanupAttempt = (startedAtMs: number): CleanupAttempt => ({
   startedAtMs,
   collectedIds: [],
+  pausedAtMs: null,
+  pausedDurationMs: 0,
 });
 
 /** A retry must discard all progress; quest state is reset separately by GameSession. */
 export const retryCleanupAttempt = (startedAtMs: number): CleanupAttempt =>
   createCleanupAttempt(startedAtMs);
+
+/** Pausing is idempotent so duplicate input events cannot extend an attempt. */
+export const pauseCleanupAttempt = (
+  attempt: CleanupAttempt,
+  nowMs: number,
+): CleanupAttempt => {
+  if (attempt.pausedAtMs !== null) return attempt;
+  return {
+    ...attempt,
+    pausedAtMs: Math.max(attempt.startedAtMs, nowMs),
+  };
+};
+
+/** Resuming is idempotent and records only positive elapsed wall-clock time. */
+export const resumeCleanupAttempt = (
+  attempt: CleanupAttempt,
+  nowMs: number,
+): CleanupAttempt => {
+  if (attempt.pausedAtMs === null) return attempt;
+  return {
+    ...attempt,
+    pausedAtMs: null,
+    pausedDurationMs:
+      attempt.pausedDurationMs + Math.max(0, nowMs - attempt.pausedAtMs),
+  };
+};
+
+export const cleanupElapsedMs = (
+  attempt: CleanupAttempt,
+  nowMs: number,
+): number => {
+  const effectiveNow = attempt.pausedAtMs ?? nowMs;
+  return Math.max(
+    0,
+    effectiveNow - attempt.startedAtMs - attempt.pausedDurationMs,
+  );
+};
 
 export const collectedTrashCount = (attempt: CleanupAttempt): number =>
   attempt.collectedIds.length;
@@ -131,19 +194,36 @@ export function collectTrash(
 }
 
 export const cleanupDeadline = (attempt: CleanupAttempt): number =>
-  attempt.startedAtMs + MY_KHE_CLEANUP_RULES.maximumDurationMs;
+  attempt.startedAtMs +
+  attempt.pausedDurationMs +
+  MY_KHE_CLEANUP_RULES.maximumDurationMs;
 
 export const remainingCleanupSeconds = (
   deadlineMs: number,
   nowMs: number,
 ): number => Math.max(0, Math.ceil((deadlineMs - nowMs) / 1_000));
 
+export const remainingCleanupAttemptSeconds = (
+  attempt: CleanupAttempt,
+  nowMs: number,
+): number =>
+  Math.max(
+    0,
+    Math.ceil(
+      (MY_KHE_CLEANUP_RULES.maximumDurationMs -
+        cleanupElapsedMs(attempt, nowMs)) /
+        1_000,
+    ),
+  );
+
 /** Time expiry wins ties so a collection at exactly 60.000 seconds cannot pass. */
 export function getCleanupOutcome(
   attempt: CleanupAttempt,
   nowMs: number,
 ): CleanupOutcome {
-  if (nowMs >= cleanupDeadline(attempt)) {
+  if (
+    cleanupElapsedMs(attempt, nowMs) >= MY_KHE_CLEANUP_RULES.maximumDurationMs
+  ) {
     return "FAILED";
   }
   return cleanupIsComplete(attempt) ? "SUCCESS" : "IN_PROGRESS";

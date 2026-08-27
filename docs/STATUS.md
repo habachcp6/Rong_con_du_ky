@@ -1,7 +1,71 @@
 # PROJECT STATUS — Rồng Con Du Ký
 
-Last updated: 2026-08-04T12:07:01Z
+Last updated: 2026-08-11T12:20:00+07:00
 Track selected: **Starter Tier (curated cards + Google Maps URLs)**
+
+## Mini-game logic/input repair (2026-08-11)
+
+The current working tree includes a mini-game-only repair pass. No sprite,
+background, map, prop, FX, or other visual asset was changed, so the mandatory
+`generate2dmap`/`generate2dsprite` graphics gate was not activated.
+
+- My Khe now creates the player before obstacles, keeps invisible Arcade static
+  colliders in authored world coordinates (independent of visual Containers),
+  and pauses/resumes the tutorial clock while blocking gameplay input.
+- Dragon Bridge stops Phaser pointer propagation for Info/Start/Exit and pauses
+  rhythm timing/tweens while help is open.
+- Son Tra synchronizes tutorial state, makes the first Escape close help, gates
+  the not-yet-started attempt, and pauses/resumes its deadline.
+- Shared Landmark Challenge scenes bind Enter alongside E/Space, freeze their
+  deadline during help, and Marble E2E fixtures dismiss the tutorial before
+  using the current node centers.
+
+Current checks: `npm run typecheck:game`, full Vitest (241 tests), content/assets
+validation, production build, client-build security validation, and Firestore
+rules (15 tests) pass. Targeted desktop/mobile E2E journeys for the repaired
+games pass with one worker. `npm run verify` reaches `format:check` but remains
+blocked by existing formatting in dirty scene/test files; no global formatting
+rewrite was applied to preserve the working tree.
+
+The broader `tsc -p tsconfig.app.json` surface still has unrelated baseline
+diagnostics in App analytics, Overworld, Firebase/services, and test helpers;
+those are intentionally outside this mini-game repair scope. The isolated game
+gate is clean.
+
+## Mini-Game Visual Redesign & UX Consistency Status (Milestone 6)
+
+### Overview
+
+All 10 mini-games across the 5 game categories have undergone a comprehensive visual design system alignment, UX clarity upgrade, and HUD standardization while strictly preserving deterministic game logic and quest state machines.
+
+### Mini-Game Redesign Summary
+
+1. **Han River Bridge Turn** (`rotate`): Detailed river & night sky background with 4 rotatable bridge spans showing visual angle rotation.
+2. **Linh Ung Quiet Path** (`sequence`): Pagoda landscape with 7 glowing lotus stone markers and visual path preview.
+3. **Cham Museum Relic Match** (`sequence`): Terracotta museum gallery background with 6 sculpted relief motifs instead of plain text boxes.
+4. **Non Nuoc Carving Pattern** (`sequence`): Marble workshop setting with granite block silhouette and progressive chisel stroke markers.
+5. **Han Market Basket Sort** (`cycle`): Marketplace background with 3 labeled category containers (Specialty, Gift, Immediate) and themed food/craft items.
+6. **Ba Na Golden Bridge Path** (`toggle`): Mountain cloud backdrop with golden bridge walkway tiles that illuminate when toggled ON.
+7. **Thắp Sáng Cầu Rồng** (Dragon Bridge Rhythm): Night skyline over Han river, parabolic golden dragon arches, animated water waves, widened hit window (1.5s), and traveling sweet spot ring.
+8. **Ngũ Hành Kỳ Bí** (Marble Mountains Puzzle): Marble mountain backdrop, 5 element nodes with custom symbols (⚔️, 🍃, 💧, 🔥, ⛰️) and pulsing connection lines.
+9. **Sóng Xanh Mỹ Khê** (My Khe Beach Cleanup): Animated sea wave shoreline, beach dune obstacles, vector trash items (plastic bag, bottle cap, straw, etc.), and proximity aura ring.
+10. **Dấu Vết Sơn Trà** (Son Tra Wildlife Observation): Deep emerald forest canopy with ambient sunbeams, camera viewfinder overlay, shutter flash effect, and vector trace icons.
+
+### Acceptance Criteria Checklist
+
+- [x] **Visual Quality**: Unique themed background for each landmark; hover/press states on interactive elements; particle/tween effects in all games; zero plain Phaser rectangles used for primary gameplay.
+- [x] **Playability & UX**: "How to Play" tutorial overlay before gameplay begins; action-oriented instructions; visual hints & path previews; 50% time limit increase in rules constants; rhythm hit window widened to ≥1.5s.
+- [x] **Design System & HUD Consistency**: System sans-serif typography; landmark-specific color palettes; standardized timer & progress/score displays; clearly visible "How to Play" (`ℹ️`) and "Back to Map" (`🚪` / `🚪 Map`) buttons in every mini-game scene.
+
+### Verification Pipeline Results (2026-08-05)
+
+- `npx tsc --noEmit`: **PASS** (0 errors)
+- `npm run test`: **PASS** (34 test files, 235 unit tests passed)
+- `npm run verify`: **PASS** (typecheck, lint, format:check, test, validate:content, validate:assets, build, validate:client-build)
+- `npx playwright test tests/e2e/landmark-games.spec.ts`: **PASS** (44 specs passed)
+- `npx playwright test tests/e2e/dragon-bridge-journey.spec.ts`: **PASS** (18 specs passed)
+- `npx playwright test tests/e2e/keyboard-happy-path.spec.ts`: **PASS** (8 specs passed)
+- `npx playwright test tests/e2e/remaining-quests.spec.ts`: **PASS** (30 specs passed)
 
 ## Release verdict
 

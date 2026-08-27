@@ -1,48 +1,42 @@
-# Project: Rồng Con Du Ký — Overworld Map & Landmark Assets Upgrade
+# Project: Rồng Con Du Ký — Mini-Game Redesign (Visuals, UX, Gameplay Balance)
 
 ## Architecture
 
-- **Framework & Engine**: Phaser 4 + React 19 + TypeScript + Vite.
-- **Backend & Cloud**: Fastify Node backend in single repository & Cloud Run service.
-- **Data & Auth**: Firebase Anonymous Auth + Firestore.
-- **AI & Integrations**: Gemini Interactions API on server.
-- **Map & Asset Pipeline**:
-  - Baked 1600x960 16-bit pixel-art night map (`public/assets/map/overworld-night.png`).
-  - 10 PNG Landmark Postcard images (320x180) in `public/assets/landmarks/<name>.png`.
-  - 10 PNG Map Icons (48x48, transparent) in `public/assets/landmark-icons/<name>.png`.
-  - Dynamic Phaser overlays in `OverworldScene.ts`: Han River waves, lantern flickering, Dragon Bridge fire particles, My Khe sea waves.
-  - Invisible physics colliders (`WORLD_COLLIDER` rectangles hidden via `setVisible(false)`).
+- **Frontend Engine**: Phaser 4 + React 19 + TypeScript + Vite.
+- **Deterministic Game Logic**: All 10 mini-games use deterministic rules modules (`landmark-challenge-rules.ts`, `rhythm.ts`, `marble-puzzle.ts`, `my-khe.ts`, `son-tra.ts`) and state machine (`GameStateStore.ts`).
+- **Scene Architecture**:
+  - Category 1: `LandmarkChallengeScene` base class + 6 scenes (`HanRiverBridgeQuestScene`, `LinhUngQuestScene`, `ChamMuseumQuestScene`, `NonNuocQuestScene`, `HanMarketQuestScene`, `BaNaGoldenBridgeQuestScene`) in `src/client/game/scenes/LandmarkChallengeScenes.ts`.
+  - Category 2: `DragonBridgeQuestScene.ts` in `src/client/game/scenes/`.
+  - Category 3: `MarbleMountainsPuzzleScene.ts` in `src/client/game/scenes/`.
+  - Category 4: `MyKheCleanupScene.ts` in `src/client/game/scenes/`.
+  - Category 5: `SonTraWildlifeScene.ts` in `src/client/game/scenes/`.
+- **Zero AI in Scenes**: Mini-game scenes contain no Gemini or fetch calls; AI is strictly isolated to backend server.
 
 ## Feature Inventory
 
-| #   | Requirement                     | Description                                                                                                  | Milestone | Status |
-| --- | ------------------------------- | ------------------------------------------------------------------------------------------------------------ | --------- | ------ |
-| 1   | Asset Pipeline & Validators     | Support `.png` magic header, IHDR dimensions, icon grid in `validate-assets.ts` & `manifest.json`            | M1        | DONE   |
-| 2   | Code & Content Definitions      | Update `PreloadScene.ts`, `landmark-game-definitions.ts`, `locations.vi.json`, `locations.en.json` to `.png` | M1        | DONE   |
-| 3   | Unit & E2E Test Assertions      | Update vitest and Playwright regex/file extension assertions from `.svg` to `.png`                           | M1        | DONE   |
-| 4   | Landmark Postcards Generation   | Generate 10 320x180 PNG postcards in `public/assets/landmarks/`                                              | M2        | DONE   |
-| 5   | Map Icons Refresh               | Generate 10 48x48 transparent PNG map icons in `public/assets/landmark-icons/`                               | M2        | DONE   |
-| 6   | Overworld Night Map             | Baked 1600x960 16-bit retro pixel-art night map with Da Nang geography & 10 landmarks                        | M3        | DONE   |
-| 7   | OverworldScene Integration      | Replace procedural `drawWorld()` with baked image background, hide colliders                                 | M4        | DONE   |
-| 8   | Dynamic Animation Overlays      | River waves, lantern flicker, Dragon Bridge fire particles, My Khe sea waves                                 | M4        | DONE   |
-| 9   | Full Project Verification       | Run `npm run verify` (153 tests pass, exit code 0)                                                           | M5        | DONE   |
-| 10  | Docker Container Build & Health | Build Docker container `rong-con-du-ky:local` & verify `GET /api/health` returns `status: ok`                | M5        | DONE   |
-| 11  | Docker Playwright E2E           | Run Playwright E2E suite against Docker container (85 passed, 0 failed, 31 skipped)                          | M5        | DONE   |
-| 12  | Status Documentation            | Update `docs/STATUS.md` with evidence rows for all deliverables                                              | M5        | DONE   |
+| #   | Feature                                                    | Description                                                                                                                                                                                                     | Milestone | Source                   |
+| --- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- | ------------------------ |
+| 1   | Duration & Hit Window Updates + Rules Integrity Test Suite | Update durations (+50%) & rhythm hit window (>=1500ms). Update existing test bounds and create `minigame-redesign-integrity.test.ts` (TC-5.1 to TC-5.12).                                                       | M1        | R3, TC-1..TC-5           |
+| 2   | Category 1 Landmark Challenge Redesign (6 games)           | Update `LandmarkChallengeScenes.ts` with postcard backgrounds, visual stage visualizers, tutorial overlays, progress indicators, category icons, glow/particle feedback. Preserve touch targets.                | M2        | R1, R2, R4, TC-7.1..7.6  |
+| 3   | Category 2 Dragon Bridge Rhythm Redesign                   | Golden dragon bridge graphics, conductor sweet spot track, particle spark emitters, flame/water celebration tweens, visual tutorial overlay.                                                                    | M3        | R1, R2, R3, TC-7.7       |
+| 4   | Category 3 Marble Mountains Five Elements Redesign         | Misty mountain backdrop, 5 runic elemental discs, resonant energy line, pulse target hint highlight, particle bursts, visual tutorial diagram.                                                                  | M4        | R1, R2, R3, TC-7.8       |
+| 5   | Categories 4 & 5 Beach Cleanup & Son Tra Redesign          | My Khe coastal graphics, 8 trash vector icons, 3 scenery obstacles, proximity ring, clean sparkle burst. Son Tra canopy backdrop with sunbeams, 3 trace icons, camera lens viewport, shutter flash, ranger HUD. | M5        | R1, R2, R4, TC-7.9..7.10 |
+| 6   | Design System Alignment & Full E2E Verification            | Standardized HUD buttons ("How to Play", "Back to Map"), timer/score styling, color palette per theme. Pass `npm run verify` and all Playwright specs (TC-0..TC-10).                                            | M6        | R4, R5, TC-0..TC-10      |
 
 ## Milestones
 
-| #   | Name                                                            | Scope                                                                                                         | Dependencies | Status   |
-| --- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------ | -------- |
-| M1  | Asset Pipeline & Validator Support                              | `validate-assets.ts`, `manifest.json`, `PreloadScene.ts`, `landmark-game-definitions.ts`, JSON content, tests | None         | **DONE** |
-| M2  | Landmark Postcards & Map Icons Generation                       | 10 PNG postcards (320x180) & 10 PNG map icons (48x48)                                                         | M1           | **DONE** |
-| M3  | Baked Overworld Night Map Creation                              | 1600x960 16-bit pixel-art night map PNG                                                                       | M1           | **DONE** |
-| M4  | OverworldScene Integration & Animations                         | Replace procedural `drawWorld()`, hide colliders, add 4 animation overlays                                    | M2, M3       | **DONE** |
-| M5  | Full Verification, Docker Build, Playwright E2E & Documentation | `npm run verify`, Docker container build & health check, Playwright E2E tests, `docs/STATUS.md`               | M4           | **DONE** |
+| #   | Name                                     | Scope                                                                                                     | Dependencies   | Status |
+| --- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------------- | ------ |
+| 1   | Rule Constants & Integrity Tests         | Update time limits, rhythm hit window, unit test assertions, create `minigame-redesign-integrity.test.ts` | None           | DONE   |
+| 2   | Category 1 Landmark Games Redesign       | Redesign 6 landmark challenge scenes in `LandmarkChallengeScenes.ts`                                      | M1             | DONE   |
+| 3   | Category 2 Dragon Bridge Rhythm Redesign | Redesign `DragonBridgeQuestScene.ts` visual & UX elements                                                 | M1             | DONE   |
+| 4   | Category 3 Marble Mountains Redesign     | Redesign `MarbleMountainsPuzzleScene.ts` visual & UX elements                                             | M1             | DONE   |
+| 5   | Categories 4 & 5 Mini-Games Redesign     | Redesign `MyKheCleanupScene.ts` and `SonTraWildlifeScene.ts`                                              | M1             | DONE   |
+| 6   | Design System & Full Verification        | Standardize UI across all 10 games, run `npm run verify` & full Playwright E2E suite                      | M2, M3, M4, M5 | DONE   |
 
-## Verification Summary
+## Code Layout
 
-- **`npm run verify`**: PASSED 100% (153 unit tests in 28 test files, typecheck, oxlint, Prettier formatting, asset validator, content validator, Vite client build, Fastify server build, security scan).
-- **Docker Container Health**: PASSED (`http://127.0.0.1:8080/api/health` returned `status: ok`).
-- **Playwright E2E Suite**: PASSED (85 passed, 0 failed, 31 skipped against Docker container).
-- **Forensic Audit**: CLEAN.
+- Rule modules: `src/client/game/landmark-challenge-rules.ts`, `src/client/game/rhythm.ts`, `src/client/game/my-khe.ts`, `src/client/game/son-tra.ts`, `src/client/game/marble-puzzle.ts`
+- Scene modules: `src/client/game/scenes/LandmarkChallengeScenes.ts`, `src/client/game/scenes/DragonBridgeQuestScene.ts`, `src/client/game/scenes/MarbleMountainsPuzzleScene.ts`, `src/client/game/scenes/MyKheCleanupScene.ts`, `src/client/game/scenes/SonTraWildlifeScene.ts`
+- Unit tests: `tests/unit/game/landmark-challenge-rules.test.ts`, `tests/unit/game/rhythm.test.ts`, `tests/unit/game/my-khe.test.ts`, `tests/unit/game/son-tra.test.ts`, `tests/unit/game/minigame-redesign-integrity.test.ts`
+- E2E tests: `tests/e2e/landmark-games.spec.ts`, `tests/e2e/dragon-bridge-journey.spec.ts`, `tests/e2e/remaining-quests.spec.ts`

@@ -3,6 +3,7 @@ import type { Language } from "../../shared/types";
 import { getLandmarkGameDefinitionByLocationKey } from "../../shared/landmark-game-definitions";
 import { getAllLocationContent } from "../content";
 import { gameSession } from "../game/state/GameStateStore";
+import { AppModalBackdrop } from "./AppModalBackdrop";
 import { useModalAccessibility } from "./useModalAccessibility";
 
 type LandmarkGalleryPanelProps = {
@@ -24,10 +25,11 @@ export const LandmarkGalleryPanel = ({
   const locations = getAllLocationContent(language);
 
   return (
-    <div
+    <AppModalBackdrop
+      onClose={onClose}
+      dismissOnBackdrop
       className="landmark-gallery-backdrop"
-      onClick={onClose}
-      data-testid="landmark-gallery-backdrop"
+      testId="landmark-gallery-backdrop"
     >
       <section
         ref={panelRef}
@@ -37,7 +39,6 @@ export const LandmarkGalleryPanel = ({
         aria-labelledby="landmark-gallery-title"
         tabIndex={-1}
         data-testid="landmark-gallery-panel"
-        onClick={(e) => e.stopPropagation()}
       >
         <div className="landmark-gallery-panel__heading">
           <div>
@@ -150,6 +151,6 @@ export const LandmarkGalleryPanel = ({
           })}
         </div>
       </section>
-    </div>
+    </AppModalBackdrop>
   );
 };

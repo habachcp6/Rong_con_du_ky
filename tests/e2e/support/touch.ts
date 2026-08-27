@@ -1,8 +1,19 @@
-import type { Locator, Page } from "@playwright/test";
+import type { CDPSession, Locator, Page } from "@playwright/test";
 
 export const LOGICAL_GAME_SIZE = { width: 640, height: 360 } as const;
 
 export type LogicalPoint = { x: number; y: number };
+
+const cdpSessions = new WeakMap<Page, Promise<CDPSession>>();
+
+async function getCDPSession(page: Page): Promise<CDPSession> {
+  let sessionPromise = cdpSessions.get(page);
+  if (!sessionPromise) {
+    sessionPromise = page.context().newCDPSession(page);
+    cdpSessions.set(page, sessionPromise);
+  }
+  return sessionPromise;
+}
 
 export async function logicalCanvasPoint(
   canvas: Locator,
@@ -20,30 +31,28 @@ export async function logicalCanvasPoint(
   };
 }
 
-/** Dispatches an actual CDP touch gesture rather than mouse emulation. */
+/** Dispatches a real touch gesture reusing a persistent CDP session without leak. */
 export async function tapCanvasByTouch(
   page: Page,
   canvas: Locator,
   logicalX: number,
   logicalY: number,
-  holdMs = 80,
+  holdMs = 40,
 ): Promise<void> {
   const point = await logicalCanvasPoint(canvas, logicalX, logicalY);
-  const session = await page.context().newCDPSession(page);
+  const session = await getCDPSession(page);
 
-  try {
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchStart",
-      touchPoints: [{ id: 1, x: point.x, y: point.y }],
-    });
+  await session.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{ id: 1, x: point.x, y: point.y }],
+  });
+  if (holdMs > 0) {
     await page.waitForTimeout(holdMs);
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchEnd",
-      touchPoints: [],
-    });
-  } finally {
-    await session.detach();
   }
+  await session.send("Input.dispatchTouchEvent", {
+    type: "touchEnd",
+    touchPoints: [],
+  });
 }
 
 /** Holds the in-canvas joystick in a logical direction for a real touch duration. */
@@ -59,23 +68,19 @@ export async function moveWithTouchJoystick(
     72 + direction.x * 30,
     288 + direction.y * 30,
   );
-  const session = await page.context().newCDPSession(page);
+  const session = await getCDPSession(page);
 
-  try {
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchStart",
-      touchPoints: [{ id: 1, x: base.x, y: base.y }],
-    });
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchMove",
-      touchPoints: [{ id: 1, x: target.x, y: target.y }],
-    });
-    await page.waitForTimeout(durationMs);
-    await session.send("Input.dispatchTouchEvent", {
-      type: "touchEnd",
-      touchPoints: [],
-    });
-  } finally {
-    await session.detach();
-  }
+  await session.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{ id: 1, x: base.x, y: base.y }],
+  });
+  await session.send("Input.dispatchTouchEvent", {
+    type: "touchMove",
+    touchPoints: [{ id: 1, x: target.x, y: target.y }],
+  });
+  await page.waitForTimeout(durationMs);
+  await session.send("Input.dispatchTouchEvent", {
+    type: "touchEnd",
+    touchPoints: [],
+  });
 }

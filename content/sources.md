@@ -168,59 +168,59 @@ This file is the canonical registry for the source IDs referenced by `content/*.
 - **Publisher:** ANS Vegetarian Restaurant
 - **Title:** Nhà hàng Chay ANS
 - **URL:** https://ansvegetarian.com/
-- **Accessed:** 2026-08-04
-- **License / use:** Name, address, and vegetarian classification are referenced from the venue's own site. No rating, review, image, opening hour, or menu price is copied.
-- **Supports:** The curated card's venue name, Hoàng Sa address, and vegetarian classification.
+- **Accessed:** 2026-08-27
+- **License / use:** Name, address, and vegetarian classification are referenced from the venue's verified profile. No rating, review, image, opening hour, or menu price is copied.
+- **Supports:** The curated card's venue name, Trưng Nữ Vương address, and vegetarian classification.
 
 ## `source_food_mi_quang_hong_van_01`
 
 - **Kind:** curated-place
-- **Publisher:** Visit Da Nang travel directory
+- **Publisher:** Visit Da Nang travel directory / Michelin Guide
 - **Title:** Mì Quảng Hồng Vân
 - **URL:** https://visitdanang.travel/vi/mi-quang-hong-van
-- **Accessed:** 2026-08-04
+- **Accessed:** 2026-08-27
 - **License / use:** Name and address are used as a short, attributed directory reference. No rating, review, image, opening hour, or menu price is copied.
-- **Supports:** The curated card's venue name, Mi Quang category, and Thái Phiên address reference.
+- **Supports:** The curated card's venue name, Mi Quang category, and 59C Lê Hồng Phong address reference.
 
-## `source_food_haian_seafood_01`
+## `source_food_be_man_seafood_01`
 
 - **Kind:** curated-place
 - **Publisher:** Visit Da Nang travel directory
-- **Title:** Nhà hàng Hải sản Hải An
-- **URL:** https://visitdanang.travel/vi/haian-seafood
-- **Accessed:** 2026-08-04
+- **Title:** Hải sản Bé Mặn
+- **URL:** https://visitdanang.travel/vi/hai-san-be-man
+- **Accessed:** 2026-08-27
 - **License / use:** Name and address are used as a short, attributed directory reference. No rating, review, image, opening hour, or menu price is copied.
-- **Supports:** The curated card's venue name, seafood category, and Trường Sa address reference.
+- **Supports:** The curated card's venue name, seafood category, and Võ Nguyên Giáp address reference.
 
-## `source_food_khang_lac_vegetarian_01`
+## `source_food_lien_hoa_vegetarian_01`
 
 - **Kind:** curated-place
 - **Publisher:** Visit Da Nang travel directory
-- **Title:** Quán Chay Khang Lạc
-- **URL:** https://visitdanang.travel/vi/quan-chay-khang-lac
-- **Accessed:** 2026-08-04
+- **Title:** Quán Cơm Chay Liên Hoa
+- **URL:** https://visitdanang.travel/vi/quan-chay-lien-hoa
+- **Accessed:** 2026-08-27
 - **License / use:** Name, address, and vegetarian classification are referenced from the directory. No rating, review, image, opening hour, or menu price is copied.
-- **Supports:** The curated card's venue name, Nguyễn Thái Học address, and vegetarian classification.
+- **Supports:** The curated card's venue name, Lê Hồng Phong address, and vegetarian classification.
 
-## `source_food_le_gouren_bana_01`
+## `source_food_arapang_bana_01`
 
 - **Kind:** curated-place
 - **Publisher:** Sun World Ba Na Hills Dining Directory
-- **Title:** Nhà hàng Le Gouren
-- **URL:** https://banahills.sunworld.vn/en/dining/le-gouren
-- **Accessed:** 2026-08-04
+- **Title:** Nhà hàng Arapang
+- **URL:** https://banahills.sunworld.vn/
+- **Accessed:** 2026-08-27
 - **License / use:** Name and venue address are referenced from the official resort directory. No rating, review, image, opening hour, or menu price is copied.
-- **Supports:** The curated card's venue name, Ba Na Hills location, and European cuisine classification.
+- **Supports:** The curated card's venue name, Ba Na Hills location, and buffet cuisine classification.
 
-## `source_food_com_ga_hin_beo_01`
+## `source_food_com_ga_hin_map_01`
 
 - **Kind:** curated-place
 - **Publisher:** Visit Da Nang travel directory
-- **Title:** Cơm Gà Hin Béo
-- **URL:** https://visitdanang.travel/vi/com-ga-hin-beo
-- **Accessed:** 2026-08-04
+- **Title:** Cơm Gà Hìn Mập
+- **URL:** https://visitdanang.travel/vi/com-ga-hin-map
+- **Accessed:** 2026-08-27
 - **License / use:** Name and address are used as a short, attributed directory reference. No rating, review, image, opening hour, or menu price is copied.
-- **Supports:** The curated card's venue name, chicken rice category, and Trần Quốc Toản address reference.
+- **Supports:** The curated card's venue name, chicken rice category, and 29 Phạm Hồng Thái address reference.
 
 ## `source_food_ngoc_chi_vegetarian_01`
 

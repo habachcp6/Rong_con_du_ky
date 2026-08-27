@@ -40,9 +40,21 @@ describe("landmark challenge rules", () => {
     ]);
     expect(
       Object.values(LANDMARK_CHALLENGE_RULES).every(
-        (rule) => rule.durationMs >= 60_000 && rule.durationMs <= 75_000,
+        (rule) => rule.durationMs >= 90_000 && rule.durationMs <= 115_000,
       ),
     ).toBe(true);
+  });
+
+  it("TC-1.2: Han River Bridge turn duration is 90s", () => {
+    expect(LANDMARK_CHALLENGE_RULES.han_river_bridge_turn.durationMs).toBe(
+      90_000,
+    );
+  });
+
+  it("TC-1.3: Han Market basket sort duration is >= 110s", () => {
+    expect(
+      LANDMARK_CHALLENGE_RULES.han_market_basket_sort.durationMs,
+    ).toBeGreaterThanOrEqual(110_000);
   });
 
   it("does not advance a sequence when its next selected option is wrong", () => {

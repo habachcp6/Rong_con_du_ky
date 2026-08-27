@@ -121,9 +121,9 @@ export class TitleScene extends Phaser.Scene {
     newGameButton.on("pointerdown", newGame);
     // Mobile browsers can deliver a valid Phaser pointer event outside the text
     // object's hit area. Any first canvas touch starts the title safely.
-    this.input.once("pointerdown", startGame);
-    this.input.keyboard?.once("keydown-ENTER", startGame);
-    this.input.keyboard?.once("keydown-SPACE", startGame);
+    this.input.on("pointerdown", startGame);
+    this.input.keyboard?.on("keydown-ENTER", startGame);
+    this.input.keyboard?.on("keydown-SPACE", startGame);
     const unsubscribe = bridge.onUiToGame((event) => {
       if (event.type === "SET_LANGUAGE") refreshCopy();
       if (event.type === "OPEN_LANDMARK_CHALLENGE") {

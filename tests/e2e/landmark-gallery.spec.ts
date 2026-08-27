@@ -176,7 +176,21 @@ test.describe("Landmark Gallery UI @gallery", () => {
     await page.getByTestId("landmark-gallery-close").click();
     await expect(galleryPanel).toBeHidden();
 
-    // 2. Close gallery via backdrop click
+    // 2. Header coordinates are covered by the modal. The existing gallery
+    // backdrop-dismiss behavior closes the gallery, but must not reopen it
+    // through the covered header button.
+    await galleryButton.click();
+    await expect(galleryPanel).toBeVisible();
+    const galleryHeaderBox = await galleryButton.boundingBox();
+    expect(galleryHeaderBox).not.toBeNull();
+    await page.mouse.click(
+      galleryHeaderBox!.x + galleryHeaderBox!.width / 2,
+      galleryHeaderBox!.y + galleryHeaderBox!.height / 2,
+    );
+    await expect(galleryPanel).toBeHidden();
+    await expect(page.getByTestId("landmark-gallery-panel")).toBeHidden();
+
+    // 3. Close gallery via backdrop click
     await galleryButton.click();
     await expect(galleryPanel).toBeVisible();
     await page
@@ -184,13 +198,13 @@ test.describe("Landmark Gallery UI @gallery", () => {
       .click({ position: { x: 5, y: 5 } });
     await expect(galleryPanel).toBeHidden();
 
-    // 3. Close gallery via Escape key
+    // 4. Close gallery via Escape key
     await galleryButton.click();
     await expect(galleryPanel).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(galleryPanel).toBeHidden();
 
-    // 4. Open card detail -> close detail via X button
+    // 5. Open card detail -> close detail via X button
     await galleryButton.click();
     await expect(galleryPanel).toBeVisible();
     await page.getByTestId("landmark-card-han_market").click();
@@ -198,7 +212,22 @@ test.describe("Landmark Gallery UI @gallery", () => {
     await page.getByTestId("landmark-detail-close").click();
     await expect(detailPanel).toBeHidden();
 
-    // 5. Open card detail -> close detail via Escape key
+    // 6. A header click dismisses the detail backdrop but does not open the
+    // covered gallery button through it.
+    await galleryButton.click();
+    await expect(galleryPanel).toBeVisible();
+    await page.getByTestId("landmark-card-han_market").click();
+    await expect(detailPanel).toBeVisible();
+    const detailHeaderBox = await galleryButton.boundingBox();
+    expect(detailHeaderBox).not.toBeNull();
+    await page.mouse.click(
+      detailHeaderBox!.x + detailHeaderBox!.width / 2,
+      detailHeaderBox!.y + detailHeaderBox!.height / 2,
+    );
+    await expect(detailPanel).toBeHidden();
+    await expect(page.getByTestId("landmark-gallery-panel")).toBeHidden();
+
+    // 7. Open card detail -> close detail via Escape key
     await galleryButton.click();
     await expect(galleryPanel).toBeVisible();
     await page.getByTestId("landmark-card-cham_museum").click();

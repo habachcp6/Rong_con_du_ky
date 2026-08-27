@@ -1,4 +1,5 @@
 export const SON_TRA_TRACE_IDS = ["canopy", "footprint", "fruit"] as const;
+export const ATTEMPT_DURATION_MS = 90_000;
 
 export type SonTraTraceId = (typeof SON_TRA_TRACE_IDS)[number];
 

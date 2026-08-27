@@ -1,26 +1,21 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import {
-  getCuratedPlaceCards,
-  getDialogueContent,
-  getLocationContent,
-} from "../content";
+import { getCuratedPlaceCards, getLocationContent } from "../content";
 import { gameSession } from "../game/state/GameStateStore";
 import { trackAnalytics } from "../services/analytics";
 import { createBrowserApiClient } from "../services/api-client";
 import type { GameState, Language, PlaceCard } from "../../shared/types";
-import { QUEST_ORDER } from "../../shared/game-state";
+import { AppModalBackdrop } from "./AppModalBackdrop";
 import { useModalAccessibility } from "./useModalAccessibility";
+import {
+  authoredChat,
+  createCompanionChatRequest,
+  type ChatResult,
+} from "./companion-chat";
 
 type TravelToolsPanelProps = {
   state: GameState;
   onClose: () => void;
   onStateChange: () => void;
-};
-
-export type ChatResult = {
-  dialogue: string;
-  hint?: string;
-  source: "gemini" | "fallback" | "authored";
 };
 
 type ItineraryView = {
@@ -46,43 +41,6 @@ const toBudget = (value: string): number | undefined => {
 
 const mapsSearchUrl = (name: string): string =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} Da Nang`)}`;
-
-/** Every canonical quest has an authored dialogue node. Keeping this total
- * mapping beside the companion entry point makes a missing new-landmark hint a
- * type error rather than silently falling back to Dragon Bridge copy. */
-const DIALOGUE_NODE_BY_QUEST: Record<(typeof QUEST_ORDER)[number], string> = {
-  dragon_bridge_lights: "dragon_bridge_npc",
-  my_khe_clean_wave: "my_khe_npc",
-  marble_five_elements: "marble_npc",
-  son_tra_traces: "son_tra_npc",
-  han_river_bridge_turn: "han_river_bridge_guide",
-  linh_ung_quiet_path: "linh_ung_guide",
-  cham_museum_relic_match: "cham_museum_guide",
-  non_nuoc_carving_pattern: "non_nuoc_guide",
-  han_market_basket_sort: "han_market_guide",
-  ba_na_golden_bridge: "ba_na_guide",
-};
-
-/** Prefer a live challenge for a hint, then the one available campaign
- * frontier. The order comes from the canonical game state, never a UI list. */
-export const getCompanionQuestId = (
-  state: GameState,
-): (typeof QUEST_ORDER)[number] | undefined =>
-  QUEST_ORDER.find((questId) => state.quests[questId] === "ACTIVE") ??
-  QUEST_ORDER.find((questId) => state.quests[questId] === "AVAILABLE");
-
-export const createCompanionChatRequest = (
-  state: GameState,
-  message: string,
-) => {
-  const questId = getCompanionQuestId(state);
-  return {
-    language: state.language,
-    message,
-    unlockedPostcards: state.unlockedPostcards,
-    ...(questId ? { questId } : {}),
-  };
-};
 
 const localRecommendations = (
   language: Language,
@@ -134,23 +92,6 @@ const authoredItinerary = (state: GameState): ItineraryView => {
         "Check current information and weather before you go.",
       ),
     ],
-    source: "authored",
-  };
-};
-
-export const authoredChat = (state: GameState): ChatResult => {
-  const questId = getCompanionQuestId(state);
-  const npcId = questId ? DIALOGUE_NODE_BY_QUEST[questId] : undefined;
-  const node = npcId ? getDialogueContent(state.language, npcId) : undefined;
-  return {
-    dialogue:
-      node?.questPrompt ??
-      text(
-        state.language,
-        "Hãy đến gần một địa danh và nhấn E hoặc Space để bắt đầu thử thách.",
-        "Walk to a landmark and press E or Space to begin a challenge.",
-      ),
-    hint: node?.failureMessage,
     source: "authored",
   };
 };
@@ -287,240 +228,253 @@ export const TravelToolsPanel = ({
   };
 
   return (
-    <section
-      ref={panelRef}
-      className="travel-tools-panel"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="travel-tools-title"
-      tabIndex={-1}
-      data-testid="travel-tools-panel"
-    >
-      <div className="travel-tools-panel__heading">
-        <div>
-          <p className="travel-tools-panel__eyebrow">
-            {text(language, "Trợ lý hành trình", "Journey companion")}
-          </p>
-          <h2 id="travel-tools-title">
+    <AppModalBackdrop onClose={onClose} testId="travel-tools-backdrop">
+      <section
+        ref={panelRef}
+        className="travel-tools-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="travel-tools-title"
+        tabIndex={-1}
+        data-testid="travel-tools-panel"
+      >
+        <div className="travel-tools-panel__heading">
+          <div>
+            <p className="travel-tools-panel__eyebrow">
+              {text(language, "Trợ lý hành trình", "Journey companion")}
+            </p>
+            <h2 id="travel-tools-title">
+              {text(
+                language,
+                "Rồng Con giúp bạn lên đường",
+                "Little Dragon helps you plan",
+              )}
+            </h2>
+          </div>
+          <button
+            type="button"
+            className="travel-tools-panel__close"
+            onClick={onClose}
+            aria-label={text(
+              language,
+              "Đóng trợ lý hành trình",
+              "Close journey companion",
+            )}
+          >
+            ×
+          </button>
+        </div>
+
+        <form className="travel-tools-panel__section" onSubmit={requestChat}>
+          <h3>{text(language, "Hỏi Rồng Con", "Ask Little Dragon")}</h3>
+          <label>
             {text(
               language,
-              "Rồng Con giúp bạn lên đường",
-              "Little Dragon helps you plan",
+              "Câu hỏi hoặc xin gợi ý",
+              "Question or hint request",
             )}
-          </h2>
-        </div>
-        <button
-          type="button"
-          className="travel-tools-panel__close"
-          onClick={onClose}
-          aria-label={text(
-            language,
-            "Đóng trợ lý hành trình",
-            "Close journey companion",
-          )}
-        >
-          ×
-        </button>
-      </div>
-
-      <form className="travel-tools-panel__section" onSubmit={requestChat}>
-        <h3>{text(language, "Hỏi Rồng Con", "Ask Little Dragon")}</h3>
-        <label>
-          {text(language, "Câu hỏi hoặc xin gợi ý", "Question or hint request")}
-          <textarea
-            value={message}
-            maxLength={500}
-            onChange={(event) => setMessage(event.target.value)}
-            placeholder={text(
-              language,
-              "Ví dụ: Gợi ý cho thử thách này",
-              "For example: Give me a hint for this challenge",
-            )}
-          />
-        </label>
-        <button type="submit" disabled={chatBusy || !message.trim()}>
-          {chatBusy
-            ? text(language, "Đang hỏi…", "Asking…")
-            : text(language, "Hỏi", "Ask")}
-        </button>
-        {chat ? (
-          <div
-            className="travel-tools-panel__result"
-            data-testid="dragon-chat-result"
-          >
-            <p>{chat.dialogue}</p>
-            {chat.hint ? <p>{chat.hint}</p> : null}
-            <small>
-              {text(language, "Nguồn: ", "Source: ")}
-              {sourceLabel(chat.source, language)}
-            </small>
-          </div>
-        ) : null}
-      </form>
-
-      <form
-        className="travel-tools-panel__section"
-        onSubmit={requestRecommendations}
-      >
-        <h3>{text(language, "Rồng Con Ăn Gì", "Where to eat")}</h3>
-        <div className="travel-tools-panel__fields">
-          <label>
-            {text(language, "Ngân sách VND", "Budget VND")}
-            <input
-              inputMode="numeric"
-              value={budget}
-              onChange={(event) => setBudget(event.target.value)}
+            <textarea
+              value={message}
+              maxLength={500}
+              onChange={(event) => setMessage(event.target.value)}
+              placeholder={text(
+                language,
+                "Ví dụ: Gợi ý cho thử thách này",
+                "For example: Give me a hint for this challenge",
+              )}
             />
           </label>
-          <label>
-            {text(language, "Chế độ ăn", "Diet")}
-            <select
-              value={dietary}
-              onChange={(event) =>
-                setDietary(event.target.value as "any" | "vegetarian")
-              }
+          <button type="submit" disabled={chatBusy || !message.trim()}>
+            {chatBusy
+              ? text(language, "Đang hỏi…", "Asking…")
+              : text(language, "Hỏi", "Ask")}
+          </button>
+          {chat ? (
+            <div
+              className="travel-tools-panel__result"
+              data-testid="dragon-chat-result"
             >
-              <option value="any">
-                {text(language, "Không giới hạn", "Any")}
-              </option>
-              <option value="vegetarian">
-                {text(language, "Ăn chay", "Vegetarian")}
-              </option>
-            </select>
-          </label>
-          <label>
-            {text(language, "Gần địa danh", "Near landmark")}
-            <select
-              value={landmarkKey}
-              onChange={(event) => setLandmarkKey(event.target.value)}
-            >
-              <option value="">
-                {text(language, "Tất cả thẻ đã biên tập", "All authored cards")}
-              </option>
-              {state.unlockedPostcards.map((placeKey) => {
-                const location = getLocationContent(language, placeKey);
-                return (
-                  <option value={placeKey} key={placeKey}>
-                    {location?.name ?? placeKey}
-                  </option>
-                );
-              })}
-            </select>
-          </label>
-        </div>
-        <button
-          type="submit"
-          disabled={recommendationBusy}
-          data-testid="recommendations-submit"
+              <p>{chat.dialogue}</p>
+              {chat.hint ? <p>{chat.hint}</p> : null}
+              <small>
+                {text(language, "Nguồn: ", "Source: ")}
+                {sourceLabel(chat.source, language)}
+              </small>
+            </div>
+          ) : null}
+        </form>
+
+        <form
+          className="travel-tools-panel__section"
+          onSubmit={requestRecommendations}
         >
-          {recommendationBusy
-            ? text(language, "Đang tìm…", "Finding…")
-            : text(language, "Xem gợi ý", "Show suggestions")}
-        </button>
-        {recommendationNotice ? (
-          <p className="travel-tools-panel__notice">{recommendationNotice}</p>
-        ) : null}
-        {places ? (
-          <div className="place-card-list" data-testid="travel-recommendations">
-            {places.map((place) => (
-              <article
-                className="place-card"
-                key={`${place.landmarkKey}-${place.name}`}
+          <h3>{text(language, "Rồng Con Ăn Gì", "Where to eat")}</h3>
+          <div className="travel-tools-panel__fields">
+            <label>
+              {text(language, "Ngân sách VND", "Budget VND")}
+              <input
+                inputMode="numeric"
+                value={budget}
+                onChange={(event) => setBudget(event.target.value)}
+              />
+            </label>
+            <label>
+              {text(language, "Chế độ ăn", "Diet")}
+              <select
+                value={dietary}
+                onChange={(event) =>
+                  setDietary(event.target.value as "any" | "vegetarian")
+                }
               >
-                <h4>{place.name}</h4>
-                <p>{place.description}</p>
-                <p className="place-card__meta">
-                  {place.address} · {place.priceRange} ·{" "}
-                  {place.dietary === "vegetarian"
-                    ? text(language, "ăn chay", "vegetarian")
-                    : text(language, "linh hoạt", "flexible")}
-                </p>
-                <p className="place-card__source">
-                  {text(language, "Nguồn: ", "Sources: ")}
-                  {place.sourceIds.join(", ")}
-                </p>
-                <a
-                  href={place.googleMapsUri}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() =>
-                    trackAnalytics("google_maps_open", {
-                      landmark_key: place.landmarkKey,
-                    })
-                  }
-                >
+                <option value="any">
+                  {text(language, "Không giới hạn", "Any")}
+                </option>
+                <option value="vegetarian">
+                  {text(language, "Ăn chay", "Vegetarian")}
+                </option>
+              </select>
+            </label>
+            <label>
+              {text(language, "Gần địa danh", "Near landmark")}
+              <select
+                value={landmarkKey}
+                onChange={(event) => setLandmarkKey(event.target.value)}
+              >
+                <option value="">
                   {text(
                     language,
-                    "Mở trong Google Maps",
-                    "Open in Google Maps",
+                    "Tất cả thẻ đã biên tập",
+                    "All authored cards",
                   )}
-                </a>
-              </article>
-            ))}
+                </option>
+                {state.unlockedPostcards.map((placeKey) => {
+                  const location = getLocationContent(language, placeKey);
+                  return (
+                    <option value={placeKey} key={placeKey}>
+                      {location?.name ?? placeKey}
+                    </option>
+                  );
+                })}
+              </select>
+            </label>
           </div>
-        ) : null}
-      </form>
-
-      <section className="travel-tools-panel__section">
-        <h3>
-          {text(language, "Lịch trình cá nhân hóa", "Personalized itinerary")}
-        </h3>
-        <p>
-          {text(
-            language,
-            "Chỉ dùng các địa danh bạn đã mở khóa; Gemini không thể thay đổi tiến trình game.",
-            "Uses only your unlocked landmarks; Gemini cannot change game progress.",
-          )}
-        </p>
-        <button
-          type="button"
-          onClick={() => void requestItinerary()}
-          disabled={itineraryBusy}
-          data-testid="itinerary-submit"
-        >
-          {itineraryBusy
-            ? text(language, "Đang tạo…", "Creating…")
-            : text(language, "Tạo lịch trình", "Create itinerary")}
-        </button>
-        {itinerary ? (
-          <div
-            className="travel-tools-panel__result"
-            data-testid="itinerary-result"
+          <button
+            type="submit"
+            disabled={recommendationBusy}
+            data-testid="recommendations-submit"
           >
-            <h4>{itinerary.title}</h4>
-            <p>{itinerary.summary}</p>
-            <ol>
-              {itinerary.stops.map((stop) => (
-                <li key={stop.placeKey}>
-                  <strong>{stop.name}</strong> — {stop.description}
-                  {stop.googleMapsUri ? (
-                    <a
-                      href={stop.googleMapsUri}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={() =>
-                        trackAnalytics("google_maps_open", {
-                          landmark_key: stop.placeKey,
-                        })
-                      }
-                    >
-                      {" "}
-                      {text(language, "Bản đồ", "Map")}
-                    </a>
-                  ) : null}
-                </li>
+            {recommendationBusy
+              ? text(language, "Đang tìm…", "Finding…")
+              : text(language, "Xem gợi ý", "Show suggestions")}
+          </button>
+          {recommendationNotice ? (
+            <p className="travel-tools-panel__notice">{recommendationNotice}</p>
+          ) : null}
+          {places ? (
+            <div
+              className="place-card-list"
+              data-testid="travel-recommendations"
+            >
+              {places.map((place) => (
+                <article
+                  className="place-card"
+                  key={`${place.landmarkKey}-${place.name}`}
+                >
+                  <h4>{place.name}</h4>
+                  <p>{place.description}</p>
+                  <p className="place-card__meta">
+                    {place.address} · {place.priceRange} ·{" "}
+                    {place.dietary === "vegetarian"
+                      ? text(language, "ăn chay", "vegetarian")
+                      : text(language, "linh hoạt", "flexible")}
+                  </p>
+                  <p className="place-card__source">
+                    {text(language, "Nguồn: ", "Sources: ")}
+                    {place.sourceIds.join(", ")}
+                  </p>
+                  <a
+                    href={place.googleMapsUri}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() =>
+                      trackAnalytics("google_maps_open", {
+                        landmark_key: place.landmarkKey,
+                      })
+                    }
+                  >
+                    {text(
+                      language,
+                      "Mở trong Google Maps",
+                      "Open in Google Maps",
+                    )}
+                  </a>
+                </article>
               ))}
-            </ol>
-            {itinerary.notes.map((note) => (
-              <p key={note}>{note}</p>
-            ))}
-            <small>
-              {text(language, "Nguồn: ", "Source: ")}
-              {sourceLabel(itinerary.source, language)}
-            </small>
-          </div>
-        ) : null}
+            </div>
+          ) : null}
+        </form>
+
+        <section className="travel-tools-panel__section">
+          <h3>
+            {text(language, "Lịch trình cá nhân hóa", "Personalized itinerary")}
+          </h3>
+          <p>
+            {text(
+              language,
+              "Chỉ dùng các địa danh bạn đã mở khóa; Gemini không thể thay đổi tiến trình game.",
+              "Uses only your unlocked landmarks; Gemini cannot change game progress.",
+            )}
+          </p>
+          <button
+            type="button"
+            onClick={() => void requestItinerary()}
+            disabled={itineraryBusy}
+            data-testid="itinerary-submit"
+          >
+            {itineraryBusy
+              ? text(language, "Đang tạo…", "Creating…")
+              : text(language, "Tạo lịch trình", "Create itinerary")}
+          </button>
+          {itinerary ? (
+            <div
+              className="travel-tools-panel__result"
+              data-testid="itinerary-result"
+            >
+              <h4>{itinerary.title}</h4>
+              <p>{itinerary.summary}</p>
+              <ol>
+                {itinerary.stops.map((stop) => (
+                  <li key={stop.placeKey}>
+                    <strong>{stop.name}</strong> — {stop.description}
+                    {stop.googleMapsUri ? (
+                      <a
+                        href={stop.googleMapsUri}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={() =>
+                          trackAnalytics("google_maps_open", {
+                            landmark_key: stop.placeKey,
+                          })
+                        }
+                      >
+                        {" "}
+                        {text(language, "Bản đồ", "Map")}
+                      </a>
+                    ) : null}
+                  </li>
+                ))}
+              </ol>
+              {itinerary.notes.map((note) => (
+                <p key={note}>{note}</p>
+              ))}
+              <small>
+                {text(language, "Nguồn: ", "Source: ")}
+                {sourceLabel(itinerary.source, language)}
+              </small>
+            </div>
+          ) : null}
+        </section>
       </section>
-    </section>
+    </AppModalBackdrop>
   );
 };

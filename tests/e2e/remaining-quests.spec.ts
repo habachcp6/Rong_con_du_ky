@@ -23,11 +23,11 @@ const MY_KHE_TRASH_POINTS = [
 ] as const;
 
 const MARBLE_ELEMENT_POINTS = [
-  [320, 90],
-  [399, 147],
-  [369, 240],
-  [271, 240],
-  [241, 147],
+  [320, 38],
+  [444, 128],
+  [396, 273],
+  [244, 273],
+  [196, 128],
 ] as const;
 
 const SON_TRA_TRACE_POINTS = [
@@ -35,6 +35,8 @@ const SON_TRA_TRACE_POINTS = [
   [334, 244],
   [518, 162],
 ] as const;
+
+const SON_TRA_TUTORIAL_START_POINT = [320, 260] as const;
 
 const seedForQuest = (questId: QuestId) => {
   const state = {
@@ -130,6 +132,14 @@ async function completeSeededQuest(
 ): Promise<void> {
   if (questId === "my_khe_clean_wave") {
     await pressPhaserKey(page, "Space");
+    await expect.poll(() => persistedQuestStatus(page, questId)).toBe("ACTIVE");
+
+    // Opening help pauses the active deterministic attempt. Esc must dismiss
+    // help and resume it, rather than returning to the map.
+    await clickGamePoint(page, 60, 22);
+    await pressPhaserKey(page, "Escape");
+    await expect.poll(() => persistedQuestStatus(page, questId)).toBe("ACTIVE");
+
     for (const [x, y] of MY_KHE_TRASH_POINTS) {
       await clickGamePoint(page, x, y);
     }
@@ -137,6 +147,9 @@ async function completeSeededQuest(
   }
 
   if (questId === "marble_five_elements") {
+    // The scene owns an interactive tutorial backdrop; dismiss it before
+    // sending node clicks so the coordinates exercise the real hit circles.
+    await pressPhaserKey(page, "Space");
     for (const [x, y] of MARBLE_ELEMENT_POINTS) {
       await clickGamePoint(page, x, y);
     }
@@ -154,7 +167,7 @@ async function completeSeededQuestWithTouch(
   questId: QuestId,
 ): Promise<void> {
   if (questId === "my_khe_clean_wave") {
-    await tapGamePoint(page, 320, 180);
+    await tapGamePoint(page, 320, 260);
     for (const [x, y] of MY_KHE_TRASH_POINTS) {
       await tapGamePoint(page, x, y);
     }
@@ -162,13 +175,15 @@ async function completeSeededQuestWithTouch(
   }
 
   if (questId === "marble_five_elements") {
+    // Tap the tutorial's authored Start-now control before touching nodes.
+    await tapGamePoint(page, 320, 298);
     for (const [x, y] of MARBLE_ELEMENT_POINTS) {
       await tapGamePoint(page, x, y);
     }
     return;
   }
 
-  await tapGamePoint(page, 320, 180);
+  await tapGamePoint(page, ...SON_TRA_TUTORIAL_START_POINT);
   for (const [x, y] of SON_TRA_TRACE_POINTS) {
     await tapGamePoint(page, x, y);
   }
@@ -209,10 +224,18 @@ async function startSeededQuestWithTouch(page: Page): Promise<void> {
 
   await tapCanvasByTouch(page, canvas, 320, 180);
   await expect(page.getByTestId("interaction-hint")).toBeVisible();
-  await tapCanvasByTouch(page, canvas, 556, 298);
-  await expect(page.getByTestId("landmark-challenge-panel")).toBeVisible();
+  const challengePanel = page.getByTestId("landmark-challenge-panel");
+  await expect
+    .poll(
+      async () => {
+        await tapCanvasByTouch(page, canvas, 556, 298);
+        return challengePanel.isVisible();
+      },
+      { timeout: 8_000, intervals: [200, 300, 400] },
+    )
+    .toBe(true);
   await page.getByTestId("landmark-challenge-start").tap();
-  await expect(page.getByTestId("landmark-challenge-panel")).toBeHidden();
+  await expect(challengePanel).toBeHidden();
 }
 
 test.describe("remaining quest integration @m4", () => {
@@ -244,10 +267,21 @@ test.describe("remaining quest integration @m4", () => {
       await page.waitForTimeout(250);
       await captureVisualEvidence(page, testInfo, `${questId}-tutorial`);
       await pressPhaserKey(page, "Escape");
+      if (questId === "my_khe_clean_wave") {
+        // Initial Esc dismisses My Khe's tutorial. A second Esc leaves the
+        // unstarted challenge and preserves its AVAILABLE quest state.
+        await pressPhaserKey(page, "Escape");
+      }
+      if (questId === "son_tra_traces") {
+        // Initial Esc dismisses Son Tra's tutorial. The second Esc leaves
+        // the unstarted challenge and preserves its AVAILABLE quest state.
+        await pressPhaserKey(page, "Escape");
+      }
       await expect
         .poll(() => persistedQuestStatus(page, questId))
         .toBe("AVAILABLE");
       await expect(page.locator("#game-container canvas")).toBeVisible();
+      await expect(page.getByTestId("interaction-hint")).toBeVisible();
       await expectNoSeriousBrowserErrors(testInfo, browserErrors);
     });
   }
@@ -325,6 +359,107 @@ test.describe("remaining quest integration @m4", () => {
     });
   }
 
+  test("closes active Son Tra help with Escape before leaving the quest", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "chromium-desktop",
+      "The Son Tra help lifecycle is exercised once with desktop pointer/keyboard input.",
+    );
+    const browserErrors = collectSeriousBrowserErrors(page);
+    await page.addInitScript(
+      ({ storageKey, persistedState }) =>
+        window.localStorage.setItem(storageKey, JSON.stringify(persistedState)),
+      {
+        storageKey: GAME_STATE_STORAGE_KEY,
+        persistedState: seedForQuest("son_tra_traces"),
+      },
+    );
+
+    await page.goto("/");
+    await startSeededQuest(page);
+    await pressPhaserKey(page, "Space");
+    await clickGamePoint(page, 60, 22);
+    await pressPhaserKey(page, "Escape");
+    await expect
+      .poll(() => persistedQuestStatus(page, "son_tra_traces"))
+      .toBe("ACTIVE");
+
+    await pressPhaserKey(page, "Escape");
+    await expect
+      .poll(() => persistedQuestStatus(page, "son_tra_traces"))
+      .toBe("AVAILABLE");
+    await expectNoSeriousBrowserErrors(testInfo, browserErrors);
+  });
+
+  test("closes active Marble help with Escape before leaving the quest", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "chromium-desktop",
+      "The Marble help lifecycle is exercised once with desktop pointer/keyboard input.",
+    );
+    const browserErrors = collectSeriousBrowserErrors(page);
+    await page.addInitScript(
+      ({ storageKey, persistedState }) =>
+        window.localStorage.setItem(storageKey, JSON.stringify(persistedState)),
+      {
+        storageKey: GAME_STATE_STORAGE_KEY,
+        persistedState: seedForQuest("marble_five_elements"),
+      },
+    );
+
+    await page.goto("/");
+    await startSeededQuest(page);
+    await pressPhaserKey(page, "Space");
+    await expect
+      .poll(() => persistedQuestStatus(page, "marble_five_elements"))
+      .toBe("ACTIVE");
+    await clickGamePoint(page, 600, 24);
+    await pressPhaserKey(page, "Escape");
+    await expect
+      .poll(() => persistedQuestStatus(page, "marble_five_elements"))
+      .toBe("ACTIVE");
+
+    await pressPhaserKey(page, "Escape");
+    await expect
+      .poll(() => persistedQuestStatus(page, "marble_five_elements"))
+      .toBe("AVAILABLE");
+    await expect(page.getByTestId("interaction-hint")).toBeVisible();
+    await expectNoSeriousBrowserErrors(testInfo, browserErrors);
+  });
+
+  test("returns Marble to the map from its tutorial with mobile touch", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "chromium-mobile",
+      "Marble touch lifecycle is exercised once on mobile.",
+    );
+    const browserErrors = collectSeriousBrowserErrors(page);
+    await page.addInitScript(
+      ({ storageKey, persistedState }) =>
+        window.localStorage.setItem(storageKey, JSON.stringify(persistedState)),
+      {
+        storageKey: GAME_STATE_STORAGE_KEY,
+        persistedState: seedForQuest("marble_five_elements"),
+      },
+    );
+
+    await page.goto("/");
+    await startSeededQuestWithTouch(page);
+    await tapGamePoint(page, 320, 298);
+    await expect
+      .poll(() => persistedQuestStatus(page, "marble_five_elements"))
+      .toBe("ACTIVE");
+    await tapGamePoint(page, 436, 304);
+    await expect
+      .poll(() => persistedQuestStatus(page, "marble_five_elements"))
+      .toBe("AVAILABLE");
+    await expect(page.getByTestId("interaction-hint")).toBeVisible();
+    await expectNoSeriousBrowserErrors(testInfo, browserErrors);
+  });
+
   test("shows the ending only after a valid ten-reward campaign save", async ({
     page,
   }, testInfo) => {
@@ -373,7 +508,23 @@ test.describe("remaining quest integration @m4", () => {
     await expect(page.getByTestId("passport-panel")).toContainText("10 / 10");
     await captureVisualEvidence(page, testInfo, "passport-ten-of-ten");
     await page.getByTestId("passport-ending-open").click();
-    await expect(page.getByTestId("journey-ending")).toBeVisible();
+    const ending = page.getByTestId("journey-ending");
+    await expect(ending).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /Keep exploring|Tiếp tục khám phá/ }),
+    ).toBeFocused();
+    const galleryHeader = page.getByTestId("landmark-gallery-open");
+    const galleryHeaderBox = await galleryHeader.boundingBox();
+    expect(galleryHeaderBox).not.toBeNull();
+    await page.mouse.click(
+      galleryHeaderBox!.x + galleryHeaderBox!.width / 2,
+      galleryHeaderBox!.y + galleryHeaderBox!.height / 2,
+    );
+    await expect(ending).toBeVisible();
+    await expect(page.getByTestId("landmark-gallery-panel")).toBeHidden();
+    await expect(
+      page.getByRole("button", { name: /Keep exploring|Tiếp tục khám phá/ }),
+    ).toBeFocused();
     await captureVisualEvidence(page, testInfo, "journey-ending");
     await expectNoSeriousBrowserErrors(testInfo, browserErrors);
   });

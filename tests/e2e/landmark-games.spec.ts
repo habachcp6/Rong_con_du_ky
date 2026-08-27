@@ -386,7 +386,9 @@ async function solveWithKeyboard(
   page: Page,
   game: LandmarkGame,
 ): Promise<void> {
-  await pressPhaserKey(page, "Space");
+  // Enter is part of the advertised interaction contract for all six
+  // shared scenes; use it for the intro so the journey proves that binding.
+  await pressPhaserKey(page, "Enter");
   let focusedOption = 0;
 
   for (const { optionIndex, presses } of game.solution) {
@@ -491,20 +493,29 @@ test.describe("all landmark map-icon entry @landmark-icons", () => {
   }
 });
 
-test.describe("six landmark game Escape lifecycle @landmark-games", () => {
+test.describe("six landmark game exit lifecycle @landmark-games", () => {
   for (const game of LANDMARK_GAMES) {
-    test(`returns ${game.landmarkName} to its available frontier after Escape`, async ({
+    test(`returns ${game.landmarkName} to its available frontier after exit`, async ({
       page,
     }, testInfo) => {
-      test.skip(
-        testInfo.project.name !== "chromium-desktop",
-        "Escape is a desktop keyboard control; touch completion is covered separately.",
-      );
+      const useTouch = testInfo.project.name === "chromium-mobile";
       const browserErrors = collectSeriousBrowserErrors(page);
 
-      await startSeededOverworld(page, seedForCampaignEntry(game), false);
-      await openSeededChallenge(page, false, game);
-      await pressPhaserKey(page, "Escape");
+      await startSeededOverworld(page, seedForCampaignEntry(game), useTouch);
+      await openSeededChallenge(page, useTouch, game);
+
+      if (useTouch) {
+        // On mobile: tap the in-game Exit/Back 🚪 button.
+        // In LandmarkChallengeScenes the exit hitbox is at (width-40, 32) = (600, 32)
+        // in 640×360 logical space. The tutorial overlay is showing; exit must be
+        // reachable without first dismissing it.
+        const canvas = page.locator("#game-container canvas").first();
+        await tapCanvasByTouch(page, canvas, 600, 32);
+      } else {
+        // On desktop: Escape exits the game, closing the tutorial in one step.
+        await pressPhaserKey(page, "Escape");
+      }
+
       await expect
         .poll(() => readQuestStatus(page, game.questId), { timeout: 8_000 })
         .toBe("AVAILABLE");
@@ -606,4 +617,183 @@ test.describe("six landmark game journeys @landmark-games", () => {
       await expectNoSeriousBrowserErrors(testInfo, browserErrors);
     });
   }
+});
+
+test.describe("quest state edge cases @landmark-games", () => {
+  // Cầu Sông Hàn (index 4 in CAMPAIGN) is the canonical target: earliest
+  // non-trivial LANDMARK_GAME, sits after the four initially rewarded quests.
+  const EDGE_GAME = LANDMARK_GAMES[0];
+
+  test("double-opening the challenge panel does not corrupt quest state", async ({
+    page,
+  }, testInfo) => {
+    const useTouch = testInfo.project.name === "chromium-mobile";
+    const browserErrors = collectSeriousBrowserErrors(page);
+    const canvas = await startSeededOverworld(
+      page,
+      seedForCampaignEntry(EDGE_GAME),
+      useTouch,
+    );
+
+    const hint = page.getByTestId("interaction-hint");
+    await expect(hint).toBeVisible();
+    await page.waitForTimeout(600);
+
+    const mapPoint = landmarkPoint(EDGE_GAME.player);
+    const challengePanel = page.getByTestId("landmark-challenge-panel");
+    const closeButton = page.getByTestId("landmark-challenge-close");
+
+    // Open and immediately close the challenge panel twice without starting.
+    for (let round = 0; round < 2; round++) {
+      if (useTouch) {
+        await tapCanvasByTouch(page, canvas, mapPoint.x, mapPoint.y);
+      } else {
+        await clickCanvasPoint(page, canvas, mapPoint.x, mapPoint.y);
+      }
+      await expect(challengePanel).toBeVisible();
+      await expect(challengePanel).toContainText(EDGE_GAME.landmarkName);
+      if (useTouch) await closeButton.tap();
+      else await closeButton.click();
+      await expect(challengePanel).toBeHidden();
+    }
+
+    // Quest must remain AVAILABLE; no fragment must be awarded by panel opens alone.
+    expect(await readQuestStatus(page, EDGE_GAME.questId)).toBe("AVAILABLE");
+    const state = await readPersistedState(page);
+    const targetIndex = CAMPAIGN.findIndex(
+      ({ questId }) => questId === EDGE_GAME.questId,
+    );
+    expect(state?.memoryFragments).toBe(targetIndex); // seed value — unchanged
+    await expectNoSeriousBrowserErrors(testInfo, browserErrors);
+  });
+
+  test("rewarded landmark shows detail panel, not challenge panel", async ({
+    page,
+  }, testInfo) => {
+    const useTouch = testInfo.project.name === "chromium-mobile";
+    const browserErrors = collectSeriousBrowserErrors(page);
+
+    // Seed where EDGE_GAME (Cầu Sông Hàn) is already REWARDED: use the next
+    // frontier entry (Chùa Linh Ứng) which marks all earlier quests REWARDED,
+    // then override player position to stand near the rewarded landmark.
+    const linUngEntry = CAMPAIGN.find(
+      ({ questId }) => questId === "linh_ung_quiet_path",
+    )!;
+    const rewardedSeed: V2GameState = {
+      ...seedForCampaignEntry(linUngEntry),
+      player: {
+        scene: "OverworldScene",
+        x: EDGE_GAME.player.x,
+        y: EDGE_GAME.player.y,
+      },
+    };
+    const canvas = await startSeededOverworld(page, rewardedSeed, useTouch);
+    await page.waitForTimeout(600);
+
+    const mapPoint = landmarkPoint(EDGE_GAME.player);
+    if (useTouch) {
+      await tapCanvasByTouch(page, canvas, mapPoint.x, mapPoint.y);
+    } else {
+      await clickCanvasPoint(page, canvas, mapPoint.x, mapPoint.y);
+    }
+
+    // A REWARDED landmark must not offer a new challenge start button.
+    await expect(page.getByTestId("landmark-challenge-panel")).toBeHidden();
+    // It must open the informational landmark detail panel instead.
+    await expect(page.getByTestId("landmark-detail-panel")).toBeVisible();
+    expect(await readQuestStatus(page, EDGE_GAME.questId)).toBe("REWARDED");
+    await expectNoSeriousBrowserErrors(testInfo, browserErrors);
+  });
+
+  test("closing challenge panel without starting never awards a fragment", async ({
+    page,
+  }, testInfo) => {
+    const useTouch = testInfo.project.name === "chromium-mobile";
+    const browserErrors = collectSeriousBrowserErrors(page);
+
+    // Use the first LANDMARK_GAME (Cầu Sông Hàn) as the frontier.
+    // Open its challenge panel then close WITHOUT clicking Start.
+    // The fragment count and quest status must remain unchanged.
+    const canvas = await startSeededOverworld(
+      page,
+      seedForCampaignEntry(EDGE_GAME),
+      useTouch,
+    );
+
+    const hint = page.getByTestId("interaction-hint");
+    await expect(hint).toBeVisible();
+    await page.waitForTimeout(600);
+
+    const mapPoint = landmarkPoint(EDGE_GAME.player);
+    const challengePanel = page.getByTestId("landmark-challenge-panel");
+    const closeButton = page.getByTestId("landmark-challenge-close");
+
+    // Open the panel then immediately close it (no Start clicked).
+    if (useTouch) {
+      await tapCanvasByTouch(page, canvas, mapPoint.x, mapPoint.y);
+    } else {
+      await clickCanvasPoint(page, canvas, mapPoint.x, mapPoint.y);
+    }
+    await expect(challengePanel).toBeVisible();
+    if (useTouch) await closeButton.tap();
+    else await closeButton.click();
+    await expect(challengePanel).toBeHidden();
+
+    // Repeat for the second LANDMARK_GAME to prove it's landmark-agnostic.
+    const second = LANDMARK_GAMES[1];
+    if (second) {
+      const secondSeed: V2GameState = {
+        ...seedForCampaignEntry(EDGE_GAME),
+        player: {
+          scene: "OverworldScene",
+          x: second.player.x,
+          y: second.player.y,
+        },
+      };
+      // Reload with adjusted player position (same frontier, different landmark).
+      await page.evaluate(([key, raw]) => localStorage.setItem(key, raw), [
+        "rong-con-du-ky.game-state.v2",
+        JSON.stringify(secondSeed),
+      ] as [string, string]);
+      await page.reload();
+      const secondCanvas = page.locator("#game-container canvas").first();
+      await secondCanvas.waitFor({ state: "visible", timeout: 15_000 });
+      await page.waitForTimeout(1_000);
+
+      const secondPoint = landmarkPoint(second.player);
+      if (useTouch) {
+        await tapCanvasByTouch(
+          page,
+          secondCanvas,
+          secondPoint.x,
+          secondPoint.y,
+        );
+      } else {
+        await clickCanvasPoint(
+          page,
+          secondCanvas,
+          secondPoint.x,
+          secondPoint.y,
+        );
+      }
+      const secondPanel = page.getByTestId("landmark-challenge-panel");
+      if (await secondPanel.isVisible()) {
+        const secondClose = page.getByTestId("landmark-challenge-close");
+        if (useTouch) await secondClose.tap();
+        else await secondClose.click();
+        await expect(secondPanel).toBeHidden();
+      }
+    }
+
+    // Neither close constitutes a quest completion — fragment count must be
+    // exactly the frontier index (= memoryFragments seed value).
+    const state = await readPersistedState(page);
+    const frontierIndex = CAMPAIGN.findIndex(
+      ({ questId }) => questId === EDGE_GAME.questId,
+    );
+    expect(state?.memoryFragments).toBe(frontierIndex);
+    expect(await readQuestStatus(page, EDGE_GAME.questId)).toBe("AVAILABLE");
+
+    await expectNoSeriousBrowserErrors(testInfo, browserErrors);
+  });
 });

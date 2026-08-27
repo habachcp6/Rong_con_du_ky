@@ -3,7 +3,7 @@ import {
   authoredChat,
   createCompanionChatRequest,
   getCompanionQuestId,
-} from "../../../src/client/app/TravelToolsPanel.js";
+} from "../../../src/client/app/companion-chat.js";
 import {
   createInitialGameState,
   QUEST_ORDER,

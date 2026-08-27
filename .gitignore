@@ -22,6 +22,9 @@ firebase-adminsdk-*.json
 *.pem
 *.key
 
+# Agent workspace (internal — not part of the shipped product)
+.agents/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

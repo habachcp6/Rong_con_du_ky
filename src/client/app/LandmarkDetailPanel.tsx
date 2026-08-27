@@ -4,6 +4,7 @@ import { getLandmarkGameDefinitionByLocationKey } from "../../shared/landmark-ga
 import { getCuratedPlaceCards, getLocationContent } from "../content";
 import { gameSession } from "../game/state/GameStateStore";
 import { trackAnalytics } from "../services/analytics";
+import { AppModalBackdrop } from "./AppModalBackdrop";
 import { useModalAccessibility } from "./useModalAccessibility";
 
 type LandmarkDetailPanelProps = {
@@ -43,10 +44,11 @@ export const LandmarkDetailPanel = ({
   )}`;
 
   return (
-    <div
+    <AppModalBackdrop
+      onClose={onClose}
+      dismissOnBackdrop
       className="landmark-detail-overlay"
-      onClick={onClose}
-      data-testid="landmark-detail-backdrop"
+      testId="landmark-detail-backdrop"
     >
       <section
         ref={panelRef}
@@ -56,7 +58,6 @@ export const LandmarkDetailPanel = ({
         aria-labelledby="landmark-detail-title"
         tabIndex={-1}
         data-testid="landmark-detail-panel"
-        onClick={(e) => e.stopPropagation()}
       >
         <div className="landmark-detail-panel__header">
           <div className="landmark-detail-panel__title-group">
@@ -223,6 +224,6 @@ export const LandmarkDetailPanel = ({
           </div>
         </div>
       </section>
-    </div>
+    </AppModalBackdrop>
   );
 };

@@ -4,6 +4,7 @@ import { getLandmarkGameDefinitionByQuestId } from "../../shared/landmark-game-d
 import { QUESTS } from "../../shared/quests";
 import { getLocationContent, getPrerequisiteLandmarkName } from "../content";
 import { gameSession } from "../game/state/GameStateStore";
+import { AppModalBackdrop } from "./AppModalBackdrop";
 import { useModalAccessibility } from "./useModalAccessibility";
 
 type LandmarkChallengePanelProps = {
@@ -98,10 +99,11 @@ export const LandmarkChallengePanel = ({
             );
 
   return (
-    <div
+    <AppModalBackdrop
+      onClose={onClose}
+      dismissOnBackdrop
       className="landmark-challenge-backdrop"
-      onClick={onClose}
-      data-testid="landmark-challenge-backdrop"
+      testId="landmark-challenge-backdrop"
     >
       <section
         ref={panelRef}
@@ -111,7 +113,6 @@ export const LandmarkChallengePanel = ({
         aria-labelledby="landmark-challenge-title"
         tabIndex={-1}
         data-testid="landmark-challenge-panel"
-        onClick={(event) => event.stopPropagation()}
       >
         <div className="landmark-challenge-panel__heading">
           <img
@@ -179,6 +180,6 @@ export const LandmarkChallengePanel = ({
           </button>
         </div>
       </section>
-    </div>
+    </AppModalBackdrop>
   );
 };
