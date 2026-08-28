@@ -83,4 +83,40 @@ describe("browser API client", () => {
       code: "INVALID_RESPONSE",
     } satisfies Partial<ApiClientError>);
   });
+
+  it("sends explore requests and parses grounding data correctly", async () => {
+    const exploreBody = {
+      overview: "Overview of places",
+      places: [
+        {
+          name: "Cầu Tình Yêu",
+          summary: "Cầu ven sông Hàn",
+          googleMapsUri: "https://maps.google.com/?cid=123",
+        },
+      ],
+      groundingSources: [
+        {
+          title: "Cầu Tình Yêu",
+          uri: "https://maps.google.com/?cid=123",
+        },
+      ],
+      source: "gemini_maps",
+    };
+    const fetchImpl = vi.fn(
+      async () => new Response(JSON.stringify(exploreBody), { status: 200 }),
+    ) as unknown as typeof fetch;
+    const client = new ApiClient({
+      baseUrl: "/api",
+      getAuthorization: async () => "Bearer dev:test-player",
+      fetchImpl,
+    });
+
+    const result = await client.explore({
+      language: "vi",
+      query: "Cầu Tình Yêu",
+    });
+    expect(result.source).toBe("gemini_maps");
+    expect(result.places[0].name).toBe("Cầu Tình Yêu");
+    expect(result.groundingSources[0].uri).toContain("maps.google.com");
+  });
 });

@@ -125,6 +125,36 @@ describe("API boundary", () => {
     expect(response.json()).toMatchObject({ error: "STANDARD_TRACK_DISABLED" });
   });
 
+  it("serves Maps Grounded / Explore search with authentic real-world places", async () => {
+    const instance = await app();
+    const response = await instance.inject({
+      method: "POST",
+      url: "/api/explore/search",
+      headers: { authorization: "Bearer dev:e2e-player" },
+      payload: {
+        language: "vi",
+        query: "Cầu Tình Yêu",
+        category: "sightseeing",
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json() as {
+      overview: string;
+      places: Array<{
+        name: string;
+        googleMapsUri: string;
+        address?: string;
+      }>;
+      source: string;
+      groundingSources: Array<{ uri: string }>;
+    };
+    expect(body.places.length).toBeGreaterThan(0);
+    expect(body.places[0].googleMapsUri).toContain("maps");
+    expect(body.groundingSources.length).toBeGreaterThan(0);
+    expect(response.headers["cache-control"]).toBe("no-store");
+  });
+
   it("allows the production entry point to install its SPA fallback exactly once", async () => {
     const instance = await createApp({
       config: testConfig,

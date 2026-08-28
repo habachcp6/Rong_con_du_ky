@@ -23,14 +23,14 @@ const toEnvironment = (value: string | undefined): AppEnvironment => {
 };
 
 const toPort = (value: string | undefined): number => {
-  const parsed = Number.parseInt(value ?? "8080", 10);
+  const parsed = Number.parseInt(value ?? "3000", 10);
   return Number.isInteger(parsed) && parsed > 0 && parsed <= 65535
     ? parsed
-    : 8080;
+    : 3000;
 };
 
 const toOrigins = (value: string | undefined): string[] =>
-  (value ?? "http://localhost:5173")
+  (value ?? "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173")
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);

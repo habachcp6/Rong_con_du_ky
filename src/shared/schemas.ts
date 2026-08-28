@@ -101,6 +101,39 @@ export const ItineraryApiResponseSchema = z.object({
   fallback: z.boolean(),
 });
 
+export const ExplorePlaceItemSchema = z.object({
+  name: z.string().min(1).max(200),
+  summary: z.string().min(1).max(600),
+  address: z.string().max(300).optional(),
+  category: z.string().max(80).optional(),
+  googleMapsUri: z.string().url(),
+  reviewSnippet: z.string().max(400).optional(),
+});
+
+export const ExploreSearchRequestSchema = z.object({
+  query: z.string().trim().min(1).max(300),
+  category: z.string().max(80).optional(),
+  language: z.enum(["vi", "en"]).default("vi"),
+  location: z
+    .object({
+      latitude: z.number(),
+      longitude: z.number(),
+    })
+    .optional(),
+});
+
+export const ExploreSearchResponseSchema = z.object({
+  overview: z.string().max(1000),
+  places: z.array(ExplorePlaceItemSchema).max(15),
+  groundingSources: z.array(
+    z.object({
+      title: z.string().optional(),
+      uri: z.string().url(),
+    }),
+  ),
+  source: z.enum(["gemini_maps", "authored_maps"]),
+});
+
 export type DragonReply = z.infer<typeof DragonReplySchema>;
 export type DragonChatRequest = z.infer<typeof DragonChatRequestSchema>;
 export type RecommendationRequest = z.infer<typeof RecommendationRequestSchema>;
@@ -111,3 +144,6 @@ export type RecommendationResponse = z.infer<
 >;
 export type DragonChatResponse = z.infer<typeof DragonChatResponseSchema>;
 export type ItineraryApiResponse = z.infer<typeof ItineraryApiResponseSchema>;
+export type ExplorePlaceItem = z.infer<typeof ExplorePlaceItemSchema>;
+export type ExploreSearchRequest = z.infer<typeof ExploreSearchRequestSchema>;
+export type ExploreSearchResponse = z.infer<typeof ExploreSearchResponseSchema>;

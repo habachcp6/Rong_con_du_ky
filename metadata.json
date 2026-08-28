@@ -1,0 +1,6 @@
+{
+  "name": "Rồng Con Du Ký",
+  "description": "A cultural mini-game journey exploring Da Nang landmarks with Phaser and React.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

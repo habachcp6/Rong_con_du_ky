@@ -925,21 +925,21 @@ export class LinhUngQuestScene extends LandmarkChallengeScene {
     return {
       title: getLocalizedChallengeText(this.rule.title, language),
       objective: gameText(
-        "Khám phá và chọn 5 điểm dừng tôn nghiêm theo đúng lộ trình tại Chùa Linh Ứng Sơn Trà.",
+        "Chọn 5 điểm quan sát theo đúng lộ trình trang nghiêm tại Chùa Linh Ứng.",
         "Choose the 5 respectful observation stops in order at Linh Ung Pagoda.",
       ),
       steps: [
         gameText(
-          "1. Lộ trình chuẩn: Biển chỉ dẫn 🪧 → Lối đi yên tĩnh ⛩️ → Điểm ngắm Phật Bà 🏔️ → Thùng rác 🗑️ → Lối ra 🚪.",
-          "1. Respectful order: Trail sign 🪧 → Quiet walkway ⛩️ → Viewpoint 🏔️ → Waste station 🗑️ → Exit path 🚪.",
+          "1. Thứ tự chuẩn: Biển chỉ dẫn 🪧 → Lối đi ⛩️ → Điểm ngắm 🏔️ → Thùng rác 🗑️ → Lối ra 🚪.",
+          "1. Respectful order: Trail sign 🪧 → Walkway ⛩️ → Viewpoint 🏔️ → Waste 🗑️ → Exit 🚪.",
         ),
         gameText(
-          "2. Tránh các hành vi vi phạm như khu vực cấm 🚫 hoặc gây ồn ào 🔊.",
+          "2. Tránh chọn các khu vực cấm 🚫 hoặc gây tiếng ồn 🔊.",
           "2. Avoid restricted areas 🚫 or loud noise 🔊.",
         ),
         gameText(
-          "3. Mỗi bước đi đúng sẽ làm bừng sáng hoa sen 🪷 thanh tịnh và mở ra quang cảnh Biển Đông!",
-          "3. Each correct step blooms a glowing lotus 🪷 along the tranquil coastal sanctuary!",
+          "3. Mỗi bước đúng làm hoa sen 🪷 thắp sáng đường đi xanh mát.",
+          "3. Each correct step blooms a glowing lotus 🪷 on the serene path.",
         ),
       ],
     };
@@ -1018,12 +1018,6 @@ export class LinhUngQuestScene extends LandmarkChallengeScene {
 export class ChamMuseumQuestScene extends LandmarkChallengeScene {
   private pedestals: Phaser.GameObjects.Container[] = [];
   private readonly icons = ["☀️", "💃", "⛩️", "🍃"];
-  private readonly relicNames = [
-    "Đài Mỹ Sơn ☀️",
-    "Vũ nữ Trà Kiệu 💃",
-    "Tháp Chăm ⛩️",
-    "Hoa văn Lá 🍃",
-  ];
 
   public constructor() {
     super("ChamMuseumQuestScene", "cham_museum_relic_match");
@@ -1033,21 +1027,21 @@ export class ChamMuseumQuestScene extends LandmarkChallengeScene {
     return {
       title: getLocalizedChallengeText(this.rule.title, language),
       objective: gameText(
-        "Phục dựng 4 kiệt tác cổ vật Chăm Pa theo đúng thứ tự nhãn trưng bày tại Bảo tàng.",
-        "Match the 4 iconic Cham sculpture motifs in order shown on the exhibit pedestals.",
+        "Ghép 4 motif cổ vật Chăm theo đúng thứ tự nhãn trưng bày.",
+        "Match the 4 Cham sculpture motifs in order shown on the exhibit labels.",
       ),
       steps: [
         gameText(
-          "1. Trình tự phục dựng: Thần Mặt Trời ☀️ → Vũ Nữ Apsara 💃 → Tháp Chăm Cổ ⛩️ → Hoa Văn Lá 🍃.",
-          "1. Restoration sequence: Sun Deity ☀️ → Apsara Dancer 💃 → Ancient Tower ⛩️ → Leaf Motif 🍃.",
+          "1. Thứ tự ghép: Mặt trời ☀️ → Vũ nữ 💃 → Tháp ⛩️ → Hoa văn lá 🍃.",
+          "1. Match order: Sun ☀️ → Dancer 💃 → Tower ⛩️ → Leaf 🍃.",
         ),
         gameText(
-          "2. Cổ vật chọn đúng sẽ phát sáng rực rỡ trên bục gạch nung sa thạch.",
-          "2. Correctly placed artifacts glow warmly on their sandstone pedestals.",
+          "2. Cổ vật ghép đúng sẽ hiện lên khung trưng bày sang trọng.",
+          "2. Correctly placed artifacts glow warmly on their exhibit pedestals.",
         ),
         gameText(
-          "3. Hoàn thành để tôn vinh bộ sưu tập điêu khắc Chăm Pa lớn nhất thế giới!",
-          "3. Complete the set to celebrate the world's largest Cham sculpture collection!",
+          "3. Ghép đủ 4 motif để tôn vinh di sản điêu khắc Chăm Pa!",
+          "3. Match all 4 labels to complete the museum display!",
         ),
       ],
     };
@@ -1063,10 +1057,9 @@ export class ChamMuseumQuestScene extends LandmarkChallengeScene {
       const box = this.add.rectangle(0, 0, 115, 54, 0x3d271e, 0.95);
       box.setStrokeStyle(2, 0x8a5d43);
       const label = this.add
-        .text(0, -12, `Bảo Vật ${i + 1}`, {
+        .text(0, -12, `Exhibit ${i + 1}`, {
           fontSize: "10px",
           color: "#e9a96b",
-          fontStyle: "bold",
         })
         .setOrigin(0.5);
       const icon = this.add
@@ -1087,19 +1080,14 @@ export class ChamMuseumQuestScene extends LandmarkChallengeScene {
     const progress = this.attempt.progress;
     this.pedestals.forEach((ped, i) => {
       const box = ped.first as Phaser.GameObjects.Rectangle;
-      const label = ped.getAt(1) as Phaser.GameObjects.Text;
       const icon = ped.last as Phaser.GameObjects.Text;
       if (i < progress) {
         box.setFillStyle(0x6e4331, 0.98);
         box.setStrokeStyle(2.5, 0xe9a96b, 1);
-        label.setText(this.relicNames[i] ?? `Bảo Vật ${i + 1}`);
-        label.setColor("#ffd166");
         icon.setText(this.icons[i] ?? "✓");
       } else {
         box.setFillStyle(0x3d271e, 0.95);
         box.setStrokeStyle(2, 0x8a5d43, 0.85);
-        label.setText(`Bảo Vật ${i + 1}`);
-        label.setColor("#e9a96b");
         icon.setText("❓");
       }
     });
@@ -1120,21 +1108,21 @@ export class NonNuocQuestScene extends LandmarkChallengeScene {
     return {
       title: getLocalizedChallengeText(this.rule.title, language),
       objective: gameText(
-        "Thực hiện 6 nét đục đá theo bí quyết nghệ nhân 400 năm Làng Đá Non Nước.",
-        "Execute the 6 traditional chisel strokes in proper order to carve the imperial dragon.",
+        "Thực hiện 6 nét đục đá theo đúng quy trình chạm khắc rồng.",
+        "Execute the 6 chisel strokes in proper order from outline to detail.",
       ),
       steps: [
         gameText(
-          "1. Thứ tự chuẩn: Viền trái ↖️ → Đỉnh ⬆️ → Viền phải ↗️ → Chân đế ⬇️ → Nét giữa ⏺️ → Chi tiết sáng ✨.",
-          "1. Chisel order: Left outline ↖️ → Top edge ⬆️ → Right outline ↗️ → Base edge ⬇️ → Centre line ⏺️ → Highlight ✨.",
+          "1. Thứ tự đục: Viền trái ↖️ → Đỉnh ⬆️ → Viền phải ↗️ → Chân đế ⬇️ → Nét giữa ⏺️ → Chi tiết ✨.",
+          "1. Chisel order: Left outline ↖️ → Top ⬆️ → Right outline ↗️ → Base ⬇️ → Centre ⏺️ → Highlight ✨.",
         ),
         gameText(
-          "2. Từng nhịp đục chính xác tạo tàn hoa lửa và dần tạc nên tượng Rồng cẩm thạch.",
-          "2. Accurate strokes release stone sparkles and carve out the majestic dragon statue.",
+          "2. Mỗi nét đục chính xác tạo tàn lửa và khắc rõ tác phẩm rồng.",
+          "2. Accurate strokes release stone sparkles and carve out the dragon.",
         ),
         gameText(
-          "3. Tránh chọn vết thử lỗi ❓ để hoàn thiện tác phẩm Di sản phi vật thể quốc gia!",
-          "3. Avoid test marks ❓ to complete the National Cultural Heritage masterpiece!",
+          "3. Tránh chọn vết thử lỗi ❓ để hoàn thiện pho tượng đá.",
+          "3. Avoid test marks ❓ to complete the marble masterpiece.",
         ),
       ],
     };
@@ -1165,7 +1153,7 @@ export class NonNuocQuestScene extends LandmarkChallengeScene {
     this.stageContainer.add(this.dragonArtText);
 
     this.carvingProgressText = this.add
-      .text(width / 2, stageY + 14, "Khối đá cẩm thạch nguyên bản", {
+      .text(width / 2, stageY + 14, "Khối đá nguyên bản", {
         fontSize: "11px",
         color: "#bfc5bf",
       })
@@ -1177,12 +1165,12 @@ export class NonNuocQuestScene extends LandmarkChallengeScene {
     const progress = this.attempt.progress;
     const stages = [
       "🗿 🗿 🗿",
-      "✍️ Phác thảo Viền Trái ↖️",
-      "✍️ Đục Đỉnh Đầu Rồng ⬆️",
-      "✍️ Tạo Dáng Viền Phải ↗️",
-      "✍️ Điêu Khắc Chân Đế ⬇️",
-      "✍️ Chạm Thân Rồng Vảy Ngọc ⏺️",
-      "🐉 TUYỆT TÁC RỒNG ĐÁ NON NƯỚC ✨",
+      "✍️ Viền trái ↖️",
+      "✍️ Đỉnh ⬆️",
+      "✍️ Viền phải ↗️",
+      "✍️ Chân đế ⬇️",
+      "✍️ Nét giữa ⏺️",
+      "🐉 TƯỢNG RỒNG HOÀN THIỆN ✨",
     ];
 
     if (this.dragonArtText) {
@@ -1193,8 +1181,8 @@ export class NonNuocQuestScene extends LandmarkChallengeScene {
       const pct = Math.round((progress / 6) * 100);
       this.carvingProgressText.setText(
         progress === 6
-          ? "Đã hoàn thành 100% tuyệt tác đá Non Nước!"
-          : `Tiến độ điêu khắc: ${progress}/6 nét (${pct}%)`,
+          ? "Đã hoàn thành 100% tuyệt tác Non Nước!"
+          : `Tiến độ chạm khắc: ${progress}/6 nét (${pct}%)`,
       );
       this.carvingProgressText.setColor(progress === 6 ? "#ffd166" : "#bfc5bf");
     }
@@ -1222,21 +1210,21 @@ export class HanMarketQuestScene extends LandmarkChallengeScene {
     return {
       title: getLocalizedChallengeText(this.rule.title, language),
       objective: gameText(
-        "Phân loại 8 món hàng vào đúng 3 gian hàng Chợ Hàn: Đặc sản 🍜, Quà tặng 🎁, Dùng ngay 🥤.",
-        "Sort 8 market items into 3 authentic Han Market stalls: Local food 🍜, Gift 🎁, Ready now 🥤.",
+        "Phân loại 8 món hàng vào đúng 3 giỏ: Đặc sản 🍜, Quà tặng 🎁, Dùng ngay 🥤.",
+        "Sort 8 market items into 3 baskets: Local food 🍜, Gift 🎁, Ready now 🥤.",
       ),
       steps: [
         gameText(
-          "1. Chạm từng thẻ hàng bên dưới để xoay vòng giữa 3 gian hàng.",
-          "1. Tap each item card to cycle through the 3 market stalls.",
+          "1. Chạm từng món hàng bên dưới để xoay vòng 3 loại giỏ.",
+          "1. Tap each item card to cycle through the 3 basket categories.",
         ),
         gameText(
-          "2. Cá khô rim 🐟, Bánh khô mè 🍪 → Gian hàng Đặc sản 🍜.",
-          "2. Dried fish 🐟, Sesame dry cake 🍪 → Local food stall 🍜.",
+          "2. Cá khô 🐟, Bánh khô 🍪 → Giỏ Đặc sản 🍜.",
+          "2. Dried fish 🐟, Dry cake 🍪 → Local food basket 🍜.",
         ),
         gameText(
-          "3. Khăn lụa 🧣, Móc khóa 🔑, Túi quà 🛍️ → Quà tặng 🎁 | Mì Quảng 🍜, Trái cây 🥭, Nước ép 🍹 → Dùng ngay 🥤.",
-          "3. Silk scarf 🧣, Keyring 🔑, Gift bag 🛍️ → Gift 🎁 | Mi Quang 🍜, Fruit 🥭, Juice 🍹 → Ready now 🥤.",
+          "3. Khăn 🧣, Móc khóa 🔑, Túi 🛍️ → Quà tặng 🎁 | Mì 🍜, Trái cây 🥭, Nước 🍹 → Dùng ngay 🥤.",
+          "3. Scarf 🧣, Keyring 🔑, Bag 🛍️ → Gift 🎁 | Mi Quang 🍜, Fruit 🥭, Juice 🍹 → Ready now 🥤.",
         ),
       ],
     };
@@ -1246,9 +1234,9 @@ export class HanMarketQuestScene extends LandmarkChallengeScene {
     super.drawStageVisualizer();
     const stageY = 105;
     const basketData = [
-      { name: "🍜 Đặc Sản Đà Nẵng", color: 0xffc857, x: 130 },
-      { name: "🎁 Quà Lưu Niệm", color: 0xff6b6b, x: 320 },
-      { name: "🥤 Thưởng Thức Ngay", color: 0x4ecdc4, x: 510 },
+      { name: "🍜 Đặc sản", color: 0xffc857, x: 130 },
+      { name: "🎁 Quà tặng", color: 0xff6b6b, x: 320 },
+      { name: "🥤 Dùng ngay", color: 0x4ecdc4, x: 510 },
     ];
 
     basketData.forEach((b) => {
@@ -1257,7 +1245,7 @@ export class HanMarketQuestScene extends LandmarkChallengeScene {
       box.setStrokeStyle(2, b.color);
       const title = this.add
         .text(0, -10, b.name, {
-          fontSize: "11px",
+          fontSize: "12px",
           fontStyle: "bold",
           color: `#${b.color.toString(16)}`,
         })
@@ -1286,7 +1274,6 @@ export class HanMarketQuestScene extends LandmarkChallengeScene {
 
     this.basketCounts.forEach((cntText, i) => {
       cntText.setText(`${counts[i]} món`);
-      cntText.setColor(counts[i] > 0 ? "#ffd166" : "#ffffff");
     });
   }
 
@@ -1314,7 +1301,6 @@ export class BaNaGoldenBridgeQuestScene extends LandmarkChallengeScene {
   private bridgeTiles: Phaser.GameObjects.Rectangle[] = [];
   private handLeft?: Phaser.GameObjects.Text;
   private handRight?: Phaser.GameObjects.Text;
-  private altitudeText?: Phaser.GameObjects.Text;
 
   public constructor() {
     super("BaNaGoldenBridgeQuestScene", "ba_na_golden_bridge");
@@ -1324,21 +1310,21 @@ export class BaNaGoldenBridgeQuestScene extends LandmarkChallengeScene {
     return {
       title: getLocalizedChallengeText(this.rule.title, language),
       objective: gameText(
-        "Bật sáng cả 6 cung nhịp gạch để nối liền Cầu Vàng giữa đôi bàn tay đá khổng lồ.",
+        "Bật sáng cả 6 cột mốc gạch để nối liền Cầu Vàng giữa đôi bàn tay đá.",
         "Light up all 6 path tiles to connect the Golden Bridge walkway across the clouds.",
       ),
       steps: [
         gameText(
-          "1. Chạm vào các cột mốc (Cột mốc 1 đến 6) để chuyển SÁNG / TẮT.",
+          "1. Chạm vào các tile gạch (Cột mốc 1 đến 6) để chuyển SÁNG / TẮT.",
           "1. Tap path tiles (Tile 1 to 6) to toggle them ON / OFF.",
         ),
         gameText(
-          "2. Khi bật SÁNG cả 6 tile, dải Cầu Vàng sẽ tỏa sáng rực rỡ giữa biển mây Bà Nà.",
+          "2. Khi bật SÁNG cả 6 tile, dải Cầu Vàng sẽ tỏa sáng rực rỡ trên mây.",
           "2. Lighting all 6 tiles connects the radiant walkway between giant stone hands.",
         ),
         gameText(
-          "3. Thắp sáng toàn bộ cầu để hoàn thành thử thách đỉnh Núi Chúa!",
-          "3. Illuminate the full bridge to complete the Golden Bridge challenge!",
+          "3. Thắp sáng toàn bộ cầu để hoàn thành thử thách Bà Nà Hills!",
+          "3. Illuminate the full bridge to complete the Cloud Path challenge!",
         ),
       ],
     };
@@ -1365,16 +1351,8 @@ export class BaNaGoldenBridgeQuestScene extends LandmarkChallengeScene {
       })
       .setOrigin(0.5);
 
-    this.altitudeText = this.add
-      .text(width / 2, stageY - 26, "☁️ Đỉnh Bà Nà · Độ cao 1.414m ☁️", {
-        fontSize: "10px",
-        color: "#c2e0f4",
-      })
-      .setOrigin(0.5);
-
     this.stageContainer.add(this.handLeft);
     this.stageContainer.add(this.handRight);
-    this.stageContainer.add(this.altitudeText);
 
     const tileXs = [150, 218, 286, 354, 422, 490];
     tileXs.forEach((x) => {

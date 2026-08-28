@@ -1,9 +1,12 @@
 import {
   DragonChatResponseSchema,
+  ExploreSearchResponseSchema,
   ItineraryApiResponseSchema,
   RecommendationResponseSchema,
   type DragonChatRequest,
   type DragonChatResponse,
+  type ExploreSearchRequest,
+  type ExploreSearchResponse,
   type ItineraryApiResponse,
   type ItineraryRequest,
   type RecommendationRequest,
@@ -65,6 +68,10 @@ export class ApiClient {
     input: RecommendationRequest,
   ): Promise<RecommendationResponse> {
     return this.post("/recommendations", input, RecommendationResponseSchema);
+  }
+
+  public explore(input: ExploreSearchRequest): Promise<ExploreSearchResponse> {
+    return this.post("/explore/search", input, ExploreSearchResponseSchema);
   }
 
   public itinerary(input: ItineraryRequest): Promise<ItineraryApiResponse> {

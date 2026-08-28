@@ -12,6 +12,7 @@ type LandmarkDetailPanelProps = {
   language: Language;
   onClose: () => void;
   onOpenChallenge: (placeKey: string) => void;
+  onOpenMapsExplore?: (query: string) => void;
 };
 
 const text = (language: Language, vi: string, en: string): string =>
@@ -22,6 +23,7 @@ export const LandmarkDetailPanel = ({
   language,
   onClose,
   onOpenChallenge,
+  onOpenMapsExplore,
 }: LandmarkDetailPanelProps) => {
   const panelRef = useRef<HTMLElement | null>(null);
   useModalAccessibility(panelRef, onClose);
@@ -203,24 +205,40 @@ export const LandmarkDetailPanel = ({
                 {location.sourceIds.join(", ")}
               </small>
             </div>
-            <a
-              href={mapsSearchUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="landmark-detail-panel__maps-link"
-              onClick={() =>
-                trackAnalytics("google_maps_open", {
-                  landmark_key: location.key,
-                })
-              }
-            >
-              🗺️{" "}
-              {text(
-                language,
-                "Xem vị trí trên Google Maps",
-                "View location on Google Maps",
-              )}
-            </a>
+            <div className="landmark-detail-panel__actions-row">
+              {onOpenMapsExplore ? (
+                <button
+                  type="button"
+                  className="landmark-detail-panel__explore-btn"
+                  onClick={() => onOpenMapsExplore(location.name)}
+                >
+                  🔍{" "}
+                  {text(
+                    language,
+                    "Khám phá địa điểm lân cận với Google Maps",
+                    "Explore nearby places with Google Maps",
+                  )}
+                </button>
+              ) : null}
+              <a
+                href={mapsSearchUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="landmark-detail-panel__maps-link"
+                onClick={() =>
+                  trackAnalytics("google_maps_open", {
+                    landmark_key: location.key,
+                  })
+                }
+              >
+                🗺️{" "}
+                {text(
+                  language,
+                  "Xem vị trí trên Google Maps",
+                  "View location on Google Maps",
+                )}
+              </a>
+            </div>
           </div>
         </div>
       </section>

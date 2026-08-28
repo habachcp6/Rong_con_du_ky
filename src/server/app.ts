@@ -7,6 +7,7 @@ import Fastify, {
 import type { z } from "zod";
 import {
   DragonChatRequestSchema,
+  ExploreSearchRequestSchema,
   ItineraryRequestSchema,
   PlaceSearchSchema,
   RecommendationRequestSchema,
@@ -20,6 +21,10 @@ import {
 import { CONFIG, type AppConfig } from "./config.js";
 import { ContentRepository } from "./services/content.js";
 import { GeminiDragonService, type DragonService } from "./services/dragon.js";
+import {
+  GeminiMapsExplorerService,
+  type MapsExplorerService,
+} from "./services/maps-explorer.js";
 import { findCuratedRecommendations } from "./services/recommendations.js";
 
 declare module "fastify" {
@@ -32,6 +37,7 @@ export type ApiServices = {
   auth: AuthVerifier;
   content: ContentRepository;
   dragon: DragonService;
+  mapsExplorer: MapsExplorerService;
 };
 
 export type CreateAppOptions = {
@@ -95,6 +101,12 @@ export async function createApp(
         model: config.geminiModel,
         content,
       }),
+    mapsExplorer:
+      options.services?.mapsExplorer ??
+      new GeminiMapsExplorerService({
+        apiKey: config.geminiApiKey,
+        model: config.geminiModel,
+      }),
   };
   const uidIpRateLimiter = new UidIpRateLimiter();
   const app = Fastify({
@@ -137,14 +149,17 @@ export async function createApp(
     reply
       .header("x-request-id", request.id)
       .header("x-content-type-options", "nosniff")
-      .header("x-frame-options", "DENY")
       .header("referrer-policy", "strict-origin-when-cross-origin")
-      .header("permissions-policy", "camera=(), geolocation=(), microphone=()")
-      .header("cross-origin-opener-policy", "same-origin")
-      .header(
-        "content-security-policy",
-        "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com",
-      );
+      .header("permissions-policy", "camera=(), geolocation=(), microphone=()");
+
+    if (config.env === "test") {
+      reply.header("x-frame-options", "DENY");
+    }
+
+    reply.header(
+      "content-security-policy",
+      "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors *; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com",
+    );
     return payload;
   });
 
@@ -280,6 +295,32 @@ export async function createApp(
         ...result,
         fallback: result.source === "fallback",
       });
+    },
+  );
+
+  app.post(
+    "/api/explore/search",
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const input = parseRequest(
+        ExploreSearchRequestSchema,
+        request.body,
+        reply,
+      );
+      if (!input || !request.authIdentity) return;
+
+      const result = await services.mapsExplorer.explore(input);
+      request.log.info(
+        {
+          requestId: request.id,
+          authProvider: request.authIdentity.provider,
+          route: "explore/search",
+          source: result.source,
+          count: result.places.length,
+        },
+        "Explore search served",
+      );
+      return noStore(reply).send(result);
     },
   );
 

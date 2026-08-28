@@ -53,6 +53,10 @@ const GameApp: React.FC = () => {
   const [endingOpen, setEndingOpen] = useState(false);
   const [travelToolsOpen, setTravelToolsOpen] = useState(false);
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryInitialTab, setGalleryInitialTab] = useState<
+    "landmarks" | "maps_explore"
+  >("landmarks");
+  const [gallerySearchQuery, setGallerySearchQuery] = useState("");
   const [selectedLandmarkKey, setSelectedLandmarkKey] = useState<string | null>(
     null,
   );
@@ -306,6 +310,8 @@ const GameApp: React.FC = () => {
               setEndingOpen(false);
               setSelectedLandmarkKey(null);
               setChallenge(null);
+              setGalleryInitialTab("landmarks");
+              setGallerySearchQuery("");
               setGalleryOpen(true);
               trackAnalytics("gallery_open");
             }}
@@ -434,6 +440,8 @@ const GameApp: React.FC = () => {
         {galleryOpen ? (
           <LandmarkGalleryPanel
             language={language}
+            initialTab={galleryInitialTab}
+            initialSearchQuery={gallerySearchQuery}
             onClose={() => {
               setGalleryOpen(false);
               bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: true });
@@ -453,6 +461,13 @@ const GameApp: React.FC = () => {
               bridge.emitUiToGame({ type: "SET_INPUT_ENABLED", enabled: true });
             }}
             onOpenChallenge={openChallengeFromContent}
+            onOpenMapsExplore={(query) => {
+              setSelectedLandmarkKey(null);
+              setGalleryInitialTab("maps_explore");
+              setGallerySearchQuery(query);
+              setGalleryOpen(true);
+              trackAnalytics("landmark_to_maps_explore", { query });
+            }}
           />
         ) : null}
         {challenge ? (

@@ -212,7 +212,7 @@ describe("M1 asset manifest validation", () => {
     } finally {
       fs.rmSync(temporaryPublicDir, { recursive: true, force: true });
     }
-  }, 15_000);
+  });
 
   it("rejects an opaque or placeholder landmark icon declaration", () => {
     const input = canonicalInput();
